@@ -104,6 +104,9 @@ export const lightColors = {
   border:      '#EDE5D8',  // Default — inputs, dividers
   borderFocus: '#E8601C',  // Active input border
 
+  // Text on dark/saffron surfaces
+  textInverse: '#FFFFFF',
+
   // Semantic
   success: '#2E7D32',
   danger:  '#D32F2F',
@@ -129,14 +132,17 @@ export const darkColors = {
 
   // Primary (shifted lighter for dark surfaces)
   primary50:  '#3D1A08',
-  primary400: '#F5926A',  // Hover/lighter variant
-  primary500: '#F07540',  // Main — slightly lighter than light mode
-  primary600: '#E8601C',  // Pressed
+  primary200: '#7A3A10',  // Used for muted saffron text on dark surfaces
+  primary400: '#F5926A',  // Hover state on dark surfaces
+  primary500: '#F07540',  // Main — slightly lighter than light mode for contrast
+  primary600: '#E8601C',  // Pressed state
+  primary700: '#C44E12',  // Deep accent, rarely used
 
   // Text
   textPrimary:   '#F5E6D3',  // Warm cream
   textSecondary: '#8C7260',  // Muted warm brown
   textTertiary:  '#5A4535',  // Subtle — placeholders
+  textInverse:   '#1A1208',  // Text on light surfaces when in dark context
 
   // Borders
   border:      'rgba(255, 255, 255, 0.08)',
@@ -300,7 +306,9 @@ AI calls (search, itinerary, food guide) can take 10–30 seconds. Never show a 
 4. Skeleton cards below — pulsing warm gray placeholders matching card layout
 ```
 
-For list screens (saved trips): skeleton cards matching the trip card layout, 3 placeholders.
+For list screens (saved trips): 3 skeleton trip cards, each 140px tall (70px image placeholder + 70px body), image area pulsing warm gray `#EDE5D8`, two text line placeholders (80% width and 50% width) in the body.
+
+For search results skeleton: 1 large skeleton card (260px — 140px image area + 120px body) + 1 medium (190px) below it.
 
 ---
 
@@ -314,7 +322,8 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
   - Slide 1: Traveler with backpack on mountain
   - Slide 2: Train journey through landscape
   - Slide 3: Friends around campfire, starry sky
-- Slide dot indicator: active dot wide pill (#E8601C), inactive dots small (#EDE5D8)
+- Carousel behavior: manual swipe only (no auto-play). Horizontal swipe via `react-native-gesture-handler`. Dot indicator taps also switch slides. Slide transition: horizontal slide, 300ms spring animation.
+- Slide dot indicator: active dot wide pill 20×8px (#E8601C), inactive dots 8×8px (#EDE5D8)
 - Overline label above the headline — e.g. "EXPLORE INDIA YOUR WAY"
 - Screen title: "Your personal travel companion"
 - Body: "AI-powered destination finder, itineraries, and food guides — built for Indian travelers."
@@ -341,7 +350,8 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
 - "Code sent to +91 98765 XXXXX" + "Change number" tappable in saffron
 - 6-box OTP input, saffron border on all entered + active boxes, cursor blink on active
 - Auto-submits on 6th digit — "Verify & Continue →" button shown as manual fallback
-- Resend countdown: "Resend code in 0:24" — becomes tappable link when timer hits zero
+- **Verification error state:** if OTP is wrong, all 6 boxes get a danger border (`#D32F2F`), shake animation (reanimated), error message "Incorrect code. Try again." below boxes. After 3 failed attempts: boxes disabled, "Too many attempts. Request a new code." with resend link immediately available (countdown resets).
+- Resend countdown: "Resend code in 0:24" — countdown from 30s, becomes "Resend OTP" tappable link in saffron when timer hits zero
 - Step indicator dots at bottom (3 dots, active is elongated pill)
 
 ### 4. Search Form (`(tabs)/search/index.tsx`)
@@ -353,13 +363,13 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
   1. Freetext multiline input (focused by default) — "Describe your trip"
   2. Date row: FROM + TO date pickers side by side
   3. Departure city dropdown + Group size/type row
-  4. Budget dual-thumb range slider with live formatted label (₹5,000 – ₹15,000)
+  4. Budget dual-thumb range slider with live formatted label — min ₹1,000, max ₹1,00,000, step ₹1,000, default range ₹5,000–₹15,000. Thumbs snap to step boundaries. Label updates live as thumbs move.
   5. Experience type multi-select chips (wraps to 2–3 rows)
-  6. Expandable: "+ Health Profile" — tap to reveal health fields
-  7. Expandable: "+ Food Preferences" — tap to reveal dietary fields
+  6. Expandable: "+ Health Profile" — tap to reveal health fields. Smooth height animation (reanimated Layout transition, 250ms ease-out).
+  7. Expandable: "+ Food Preferences" — tap to reveal dietary fields. Same animation.
   8. Hidden Gems Only toggle with subtitle
 - Primary CTA pinned to bottom: "🔍 Find Destinations"
-- Fields 6 and 7 collapsed by default, smooth height animation on expand
+- Fields 6 and 7 collapsed by default
 
 ### 5. Search Results (`(tabs)/search/results.tsx`)
 
@@ -383,7 +393,7 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
 ### 6. Itinerary View (`trip/[id]/itinerary.tsx`)
 
 - Hero image header (110px) with destination name, trip summary, and Save button
-- Horizontal scrollable day tabs — active tab saffron pill, inactive cream
+- Horizontal scrollable day tabs — active tab saffron pill, inactive cream. Switching tabs slides the timeline content horizontally (FlatList with `pagingEnabled` or reanimated horizontal scroll). Tab switch animation: 200ms spring (damping 20, stiffness 200). Active pill slides to new tab with the same spring.
 - Day header: "Day N — Title" in section label style
 - Vertical timeline:
   - Connecting line: `#EDE5D8`, 2px wide, positioned left
@@ -416,7 +426,11 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
   - Destination photo header (70px) with name + state overlaid
   - Below: dates + group type, saved timestamp (right-aligned)
   - Status badges row: ✅ Itinerary / ✅ Food or — Food (missing)
-- Swipe-left gesture reveals delete (with confirmation bottom sheet)
+- Swipe-left gesture reveals a red "Delete" action (reanimated swipeable). Tapping Delete opens a bottom sheet with:
+  - Title: "Delete this trip?"
+  - Body: "This will permanently remove Cherrapunji Trip and all its data."
+  - "Cancel" ghost button + "Delete" destructive button
+  - Dismiss on backdrop tap or swipe down
 - Empty state: open backpack illustration + "No trips yet" + search CTA
 
 ### 9. Trip Detail (`trip/[id]/index.tsx`)
@@ -430,15 +444,52 @@ For list screens (saved trips): skeleton cards matching the trip card layout, 3 
 - Health advisory card: suitability label + physical demand description
 - Share card: dashed border, saffron "Share" button, "Anyone with the link can view"
 
-### 10. Share (`trip/[id]/share.tsx`)
+### 10. Share (bottom sheet — not a full screen route)
 
-- Bottom sheet (not full screen)
-- "Share this trip" title
-- Toggle: sharing on/off
-- Share link with copy-to-clipboard button
-- System share sheet button (WhatsApp, Instagram, etc.)
+Triggered by tapping the "Share" button on the Trip Detail screen (Screen 9). Implemented as a `@gorhom/bottom-sheet` modal, not a routed screen. The `trip/[id]/share.tsx` file in the structure is removed — sharing is handled inline within `trip/[id]/index.tsx`.
 
-### 11. Shared Trip (`shared/[token].tsx`)
+- Bottom sheet snaps to 40% screen height
+- "Share this trip" title in card heading style
+- Toggle row: "Anyone with the link can view" + on/off toggle. When toggled on, a shareable link is generated via the backend and displayed.
+- Share link row: truncated URL + "Copy" button (copies to clipboard, button label changes to "Copied ✓" for 2s)
+- "Share via…" button opens the native system share sheet (WhatsApp, Instagram, Messages, etc.)
+- Dismiss by tapping the backdrop or swiping down
+
+### 11. Standalone Itinerary Form (`itinerary/new.tsx`)
+
+Reached by tapping "Get Itinerary" on a destination card in search results (when no saved trip exists yet). Allows generating an itinerary without first saving a trip.
+
+- Back button header
+- Screen title: "Plan your itinerary"
+- Pre-filled destination name (passed via route params)
+- Fields: dates (FROM/TO), group size + type, travel mode selector (flight / train / bus / self-drive)
+- Primary CTA: "Generate Itinerary" — navigates to `trip/[id]/itinerary.tsx` after creation (saves a new trip automatically)
+
+### 12. Standalone Food Guide Form (`food-guide/new.tsx`)
+
+Reached by tapping "Food Guide" on a destination card in search results.
+
+- Back button header
+- Screen title: "Food guide for {destination}"
+- Pre-filled destination name
+- Fields: dietary preferences multi-select (Veg, No Pork, No Beef, Halal, Jain, Vegan), spice tolerance slider (Mild → Very Spicy)
+- Primary CTA: "Generate Food Guide" — navigates to `trip/[id]/food-guide.tsx` after creation
+
+### 13. Email/Password Entry (`(auth)/email.tsx`)
+
+Reached by tapping "Continue with Email" on the Login screen. Handles both sign-in and registration (determined by whether the email exists in Firebase).
+
+- Back button
+- Screen title: "Continue with email"
+- Email input (keyboard type: email-address)
+- "Continue →" button — Firebase checks if email exists:
+  - **Existing user:** shows password input below, CTA becomes "Sign In"
+  - **New user:** shows password + confirm password inputs, CTA becomes "Create Account"
+- Password input: eye toggle for visibility
+- Forgot password link (existing user only) — sends reset email via Firebase, shows "Reset email sent" confirmation
+- Error states: invalid email format, wrong password, email already in use
+
+### 14. Shared Trip (`shared/[token].tsx`)
 
 - Same layout as Trip Detail — read-only
 - "Shared by {name}" in overline style below hero
@@ -556,7 +607,8 @@ sarthi-app/
 │   │   ├── _layout.tsx
 │   │   ├── welcome.tsx
 │   │   ├── login.tsx
-│   │   └── verify-otp.tsx
+│   │   ├── verify-otp.tsx
+│   │   └── email.tsx         (email/password entry — sign in or register)
 │   ├── (tabs)/
 │   │   ├── _layout.tsx               (Warm Cream Pill tab bar)
 │   │   ├── search/
@@ -567,12 +619,11 @@ sarthi-app/
 │   │   └── profile/
 │   │       └── index.tsx
 │   ├── trip/[id]/
-│   │   ├── index.tsx
+│   │   ├── index.tsx         (Trip Detail — share bottom sheet lives here)
 │   │   ├── itinerary.tsx
-│   │   ├── food-guide.tsx
-│   │   └── share.tsx
-│   ├── itinerary/new.tsx
-│   ├── food-guide/new.tsx
+│   │   └── food-guide.tsx
+│   ├── itinerary/new.tsx     (standalone itinerary form — reached from destination card outside saved trip flow)
+│   ├── food-guide/new.tsx    (standalone food guide form — same)
 │   └── shared/[token].tsx
 │
 ├── components/
@@ -621,7 +672,8 @@ sarthi-app/
 │
 ├── stores/
 │   ├── auth.store.ts
-│   └── search.store.ts
+│   ├── search.store.ts
+│   └── theme.store.ts        (manual dark/light/system override, persisted to AsyncStorage)
 │
 ├── hooks/
 │   ├── useAuth.ts
@@ -675,11 +727,22 @@ sarthi-app/
 Driven by device system preference. Manual toggle in Profile settings stored in Zustand + AsyncStorage. NativeWind `dark:` classes throughout — no one-off overrides.
 
 ```typescript
+// stores/theme.store.ts
+interface ThemeState {
+  override: 'light' | 'dark' | 'system';  // persisted to AsyncStorage
+  setOverride: (o: 'light' | 'dark' | 'system') => void;
+}
+
 // hooks/useColorScheme.ts
 export function useColors() {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? darkColors : lightColors;
+  const systemScheme = useColorScheme();  // device preference
+  const override = useThemeStore(s => s.override);
+  const effective = override === 'system' ? systemScheme : override;
+  return effective === 'dark' ? darkColors : lightColors;
 }
+
+// Persistence: Zustand middleware `persist` with AsyncStorage adapter.
+// `@react-native-async-storage/async-storage` added to dependencies.
 ```
 
 ---
@@ -738,7 +801,8 @@ All SVG illustrations recoloured to Saffron & Mist palette before import: primar
 
     "react-native-safe-area-context": "^5.0.0",
     "react-native-screens": "~4.0.0",
-    "react-native-gesture-handler": "~2.20.0"
+    "react-native-gesture-handler": "~2.20.0",
+    "@react-native-async-storage/async-storage": "^2.0.0"
   }
 }
 ```
