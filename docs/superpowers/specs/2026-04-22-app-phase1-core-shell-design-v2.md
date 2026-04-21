@@ -104,9 +104,6 @@ export const lightColors = {
   border:      '#EDE5D8',  // Default — inputs, dividers
   borderFocus: '#E8601C',  // Active input border
 
-  // Text on dark/saffron surfaces
-  textInverse: '#FFFFFF',
-
   // Semantic
   success: '#2E7D32',
   danger:  '#D32F2F',
@@ -387,7 +384,13 @@ For search results skeleton: 1 large skeleton card (260px — 140px image area +
   - `whyItMatches` as body text
   - Stat pills: budget, travel time, weather, fitness suitability
   - "Get Itinerary" (primary) + "Food Guide" (secondary) action buttons
-- Trek results use a different card layout: altitude, difficulty, duration, terrain type pills
+- Trek results use `TrekCard` — same 16px radius white card, no hero image. Layout:
+  - Header row: trek name (card heading) + match score badge (right-aligned)
+  - Subheader: mountain range / state in secondary text
+  - Stats row (4 pills): Altitude (e.g. "4,200m"), Difficulty ("Moderate"), Duration ("6 days"), Terrain ("Snow + Rock")
+  - Body: one-line `whyItMatches` description
+  - Action buttons: "Get Itinerary" (primary) + "Food Guide" (secondary) — same as destination cards
+  - No save/bookmark icon on image (no image). Save icon appears as a ghost bookmark button top-right of the card header.
 - AI loading state: Lottie compass + message + skeleton cards before results appear
 
 ### 6. Itinerary View (`trip/[id]/itinerary.tsx`)
@@ -465,15 +468,15 @@ Reached by tapping "Get Itinerary" on a destination card in search results (when
 - Fields: dates (FROM/TO), group size + type, travel mode selector (flight / train / bus / self-drive)
 - Primary CTA: "Generate Itinerary" — navigates to `trip/[id]/itinerary.tsx` after creation (saves a new trip automatically)
 
-### 12. Standalone Food Guide Form (`food-guide/new.tsx`)
+### 12. Standalone Food Guide Form (`food-guide/new.tsx`)  <!-- screen 12 of 15 -->
 
 Reached by tapping "Food Guide" on a destination card in search results.
 
 - Back button header
 - Screen title: "Food guide for {destination}"
 - Pre-filled destination name
-- Fields: dietary preferences multi-select (Veg, No Pork, No Beef, Halal, Jain, Vegan), spice tolerance slider (Mild → Very Spicy)
-- Primary CTA: "Generate Food Guide" — navigates to `trip/[id]/food-guide.tsx` after creation
+- Fields: dietary preferences multi-select (Veg, No Pork, No Beef, Halal, Jain, Vegan), spice tolerance slider (Mild → Very Spicy, 5 steps)
+- Primary CTA: "Generate Food Guide" — auto-creates a new trip (same as itinerary form), then navigates to `trip/[id]/food-guide.tsx`. If a trip already exists for this destination + dates, attaches the food guide to that trip instead of creating a duplicate.
 
 ### 13. Email/Password Entry (`(auth)/email.tsx`)
 
@@ -496,7 +499,7 @@ Reached by tapping "Continue with Email" on the Login screen. Handles both sign-
 - "Sign up to plan your own trip" saffron CTA banner at bottom
 - No auth required
 
-### 12. Profile (`(tabs)/profile/index.tsx`)
+### 15. Profile (`(tabs)/profile/index.tsx`)
 
 - Dark warm header (`#2C1A08 → #5A3214` gradient) with avatar, name, email, stats (trips / days planned / shared)
 - **Preferences section:** Dark Mode toggle, Language selector, Notifications toggle
