@@ -1,0 +1,1830 @@
+[
+  {
+    "name": "Hampta Pass",
+    "region": "Kullu, Himachal Pradesh",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Jobra (near Manali)",
+    "peakAltitude": 4270,
+    "difficulty": "moderate",
+    "durationDays": 5,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["snow", "meadows", "river_crossing", "rocky_trails"],
+    "highlights": [
+      "Lahaul Valley views",
+      "Chandratal Lake side trip",
+      "Dramatic landscape shift from green to barren terrain"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Must be able to walk 6–8 hours per day with a 10kg backpack on uneven terrain"
+  },
+  {
+    "name": "Kedarkantha",
+    "region": "Govind Wildlife Sanctuary",
+    "state": "Uttarakhand",
+    "baseCamp": "Sankri",
+    "peakAltitude": 3810,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 6,
+    "bestMonths": [12, 1, 2, 3, 4],
+    "terrain": ["snow", "pine_forest", "meadows"],
+    "highlights": [
+      "Panoramic Himalayan summit",
+      "Winter snow trekking",
+      "Juda Ka Talab"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": true,
+    "fitnessDemand": "Suitable for beginners with good stamina and the ability to trek 5–6 hours daily"
+  },
+  {
+    "name": "Valley of Flowers",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Govindghat",
+    "peakAltitude": 3658,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 6,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["meadows", "glacier", "river_valley"],
+    "highlights": [
+      "UNESCO World Heritage Site",
+      "Rare Himalayan flora",
+      "Hemkund Sahib"
+    ],
+    "nearestCity": "Joshimath",
+    "permits": true,
+    "fitnessDemand": "Requires the ability to trek 5–6 hours daily at moderate altitude"
+  },
+  {
+    "name": "Roopkund Trek",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Lohajung",
+    "peakAltitude": 5029,
+    "difficulty": "difficult",
+    "durationDays": 8,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["snow", "alpine_meadows", "rocky_trails"],
+    "highlights": [
+      "Mystical Skeleton Lake",
+      "Ali and Bedni Bugyal",
+      "Views of Trishul and Nanda Ghunti"
+    ],
+    "nearestCity": "Kathgodam",
+    "permits": true,
+    "fitnessDemand": "Requires excellent endurance and high-altitude trekking experience"
+  },
+  {
+    "name": "Goechala Trek",
+    "region": "Kanchenjunga National Park",
+    "state": "Sikkim",
+    "baseCamp": "Yuksom",
+    "peakAltitude": 4940,
+    "difficulty": "difficult",
+    "durationDays": 11,
+    "bestMonths": [4, 5, 9, 10],
+    "terrain": ["forests", "glaciers", "alpine_meadows", "moraines"],
+    "highlights": [
+      "Close views of Mount Kanchenjunga",
+      "Samiti Lake",
+      "Sunrise from Goechala Viewpoint"
+    ],
+    "nearestCity": "Gangtok",
+    "permits": true,
+    "fitnessDemand": "Requires the ability to trek 7–9 hours daily at high altitudes"
+  },
+  {
+    "name": "Chadar Trek",
+    "region": "Zanskar Valley",
+    "state": "Ladakh",
+    "baseCamp": "Leh",
+    "peakAltitude": 3390,
+    "difficulty": "difficult",
+    "durationDays": 9,
+    "bestMonths": [1, 2],
+    "terrain": ["frozen_river", "ice", "snow"],
+    "highlights": [
+      "Trek on the frozen Zanskar River",
+      "Ice caves and frozen waterfalls",
+      "Unique winter adventure"
+    ],
+    "nearestCity": "Leh",
+    "permits": true,
+    "fitnessDemand": "Requires exceptional endurance and the ability to withstand sub-zero temperatures"
+  },
+  {
+    "name": "Kashmir Great Lakes",
+    "region": "Sonamarg",
+    "state": "Jammu and Kashmir",
+    "baseCamp": "Shitkadi",
+    "peakAltitude": 4200,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 7,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["alpine_meadows", "lakes", "snow_passes"],
+    "highlights": [
+      "Seven alpine lakes",
+      "Vishansar and Gadsar Lakes",
+      "Stunning Himalayan vistas"
+    ],
+    "nearestCity": "Srinagar",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance and the ability to trek 6–8 hours daily"
+  },
+  {
+    "name": "Tarsar Marsar Trek",
+    "region": "Anantnag",
+    "state": "Jammu and Kashmir",
+    "baseCamp": "Aru",
+    "peakAltitude": 3962,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["lakes", "meadows", "forests"],
+    "highlights": [
+      "Twin alpine lakes",
+      "Pristine campsites",
+      "Panoramic Himalayan views"
+    ],
+    "nearestCity": "Srinagar",
+    "permits": true,
+    "fitnessDemand": "Suitable for trekkers with prior multi-day trekking experience"
+  },
+  {
+    "name": "Sandakphu Trek",
+    "region": "Singalila Ridge",
+    "state": "West Bengal",
+    "baseCamp": "Manebhanjan",
+    "peakAltitude": 3636,
+    "difficulty": "moderate",
+    "durationDays": 6,
+    "bestMonths": [4, 5, 10, 11],
+    "terrain": ["ridge_walk", "forests", "mountain_trails"],
+    "highlights": [
+      "Views of Everest, Kanchenjunga, Lhotse, and Makalu",
+      "Sleeping Buddha formation",
+      "Rhododendron forests"
+    ],
+    "nearestCity": "Darjeeling",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness for continuous ascents"
+  },
+  {
+    "name": "Brahmatal Trek",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Lohajung",
+    "peakAltitude": 3734,
+    "difficulty": "moderate",
+    "durationDays": 6,
+    "bestMonths": [12, 1, 2, 3],
+    "terrain": ["snow", "forests", "alpine_lakes"],
+    "highlights": [
+      "Frozen alpine lakes",
+      "Views of Mt. Trishul and Nanda Ghunti",
+      "Winter summit experience"
+    ],
+    "nearestCity": "Kathgodam",
+    "permits": true,
+    "fitnessDemand": "Requires the ability to trek in snow for 5–6 hours daily"
+  },
+  {
+    "name": "Har Ki Dun",
+    "region": "Garhwal Himalayas",
+    "state": "Uttarakhand",
+    "baseCamp": "Sankri",
+    "peakAltitude": 3566,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [4, 5, 9, 10],
+    "terrain": ["valleys", "forests", "rivers"],
+    "highlights": [
+      "Ancient Himalayan villages",
+      "Swargarohini Peak views",
+      "Rich cultural heritage"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness and multi-day trekking capability"
+  },
+  {
+    "name": "Pin Parvati Pass",
+    "region": "Kullu-Spiti",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Barshaini",
+    "peakAltitude": 5319,
+    "difficulty": "difficult",
+    "durationDays": 11,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["glaciers", "snow", "river_crossings", "high_pass"],
+    "highlights": [
+      "Transition from Parvati Valley to Spiti",
+      "Hot springs of Kheerganga",
+      "One of the toughest Himalayan passes"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Requires expert-level fitness and prior high-altitude trekking experience"
+  },
+  {
+    "name": "Stok Kangri",
+    "region": "Stok Range",
+    "state": "Ladakh",
+    "baseCamp": "Stok Village",
+    "peakAltitude": 6153,
+    "difficulty": "difficult",
+    "durationDays": 8,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["snow", "glaciers", "rocky_trails"],
+    "highlights": [
+      "One of India's highest trekking peaks",
+      "Panoramic views of the Karakoram Range"
+    ],
+    "nearestCity": "Leh",
+    "permits": false,
+    "fitnessDemand": "Currently closed; requires mountaineering-level fitness when open"
+  },
+  {
+    "name": "Rajmachi Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Udhewadi",
+    "peakAltitude": 820,
+    "difficulty": "easy",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["forest", "plateau", "rocky_trails"],
+    "highlights": [
+      "Shrivardhan and Manaranjan forts",
+      "Monsoon waterfalls",
+      "Fireflies during summer"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners with basic fitness"
+  },
+  {
+    "name": "Kumara Parvatha Trek",
+    "region": "Pushpagiri Wildlife Sanctuary",
+    "state": "Karnataka",
+    "baseCamp": "Kukke Subramanya",
+    "peakAltitude": 1712,
+    "difficulty": "difficult",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands", "steep_climbs"],
+    "highlights": [
+      "Second-highest peak in Karnataka",
+      "Panoramic Western Ghats views"
+    ],
+    "nearestCity": "Mangalore",
+    "permits": true,
+    "fitnessDemand": "Requires excellent stamina for steep ascents"
+  },
+  {
+    "name": "Chembra Peak Trek",
+    "region": "Wayanad",
+    "state": "Kerala",
+    "baseCamp": "Meppadi",
+    "peakAltitude": 2100,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [9, 10, 11, 12, 1, 2],
+    "terrain": ["grasslands", "forests"],
+    "highlights": [
+      "Heart-shaped lake",
+      "Scenic Western Ghats landscapes"
+    ],
+    "nearestCity": "Kozhikode",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness for a steep climb"
+  },
+  {
+    "name": "Dzükou Valley Trek",
+    "region": "Nagaland-Manipur Border",
+    "state": "Nagaland",
+    "baseCamp": "Viswema",
+    "peakAltitude": 2452,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["valleys", "bamboo_forests", "meadows"],
+    "highlights": [
+      "Seasonal Dzükou lilies",
+      "Rolling green valleys"
+    ],
+    "nearestCity": "Kohima",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness for steep ascents"
+  },
+  {
+    "name": "Tawang Trek",
+    "region": "Tawang",
+    "state": "Arunachal Pradesh",
+    "baseCamp": "Tawang",
+    "peakAltitude": 4500,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 6,
+    "bestMonths": [4, 5, 9, 10],
+    "terrain": ["mountain_passes", "lakes", "snow"],
+    "highlights": [
+      "High-altitude Himalayan lakes",
+      "Monasteries and cultural heritage"
+    ],
+    "nearestCity": "Tezpur",
+    "permits": true,
+    "fitnessDemand": "Requires good acclimatization and stamina"
+  },
+  {
+    "name": "Gurez Valley Trek",
+    "region": "Bandipora",
+    "state": "Jammu and Kashmir",
+    "baseCamp": "Dawar",
+    "peakAltitude": 4100,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["valleys", "meadows", "rivers"],
+    "highlights": [
+      "Remote Himalayan beauty",
+      "Habba Khatoon Peak"
+    ],
+    "nearestCity": "Srinagar",
+    "permits": true,
+    "fitnessDemand": "Requires moderate endurance and high-altitude preparedness"
+  },
+  {
+    "name": "Markha Valley Trek",
+    "region": "Hemis National Park",
+    "state": "Ladakh",
+    "baseCamp": "Chilling",
+    "peakAltitude": 5260,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 8,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["river_crossings", "canyons", "high_pass"],
+    "highlights": [
+      "Kongmaru La Pass",
+      "Ancient monasteries",
+      "Hemis National Park"
+    ],
+    "nearestCity": "Leh",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance and acclimatization"
+  },
+  {
+    "name": "Everest Base Camp (India View via Sandakphu)",
+    "region": "Singalila Ridge",
+    "state": "West Bengal",
+    "baseCamp": "Manebhanjan",
+    "peakAltitude": 3636,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [4, 5, 10, 11],
+    "terrain": ["ridge_walk", "forests", "alpine_meadows"],
+    "highlights": [
+      "Views of Everest, Lhotse, Makalu, and Kanchenjunga",
+      "Sleeping Buddha formation",
+      "Indo-Nepal border trail"
+    ],
+    "nearestCity": "Darjeeling",
+    "permits": true,
+    "fitnessDemand": "Requires moderate endurance for long ridge walks"
+  },
+  {
+    "name": "Ali Bedni Bugyal Trek",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Lohajung",
+    "peakAltitude": 3354,
+    "difficulty": "moderate",
+    "durationDays": 6,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["meadows", "forests", "snow"],
+    "highlights": [
+      "Expansive alpine meadows",
+      "Views of Mt. Trishul and Nanda Ghunti",
+      "Stargazing campsites"
+    ],
+    "nearestCity": "Kathgodam",
+    "permits": true,
+    "fitnessDemand": "Requires ability to trek 5–6 hours daily"
+  },
+  {
+    "name": "Nag Tibba Trek",
+    "region": "Tehri Garhwal",
+    "state": "Uttarakhand",
+    "baseCamp": "Pantwari",
+    "peakAltitude": 3022,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 2,
+    "bestMonths": [1, 2, 3, 4, 5, 10, 11, 12],
+    "terrain": ["forests", "snow", "meadows"],
+    "highlights": [
+      "Ideal weekend trek from Delhi",
+      "Panoramic Himalayan views",
+      "Camping under oak and rhododendron forests"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners with basic fitness"
+  },
+  {
+    "name": "Dayara Bugyal Trek",
+    "region": "Uttarkashi",
+    "state": "Uttarakhand",
+    "baseCamp": "Barsu",
+    "peakAltitude": 3639,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 4,
+    "bestMonths": [5, 6, 9, 10, 12, 1, 2],
+    "terrain": ["meadows", "forests", "snow"],
+    "highlights": [
+      "One of India's most beautiful alpine meadows",
+      "Winter snow landscapes",
+      "Views of Bandarpoonch"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness for gradual ascents"
+  },
+  {
+    "name": "Gaumukh Tapovan Trek",
+    "region": "Gangotri National Park",
+    "state": "Uttarakhand",
+    "baseCamp": "Gangotri",
+    "peakAltitude": 4463,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 8,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["glacier", "moraines", "rocky_trails"],
+    "highlights": [
+      "Source of the River Ganges",
+      "Views of Mt. Shivling",
+      "Tapovan meadows"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": true,
+    "fitnessDemand": "Requires excellent endurance and high-altitude acclimatization"
+  },
+  {
+    "name": "Kuari Pass Trek",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Joshimath",
+    "peakAltitude": 3814,
+    "difficulty": "moderate",
+    "durationDays": 6,
+    "bestMonths": [3, 4, 5, 9, 10, 11, 12],
+    "terrain": ["forests", "snow", "meadows"],
+    "highlights": [
+      "Lord Curzon Trail",
+      "Views of Nanda Devi and Dronagiri",
+      "Oak and rhododendron forests"
+    ],
+    "nearestCity": "Joshimath",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness and stamina"
+  },
+  {
+    "name": "Rupin Pass Trek",
+    "region": "Uttarakhand–Himachal Border",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Dhaula",
+    "peakAltitude": 4650,
+    "difficulty": "difficult",
+    "durationDays": 8,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["waterfalls", "snow", "glaciers", "meadows"],
+    "highlights": [
+      "Three-stage Rupin waterfall",
+      "Hanging villages",
+      "Dramatic pass crossing"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": true,
+    "fitnessDemand": "Requires prior high-altitude trekking experience"
+  },
+  {
+    "name": "Buran Ghati Trek",
+    "region": "Pabbar Valley",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Janglik",
+    "peakAltitude": 4575,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 8,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["snow", "forests", "meadows", "glacier"],
+    "highlights": [
+      "Thrilling snow wall descent",
+      "Chandranahan Lake",
+      "Panoramic Himalayan views"
+    ],
+    "nearestCity": "Shimla",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance and technical awareness"
+  },
+  {
+    "name": "Triund Trek",
+    "region": "Kangra Valley",
+    "state": "Himachal Pradesh",
+    "baseCamp": "McLeod Ganj",
+    "peakAltitude": 2850,
+    "difficulty": "easy",
+    "durationDays": 2,
+    "bestMonths": [3, 4, 5, 6, 9, 10, 11, 12],
+    "terrain": ["meadows", "forests", "rocky_trails"],
+    "highlights": [
+      "Views of the Dhauladhar Range",
+      "Perfect beginner trek",
+      "Camping under the stars"
+    ],
+    "nearestCity": "Dharamshala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners with basic fitness"
+  },
+  {
+    "name": "Indrahar Pass Trek",
+    "region": "Dhauladhar Range",
+    "state": "Himachal Pradesh",
+    "baseCamp": "McLeod Ganj",
+    "peakAltitude": 4342,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 5,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["rocky_trails", "snow", "alpine_meadows"],
+    "highlights": [
+      "Views of Pir Panjal Range",
+      "High-altitude pass crossing",
+      "Dramatic landscapes"
+    ],
+    "nearestCity": "Dharamshala",
+    "permits": true,
+    "fitnessDemand": "Requires strong stamina and endurance"
+  },
+  {
+    "name": "Beas Kund Trek",
+    "region": "Kullu",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Solang Valley",
+    "peakAltitude": 3700,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 3,
+    "bestMonths": [5, 6, 7, 8, 9, 10],
+    "terrain": ["glacial_valley", "meadows", "rocky_trails"],
+    "highlights": [
+      "Origin of the Beas River",
+      "Views of Friendship Peak",
+      "Ideal for beginners"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Suitable for beginners with moderate fitness"
+  },
+  {
+    "name": "Friendship Peak Trek",
+    "region": "Pir Panjal Range",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Solang Valley",
+    "peakAltitude": 5289,
+    "difficulty": "difficult",
+    "durationDays": 8,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["glacier", "snow", "mountaineering"],
+    "highlights": [
+      "Ideal trekking peak for beginners in mountaineering",
+      "Panoramic Himalayan views"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Requires mountaineering skills and excellent fitness"
+  },
+  {
+    "name": "Rajmachi Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Udhewadi",
+    "peakAltitude": 820,
+    "difficulty": "easy",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["forest", "plateau", "rocky_trails"],
+    "highlights": [
+      "Shrivardhan and Manaranjan Forts",
+      "Fireflies during summer",
+      "Monsoon waterfalls"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Harishchandragad Trek",
+    "region": "Ahmednagar",
+    "state": "Maharashtra",
+    "baseCamp": "Pachnai",
+    "peakAltitude": 1424,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "plateau", "forest"],
+    "highlights": [
+      "Kokan Kada cliff",
+      "Ancient temples and caves",
+      "Spectacular sunsets"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Kalsubai Peak Trek",
+    "region": "Ahmednagar",
+    "state": "Maharashtra",
+    "baseCamp": "Bari Village",
+    "peakAltitude": 1646,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [1, 2, 9, 10, 11, 12],
+    "terrain": ["rocky_trails", "grasslands"],
+    "highlights": [
+      "Highest peak in Maharashtra",
+      "Iron ladder climbs",
+      "Panoramic Sahyadri views"
+    ],
+    "nearestCity": "Nashik",
+    "permits": false,
+    "fitnessDemand": "Requires good stamina for steep ascents"
+  },
+  {
+    "name": "Tadiandamol Trek",
+    "region": "Coorg",
+    "state": "Karnataka",
+    "baseCamp": "Kakkabe",
+    "peakAltitude": 1748,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["grasslands", "forests"],
+    "highlights": [
+      "Highest peak in Coorg",
+      "Western Ghats landscapes",
+      "Misty mountain views"
+    ],
+    "nearestCity": "Madikeri",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness"
+  },
+  {
+    "name": "Mullayanagiri Trek",
+    "region": "Chikkamagaluru",
+    "state": "Karnataka",
+    "baseCamp": "Sarpadhari",
+    "peakAltitude": 1930,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 1,
+    "bestMonths": [9, 10, 11, 12, 1, 2],
+    "terrain": ["grasslands", "rocky_trails"],
+    "highlights": [
+      "Highest peak in Karnataka",
+      "Panoramic Western Ghats views"
+    ],
+    "nearestCity": "Chikkamagaluru",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners with basic fitness"
+  },
+  {
+    "name": "Anamudi Trek",
+    "region": "Eravikulam National Park",
+    "state": "Kerala",
+    "baseCamp": "Munnar",
+    "peakAltitude": 2695,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [1, 2, 3, 4, 9, 10, 11, 12],
+    "terrain": ["grasslands", "forests"],
+    "highlights": [
+      "Highest peak in South India",
+      "Nilgiri Tahr sightings",
+      "Rolling hills of Munnar"
+    ],
+    "nearestCity": "Munnar",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness"
+  },
+  {
+    "name": "Dzukou Valley Trek",
+    "region": "Nagaland-Manipur Border",
+    "state": "Nagaland",
+    "baseCamp": "Viswema",
+    "peakAltitude": 2452,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9, 10],
+    "terrain": ["valleys", "meadows", "bamboo_forests"],
+    "highlights": [
+      "Valley of Flowers of the Northeast",
+      "Seasonal Dzukou lilies",
+      "Scenic landscapes"
+    ],
+    "nearestCity": "Kohima",
+    "permits": true,
+    "fitnessDemand": "Requires moderate stamina"
+  },
+  {
+    "name": "Mechuka Trek",
+    "region": "Shi-Yomi District",
+    "state": "Arunachal Pradesh",
+    "baseCamp": "Mechuka",
+    "peakAltitude": 3650,
+    "difficulty": "moderate",
+    "durationDays": 5,
+    "bestMonths": [3, 4, 5, 9, 10, 11],
+    "terrain": ["meadows", "forests", "mountain_trails"],
+    "highlights": [
+      "Remote Himalayan valley",
+      "Indo-Tibet landscapes",
+      "Buddhist monasteries"
+    ],
+    "nearestCity": "Aalo",
+    "permits": true,
+    "fitnessDemand": "Requires good endurance"
+  },
+  {
+    "name": "Living Root Bridges Trek",
+    "region": "Meghalaya",
+    "state": "Meghalaya",
+    "baseCamp": "Tyrna Village",
+    "peakAltitude": 240,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2, 3, 4, 5],
+    "terrain": ["forests", "stone_steps", "river_crossing"],
+    "highlights": [
+      "Double Decker Living Root Bridge",
+      "Dense rainforests",
+      "Crystal-clear streams"
+    ],
+    "nearestCity": "Shillong",
+    "permits": false,
+    "fitnessDemand": "Requires ability to climb thousands of steps"
+  },
+  
+  {
+    "name": "Markha Valley Trek",
+    "region": "Hemis National Park, Ladakh",
+    "state": "Ladakh",
+    "baseCamp": "Chilling",
+    "peakAltitude": 5260,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 8,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["river_crossing", "canyons", "high_pass", "cold_desert"],
+    "highlights": [
+      "Kongmaru La Pass",
+      "Buddhist monasteries",
+      "Hemis National Park"
+    ],
+    "nearestCity": "Leh",
+    "permits": true,
+    "fitnessDemand": "Requires high endurance and acclimatization for high-altitude trekking"
+  },
+  {
+    "name": "Sham Valley Trek",
+    "region": "Leh",
+    "state": "Ladakh",
+    "baseCamp": "Likir",
+    "peakAltitude": 3870,
+    "difficulty": "easy",
+    "durationDays": 3,
+    "bestMonths": [5, 6, 7, 8, 9, 10],
+    "terrain": ["cold_desert", "mountain_passes", "villages"],
+    "highlights": [
+      "Beginner-friendly Ladakh trek",
+      "Remote Himalayan villages",
+      "Ancient monasteries"
+    ],
+    "nearestCity": "Leh",
+    "permits": true,
+    "fitnessDemand": "Suitable for beginners with basic fitness and acclimatization"
+  },
+  {
+    "name": "Rumtse to Tso Moriri Trek",
+    "region": "Changthang Plateau",
+    "state": "Ladakh",
+    "baseCamp": "Rumtse",
+    "peakAltitude": 5430,
+    "difficulty": "difficult",
+    "durationDays": 9,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["high_pass", "cold_desert", "salt_lakes"],
+    "highlights": [
+      "Crosses multiple high-altitude passes",
+      "Nomadic Changpa settlements",
+      "Tso Moriri Lake"
+    ],
+    "nearestCity": "Leh",
+    "permits": true,
+    "fitnessDemand": "Requires excellent endurance and prior high-altitude trekking experience"
+  },
+  {
+    "name": "Parang La Trek",
+    "region": "Spiti–Ladakh",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Kaza",
+    "peakAltitude": 5578,
+    "difficulty": "difficult",
+    "durationDays": 10,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["glaciers", "moraines", "cold_desert", "high_pass"],
+    "highlights": [
+      "Expedition-style trek",
+      "Tso Moriri Lake finish",
+      "Remote Himalayan terrain"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Requires mountaineering-level fitness and glacier travel experience"
+  },
+  {
+    "name": "Pin Bhaba Pass Trek",
+    "region": "Kinnaur-Spiti",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Kafnu",
+    "peakAltitude": 4915,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 8,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["forests", "meadows", "glaciers", "cold_desert"],
+    "highlights": [
+      "Transition from Kinnaur to Spiti",
+      "Dramatic landscape contrasts",
+      "Pin Valley National Park"
+    ],
+    "nearestCity": "Shimla",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance and high-altitude acclimatization"
+  },
+  {
+    "name": "Kanamo Peak Trek",
+    "region": "Spiti Valley",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Kibber",
+    "peakAltitude": 5974,
+    "difficulty": "difficult",
+    "durationDays": 7,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["scree", "snow", "cold_desert"],
+    "highlights": [
+      "Non-technical 6000-meter peak",
+      "Spectacular Spiti views",
+      "High-altitude adventure"
+    ],
+    "nearestCity": "Manali",
+    "permits": true,
+    "fitnessDemand": "Requires excellent stamina and prior high-altitude trekking experience"
+  },
+  {
+    "name": "Goechala Trek",
+    "region": "Kanchenjunga National Park",
+    "state": "Sikkim",
+    "baseCamp": "Yuksom",
+    "peakAltitude": 4940,
+    "difficulty": "difficult",
+    "durationDays": 11,
+    "bestMonths": [4, 5, 9, 10],
+    "terrain": ["forests", "glaciers", "alpine_meadows"],
+    "highlights": [
+      "Close views of Kanchenjunga",
+      "Samiti Lake",
+      "Sunrise from Goechala Viewpoint"
+    ],
+    "nearestCity": "Gangtok",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance and high-altitude trekking experience"
+  },
+  {
+    "name": "Green Lake Trek",
+    "region": "Kanchenjunga",
+    "state": "Sikkim",
+    "baseCamp": "Lachen",
+    "peakAltitude": 5050,
+    "difficulty": "difficult",
+    "durationDays": 11,
+    "bestMonths": [4, 5, 9, 10],
+    "terrain": ["glaciers", "moraines", "alpine_meadows"],
+    "highlights": [
+      "Base of Kanchenjunga",
+      "Remote and pristine trail",
+      "Zemu Glacier views"
+    ],
+    "nearestCity": "Gangtok",
+    "permits": true,
+    "fitnessDemand": "Requires expert-level fitness and expedition experience"
+  },
+  {
+    "name": "Singalila Ridge Trek",
+    "region": "Darjeeling",
+    "state": "West Bengal",
+    "baseCamp": "Manebhanjan",
+    "peakAltitude": 3636,
+    "difficulty": "moderate",
+    "durationDays": 6,
+    "bestMonths": [4, 5, 10, 11],
+    "terrain": ["ridge_walk", "forests"],
+    "highlights": [
+      "Views of Everest and Kanchenjunga",
+      "Rhododendron forests",
+      "Indo-Nepal border trek"
+    ],
+    "nearestCity": "Darjeeling",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness for long-distance trekking"
+  },
+  {
+    "name": "Bailey Trail Trek",
+    "region": "Tawang",
+    "state": "Arunachal Pradesh",
+    "baseCamp": "Dirang",
+    "peakAltitude": 4500,
+    "difficulty": "difficult",
+    "durationDays": 12,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["snow", "mountain_passes", "forests"],
+    "highlights": [
+      "Historic Indo-Tibet trade route",
+      "High-altitude passes",
+      "Spectacular Eastern Himalayas"
+    ],
+    "nearestCity": "Tezpur",
+    "permits": true,
+    "fitnessDemand": "Requires excellent endurance and acclimatization"
+  },
+  {
+    "name": "Gorichen Base Camp Trek",
+    "region": "Tawang",
+    "state": "Arunachal Pradesh",
+    "baseCamp": "Jang",
+    "peakAltitude": 4500,
+    "difficulty": "difficult",
+    "durationDays": 10,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["glaciers", "meadows", "rocky_trails"],
+    "highlights": [
+      "Views of Gorichen Peak",
+      "Pristine alpine landscapes",
+      "Remote Himalayan trails"
+    ],
+    "nearestCity": "Tezpur",
+    "permits": true,
+    "fitnessDemand": "Requires advanced trekking experience"
+  },
+  {
+    "name": "Kalsubai Peak Trek",
+    "region": "Ahmednagar",
+    "state": "Maharashtra",
+    "baseCamp": "Bari Village",
+    "peakAltitude": 1646,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [1, 2, 9, 10, 11, 12],
+    "terrain": ["rocky_trails", "grasslands"],
+    "highlights": [
+      "Highest peak in Maharashtra",
+      "Panoramic Sahyadri views"
+    ],
+    "nearestCity": "Nashik",
+    "permits": false,
+    "fitnessDemand": "Requires good stamina for steep ascents"
+  },
+  {
+    "name": "Sinhagad Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Sinhagad Base",
+    "peakAltitude": 1312,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails"],
+    "highlights": [
+      "Historic Maratha fort",
+      "Popular sunrise trek"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Rajgad Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Gunjavane",
+    "peakAltitude": 1374,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "plateau"],
+    "highlights": [
+      "Capital of the Maratha Empire",
+      "Historic architecture"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Skandagiri Trek",
+    "region": "Chikkaballapur",
+    "state": "Karnataka",
+    "baseCamp": "Kalavara Village",
+    "peakAltitude": 1450,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "grasslands"],
+    "highlights": [
+      "Famous sunrise trek",
+      "Sea of clouds phenomenon"
+    ],
+    "nearestCity": "Bengaluru",
+    "permits": true,
+    "fitnessDemand": "Suitable for beginners with moderate fitness"
+  },
+  {
+    "name": "Kodachadri Trek",
+    "region": "Shimoga",
+    "state": "Karnataka",
+    "baseCamp": "Nittur",
+    "peakAltitude": 1343,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "Western Ghats biodiversity",
+      "Sunset viewpoints",
+      "Hidlumane Falls"
+    ],
+    "nearestCity": "Shimoga",
+    "permits": true,
+    "fitnessDemand": "Requires moderate stamina"
+  },
+  {
+    "name": "Agasthyakoodam Trek",
+    "region": "Neyyar Wildlife Sanctuary",
+    "state": "Kerala",
+    "baseCamp": "Bonacaud",
+    "peakAltitude": 1868,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 2,
+    "bestMonths": [1, 2, 3],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "Sacred peak of Sage Agastya",
+      "Rich biodiversity of the Western Ghats"
+    ],
+    "nearestCity": "Thiruvananthapuram",
+    "permits": true,
+    "fitnessDemand": "Requires good endurance"
+  },
+  {
+    "name": "Perumal Peak Trek",
+    "region": "Kodaikanal",
+    "state": "Tamil Nadu",
+    "baseCamp": "Perumalmalai",
+    "peakAltitude": 2440,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [1, 2, 3, 4, 9, 10, 11, 12],
+    "terrain": ["grasslands", "rocky_trails"],
+    "highlights": [
+      "Panoramic views of the Palani Hills",
+      "Ideal for sunrise treks"
+    ],
+    "nearestCity": "Kodaikanal",
+    "permits": false,
+    "fitnessDemand": "Requires moderate fitness"
+  },
+  {
+    "name": "Arma Konda Trek",
+    "region": "Eastern Ghats",
+    "state": "Andhra Pradesh",
+    "baseCamp": "Paderu",
+    "peakAltitude": 1680,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "Highest peak in Andhra Pradesh",
+      "Scenic Eastern Ghats"
+    ],
+    "nearestCity": "Visakhapatnam",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Guru Shikhar Trek",
+    "region": "Mount Abu",
+    "state": "Rajasthan",
+    "baseCamp": "Mount Abu",
+    "peakAltitude": 1722,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails"],
+    "highlights": [
+      "Highest peak in Rajasthan",
+      "Views of the Aravalli Range"
+    ],
+    "nearestCity": "Mount Abu",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Pachmarhi Trek",
+    "region": "Satpura Range",
+    "state": "Madhya Pradesh",
+    "baseCamp": "Pachmarhi",
+    "peakAltitude": 1350,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 3,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["forests", "sandstone", "waterfalls"],
+    "highlights": [
+      "Satpura National Park",
+      "Dhoopgarh sunset",
+      "Bee Falls"
+    ],
+    "nearestCity": "Bhopal",
+    "permits": true,
+    "fitnessDemand": "Requires basic to moderate fitness"
+  },
+  {
+    "name": "Raigad Fort Trek",
+    "region": "Raigad",
+    "state": "Maharashtra",
+    "baseCamp": "Pachad",
+    "peakAltitude": 820,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "stone_steps", "plateau"],
+    "highlights": [
+      "Capital of the Maratha Empire",
+      "Samadhi of Chhatrapati Shivaji Maharaj",
+      "Hirkani Buruj and Maha Darwaja"
+    ],
+    "nearestCity": "Mahad",
+    "permits": false,
+    "fitnessDemand": "Requires moderate stamina for steep ascents via stone steps"
+  },
+  {
+    "name": "Torna Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Velhe",
+    "peakAltitude": 1405,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "ridge_walk", "grasslands"],
+    "highlights": [
+      "First fort captured by Shivaji Maharaj",
+      "Zunjar Machi",
+      "Panoramic Sahyadri views"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Requires good endurance for steep climbs"
+  },
+  {
+    "name": "Lohagad Fort Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Lohagadwadi",
+    "peakAltitude": 1033,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["stone_steps", "plateau"],
+    "highlights": [
+      "Vinchu Kata ridge",
+      "Monsoon beauty",
+      "Beginner-friendly trail"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners with basic fitness"
+  },
+  {
+    "name": "Visapur Fort Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Bhaje Village",
+    "peakAltitude": 1084,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "plateau", "waterfalls"],
+    "highlights": [
+      "Spectacular monsoon waterfalls",
+      "Panoramic views of Lohagad",
+      "Historic ruins"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Pratapgad Fort Trek",
+    "region": "Satara",
+    "state": "Maharashtra",
+    "baseCamp": "Pratapgad Base",
+    "peakAltitude": 1080,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["stone_steps", "forest_trails"],
+    "highlights": [
+      "Battle of Pratapgad site",
+      "Statue of Shivaji Maharaj",
+      "Views of the Western Ghats"
+    ],
+    "nearestCity": "Mahabaleshwar",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Purandar Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Narayanpur",
+    "peakAltitude": 1387,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "ridge_walk"],
+    "highlights": [
+      "Birthplace of Sambhaji Maharaj",
+      "Historic Maratha fort",
+      "Scenic Sahyadri landscapes"
+    ],
+    "nearestCity": "Pune",
+    "permits": true,
+    "fitnessDemand": "Requires moderate stamina for steep ascents"
+  },
+  {
+    "name": "Tikona Fort Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Tikona Peth",
+    "peakAltitude": 1066,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "stone_steps"],
+    "highlights": [
+      "Pyramid-shaped fort",
+      "Views of Pawna Lake",
+      "Ideal for beginners"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Tung Fort Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Tungwadi",
+    "peakAltitude": 1075,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "ridge_walk"],
+    "highlights": [
+      "Narrow ridge ascent",
+      "Panoramic views of Pawna Lake"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Requires moderate stamina"
+  },
+  {
+    "name": "Korigad Fort Trek",
+    "region": "Lonavala",
+    "state": "Maharashtra",
+    "baseCamp": "Peth Shahpur",
+    "peakAltitude": 929,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["stone_steps", "plateau"],
+    "highlights": [
+      "Fortified walls and temples",
+      "Monsoon landscapes",
+      "Lake on the fort"
+    ],
+    "nearestCity": "Lonavala",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Sudhagad Fort Trek",
+    "region": "Raigad",
+    "state": "Maharashtra",
+    "baseCamp": "Pali",
+    "peakAltitude": 620,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["forests", "rocky_trails"],
+    "highlights": [
+      "Often compared to Raigad",
+      "Ancient temples and ruins",
+      "Scenic forest trails"
+    ],
+    "nearestCity": "Khopoli",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Sinhagad Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Sinhagad Base",
+    "peakAltitude": 1312,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [6, 7, 8, 9, 10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails"],
+    "highlights": [
+      "Historic battle of Tanaji Malusare",
+      "Popular sunrise trek"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Rajgad Fort Trek",
+    "region": "Pune",
+    "state": "Maharashtra",
+    "baseCamp": "Gunjavane",
+    "peakAltitude": 1374,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["ridge_walk", "rocky_trails"],
+    "highlights": [
+      "Former capital of the Maratha Empire",
+      "Padmavati Machi",
+      "Balekilla climb"
+    ],
+    "nearestCity": "Pune",
+    "permits": false,
+    "fitnessDemand": "Requires moderate stamina"
+  },
+  {
+    "name": "Panhala Fort Trek",
+    "region": "Kolhapur",
+    "state": "Maharashtra",
+    "baseCamp": "Panhala",
+    "peakAltitude": 845,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["plateau", "stone_paths"],
+    "highlights": [
+      "Teen Darwaza",
+      "Sajja Kothi",
+      "Associated with Shivaji Maharaj"
+    ],
+    "nearestCity": "Kolhapur",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Vasota Fort Trek",
+    "region": "Satara",
+    "state": "Maharashtra",
+    "baseCamp": "Bamnoli",
+    "peakAltitude": 1171,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["dense_forests", "rocky_trails"],
+    "highlights": [
+      "Located within Koyna Wildlife Sanctuary",
+      "Boat ride through Shivsagar Lake",
+      "Rich biodiversity"
+    ],
+    "nearestCity": "Satara",
+    "permits": true,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Sindhudurg Fort Trek",
+    "region": "Malvan",
+    "state": "Maharashtra",
+    "baseCamp": "Malvan",
+    "peakAltitude": 15,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["coastal", "rocky_paths"],
+    "highlights": [
+      "Sea fort built by Shivaji Maharaj",
+      "Arabian Sea views",
+      "Unique coastal heritage"
+    ],
+    "nearestCity": "Malvan",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Harihar Fort Trek",
+    "region": "Nashik",
+    "state": "Maharashtra",
+    "baseCamp": "Nirgudpada",
+    "peakAltitude": 1120,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "stone_steps", "ridge_walk"],
+    "highlights": [
+      "Iconic 80-degree rock-cut staircase",
+      "Panoramic Sahyadri views"
+    ],
+    "nearestCity": "Nashik",
+    "permits": false,
+    "fitnessDemand": "Requires good balance and stamina"
+  },
+  {
+    "name": "Ratangad Fort Trek",
+    "region": "Ahmednagar",
+    "state": "Maharashtra",
+    "baseCamp": "Ratanwadi",
+    "peakAltitude": 1297,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["rocky_trails", "plateau"],
+    "highlights": [
+      "Nedhe (natural rock window)",
+      "Views of Bhandardara Lake"
+    ],
+    "nearestCity": "Igatpuri",
+    "permits": false,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Alang Madan Kulang (AMK) Trek",
+    "region": "Nashik",
+    "state": "Maharashtra",
+    "baseCamp": "Ambewadi",
+    "peakAltitude": 1487,
+    "difficulty": "difficult",
+    "durationDays": 3,
+    "bestMonths": [11, 12, 1, 2],
+    "terrain": ["rock_climbing", "rocky_trails", "plateau"],
+    "highlights": [
+      "Most challenging Sahyadri trek",
+      "Technical rock patches and caves"
+    ],
+    "nearestCity": "Igatpuri",
+    "permits": false,
+    "fitnessDemand": "Requires technical climbing skills and excellent fitness"
+  },
+  {
+    "name": "Kalavantin Durg Trek",
+    "region": "Raigad",
+    "state": "Maharashtra",
+    "baseCamp": "Thakurwadi",
+    "peakAltitude": 686,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["rocky_trails", "stone_steps"],
+    "highlights": [
+      "Exposed staircase climb",
+      "Views of Prabalgad"
+    ],
+    "nearestCity": "Panvel",
+    "permits": false,
+    "fitnessDemand": "Requires good stamina and balance"
+  },
+  {
+    "name": "Sandhan Valley Trek",
+    "region": "Ahmednagar",
+    "state": "Maharashtra",
+    "baseCamp": "Samrad",
+    "peakAltitude": 1200,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 2,
+    "bestMonths": [11, 12, 1, 2],
+    "terrain": ["canyon", "boulders", "rappelling"],
+    "highlights": [
+      "Grand Canyon of Maharashtra",
+      "Thrilling rappelling sections"
+    ],
+    "nearestCity": "Igatpuri",
+    "permits": false,
+    "fitnessDemand": "Requires endurance and basic technical skills"
+  },
+  {
+    "name": "Kudremukh Trek",
+    "region": "Chikkamagaluru",
+    "state": "Karnataka",
+    "baseCamp": "Mullodi",
+    "peakAltitude": 1894,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["grasslands", "forests"],
+    "highlights": [
+      "Horse-face shaped peak",
+      "Lush Western Ghats landscapes"
+    ],
+    "nearestCity": "Mangalore",
+    "permits": true,
+    "fitnessDemand": "Requires moderate stamina"
+  },
+  {
+    "name": "Meesapulimala Trek",
+    "region": "Munnar",
+    "state": "Kerala",
+    "baseCamp": "Silent Valley",
+    "peakAltitude": 2640,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [9, 10, 11, 12, 1, 2, 3],
+    "terrain": ["grasslands", "forests"],
+    "highlights": [
+      "Second-highest peak in the Western Ghats",
+      "Shola-grassland ecosystem"
+    ],
+    "nearestCity": "Munnar",
+    "permits": true,
+    "fitnessDemand": "Requires moderate fitness"
+  },
+  {
+    "name": "Brahmagiri Trek",
+    "region": "Kodagu",
+    "state": "Karnataka",
+    "baseCamp": "Iruppu Falls",
+    "peakAltitude": 1608,
+    "difficulty": "moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "Panoramic Western Ghats views",
+      "Origin of River Lakshmana Tirtha"
+    ],
+    "nearestCity": "Madikeri",
+    "permits": true,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Pushpagiri Trek",
+    "region": "Kodagu",
+    "state": "Karnataka",
+    "baseCamp": "Kukke Subramanya",
+    "peakAltitude": 1712,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 2,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "Second-highest peak in Karnataka",
+      "Rich biodiversity"
+    ],
+    "nearestCity": "Mangalore",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance"
+  },
+  {
+    "name": "Meghamalai Trek",
+    "region": "Theni",
+    "state": "Tamil Nadu",
+    "baseCamp": "Meghamalai",
+    "peakAltitude": 1500,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["forests", "grasslands"],
+    "highlights": [
+      "High Wavy Mountains",
+      "Tea plantations and misty hills"
+    ],
+    "nearestCity": "Madurai",
+    "permits": true,
+    "fitnessDemand": "Requires basic fitness"
+  },
+  {
+    "name": "Dzükou Valley Trek",
+    "region": "Nagaland-Manipur Border",
+    "state": "Nagaland",
+    "baseCamp": "Viswema",
+    "peakAltitude": 2452,
+    "difficulty": "moderate",
+    "durationDays": 2,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["meadows", "valleys", "bamboo_forests"],
+    "highlights": [
+      "Valley of Flowers of the Northeast",
+      "Seasonal Dzükou lilies"
+    ],
+    "nearestCity": "Kohima",
+    "permits": true,
+    "fitnessDemand": "Requires moderate endurance"
+  },
+  {
+    "name": "Talley Valley Trek",
+    "region": "Ziro",
+    "state": "Arunachal Pradesh",
+    "baseCamp": "Ziro",
+    "peakAltitude": 2400,
+    "difficulty": "moderate",
+    "durationDays": 5,
+    "bestMonths": [3, 4, 5, 9, 10],
+    "terrain": ["forests", "meadows"],
+    "highlights": [
+      "Dense Eastern Himalayan forests",
+      "Rich biodiversity"
+    ],
+    "nearestCity": "Itanagar",
+    "permits": true,
+    "fitnessDemand": "Requires good stamina"
+  },
+  {
+    "name": "Gurez Valley Trek",
+    "region": "Bandipora",
+    "state": "Jammu and Kashmir",
+    "baseCamp": "Dawar",
+    "peakAltitude": 4100,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [6, 7, 8, 9],
+    "terrain": ["meadows", "valleys", "rivers"],
+    "highlights": [
+      "Remote Himalayan landscapes",
+      "Habba Khatoon Peak views"
+    ],
+    "nearestCity": "Srinagar",
+    "permits": true,
+    "fitnessDemand": "Requires high-altitude fitness"
+  },
+  {
+    "name": "Milam Glacier Trek",
+    "region": "Pithoragarh",
+    "state": "Uttarakhand",
+    "baseCamp": "Munsiyari",
+    "peakAltitude": 4268,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 12,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["glacier", "moraines", "valleys"],
+    "highlights": [
+      "Historic trade route to Tibet",
+      "Views of Nanda Devi East"
+    ],
+    "nearestCity": "Pithoragarh",
+    "permits": true,
+    "fitnessDemand": "Requires excellent endurance"
+  },
+  {
+    "name": "Panchachuli Base Camp Trek",
+    "region": "Kumaon",
+    "state": "Uttarakhand",
+    "baseCamp": "Dharchula",
+    "peakAltitude": 4260,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 10,
+    "bestMonths": [5, 6, 9, 10],
+    "terrain": ["glacier", "meadows", "river_valleys"],
+    "highlights": [
+      "Views of Panchachuli Peaks",
+      "Remote Himalayan villages"
+    ],
+    "nearestCity": "Pithoragarh",
+    "permits": true,
+    "fitnessDemand": "Requires strong endurance"
+  },
+  {
+    "name": "Deomali Trek",
+    "region": "Koraput",
+    "state": "Odisha",
+    "baseCamp": "Pottangi",
+    "peakAltitude": 1672,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2],
+    "terrain": ["grasslands", "hills"],
+    "highlights": [
+      "Highest peak in Odisha",
+      "Scenic Eastern Ghats views"
+    ],
+    "nearestCity": "Visakhapatnam",
+    "permits": false,
+    "fitnessDemand": "Requires moderate fitness"
+  },
+  {
+    "name": "Netarhat Trek",
+    "region": "Latehar",
+    "state": "Jharkhand",
+    "baseCamp": "Netarhat",
+    "peakAltitude": 1128,
+    "difficulty": "easy",
+    "durationDays": 1,
+    "bestMonths": [10, 11, 12, 1, 2, 3],
+    "terrain": ["forests", "plateau"],
+    "highlights": [
+      "Queen of Chotanagpur",
+      "Magnificent sunrise and sunset views"
+    ],
+    "nearestCity": "Ranchi",
+    "permits": false,
+    "fitnessDemand": "Suitable for beginners"
+  },
+  {
+    "name": "Sar Pass Trek",
+    "region": "Parvati Valley, Kullu",
+    "state": "Himachal Pradesh",
+    "baseCamp": "Kasol",
+    "peakAltitude": 4020,
+    "difficulty": "moderate",
+    "durationDays": 5,
+    "bestMonths": [4, 5, 6],
+    "terrain": ["snow", "meadows", "pine_forest"],
+    "highlights": [
+      "Sar Pass summit snow slide",
+      "Biskeri Thach campsite",
+      "Dense Parvati Valley forests"
+    ],
+    "nearestCity": "Bhuntar",
+    "permits": false,
+    "fitnessDemand": "Must be able to trek 6–7 hours daily on steep snow sections"
+  },
+  {
+    "name": "Pangarchulla Peak Trek",
+    "region": "Chamoli",
+    "state": "Uttarakhand",
+    "baseCamp": "Joshimath",
+    "peakAltitude": 4700,
+    "difficulty": "moderate_to_difficult",
+    "durationDays": 6,
+    "bestMonths": [3, 4, 5, 11, 12],
+    "terrain": ["snow", "alpine_meadows", "rocky_summit"],
+    "highlights": [
+      "Summit climb with 360° Himalayan panorama",
+      "Views of Nanda Devi, Dronagiri, Chaukhamba",
+      "Gorson Bugyal meadows"
+    ],
+    "nearestCity": "Joshimath",
+    "permits": false,
+    "fitnessDemand": "Requires ability to climb steep snow slopes and trek 7–8 hours daily"
+  },
+  {
+    "name": "Phulara Ridge Trek",
+    "region": "Uttarkashi",
+    "state": "Uttarakhand",
+    "baseCamp": "Sankri",
+    "peakAltitude": 3700,
+    "difficulty": "easy_to_moderate",
+    "durationDays": 6,
+    "bestMonths": [4, 5, 10, 11],
+    "terrain": ["meadows", "ridge_walk", "pine_forest"],
+    "highlights": [
+      "Continuous ridge walking with open views",
+      "Kedarkantha and Swargarohini views",
+      "Autumn colours in November"
+    ],
+    "nearestCity": "Dehradun",
+    "permits": false,
+    "fitnessDemand": "Suitable for fit beginners; 5–6 hours of walking per day on gentle ridges"
+  },
+  {
+    "name": "Kashmir Great Lakes Trek",
+    "region": "Sonamarg to Naranag",
+    "state": "Jammu and Kashmir",
+    "baseCamp": "Sonamarg",
+    "peakAltitude": 4200,
+    "difficulty": "moderate",
+    "durationDays": 7,
+    "bestMonths": [7, 8, 9],
+    "terrain": ["alpine_lakes", "meadows", "snow_passes"],
+    "highlights": [
+      "Seven stunning alpine lakes",
+      "Vishansar and Krishansar lakes",
+      "Gadsar Pass crossing"
+    ],
+    "nearestCity": "Srinagar",
+    "permits": true,
+    "fitnessDemand": "Must be able to trek 6–8 hours daily at moderate altitude with river crossings"
+  }
+]

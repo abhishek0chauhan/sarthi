@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Destination {
+  id              String   @id @default(uuid())
+  name            String
+  state           String
+  region          String
+  experienceTypes String[]
+  budgetMin       Int
+  budgetMax       Int
+  bestMonths      Int[]
+  highlights      String[]
+  isHiddenGem     Boolean  @default(false)
+  weatherSummary  String
+  travelTimes     Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum TravelMode {
+  train
+  flight
+  bus
+  car
+}
+
+model User {
+  id          String      @id @default(uuid())
+  firebaseUid String      @unique
+  displayName String?
+  email       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  savedTrips  SavedTrip[]
+}
+
+model SavedTrip {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  destination     String
+  state           String
+  dates           Json
+  travelMode      TravelMode?
+  destinationData Json
+  itineraryData   Json?
+  foodGuideData   Json?
+  shareToken      String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([shareToken])
+}

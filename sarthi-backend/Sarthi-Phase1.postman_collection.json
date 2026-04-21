@@ -1,0 +1,1237 @@
+{
+  "info": {
+    "name": "Sarthi - Phase 1 & 2A (Complete)",
+    "_postman_id": "sarthi-phase1-collection",
+    "description": "API tests for Sarthi backend Phase 1 & 2A - Destination Finder with Saved Trips.\n\n**Setup:**\n1. Set collection variable `firebaseWebApiKey` to your Firebase Web API key\n2. Run \"Sign In\" first \u2014 it auto-saves the token to `idToken`\n3. All requests automatically use the saved token",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "firebaseWebApiKey",
+      "value": "AIzaSyA7p9xd213XE_Hai21YC2MgKttBHxJ77sw",
+      "type": "string"
+    },
+    {
+      "key": "firebaseEmail",
+      "value": "test@sarthi.dev",
+      "type": "string"
+    },
+    {
+      "key": "firebasePassword",
+      "value": "Test@12345",
+      "type": "string"
+    },
+    {
+      "key": "idToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "shareToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tripId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign In (get token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.idToken) {",
+                  "    pm.collectionVariables.set('idToken', res.idToken);",
+                  "    pm.test('Token saved', () => pm.expect(res.idToken).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Sign in failed', () => pm.expect.fail(JSON.stringify(res)));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={{firebaseWebApiKey}}",
+              "protocol": "https",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signInWithPassword"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{firebaseWebApiKey}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{firebaseEmail}}\",\n  \"password\": \"{{firebasePassword}}\",\n  \"returnSecureToken\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Sign Up (first time only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.idToken) {",
+                  "    pm.collectionVariables.set('idToken', res.idToken);",
+                  "    pm.test('User created and token saved', () => pm.expect(res.idToken).to.be.a('string'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={{firebaseWebApiKey}}",
+              "protocol": "https",
+              "host": [
+                "identitytoolkit",
+                "googleapis",
+                "com"
+              ],
+              "path": [
+                "v1",
+                "accounts:signUp"
+              ],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{firebaseWebApiKey}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{firebaseEmail}}\",\n  \"password\": \"{{firebasePassword}}\",\n  \"returnSecureToken\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Destination Finder",
+      "item": [
+        {
+          "name": "Beach Vacation \u2014 fit young woman",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has mode field', () => pm.expect(res).to.have.property('mode'));",
+                  "pm.test('Has results array', () => pm.expect(res.results).to.be.an('array'));",
+                  "pm.test('Results not empty', () => pm.expect(res.results.length).to.be.greaterThan(0));",
+                  "pm.test('Each result has healthAdvisory', () => res.results.forEach(r => pm.expect(r).to.have.property('healthAdvisory')));",
+                  "pm.test('Each result has costBreakdown', () => res.results.forEach(r => pm.expect(r).to.have.property('costBreakdown')));",
+                  "pm.test('costBreakdown has total', () => res.results.forEach(r => pm.expect(r.costBreakdown).to.have.property('total')));",
+                  "pm.test('Each result has permits', () => res.results.forEach(r => pm.expect(r).to.have.property('permits')));",
+                  "pm.test('permits has required field', () => res.results.forEach(r => pm.expect(r.permits).to.have.property('required')));",
+                  "pm.test('Each result has tripReadiness', () => res.results.forEach(r => pm.expect(r).to.have.property('tripReadiness')));",
+                  "pm.test('tripReadiness has score 0-100', () => res.results.forEach(r => { pm.expect(r.tripReadiness.score).to.be.a('number'); pm.expect(r.tripReadiness.score).to.be.at.least(0); pm.expect(r.tripReadiness.score).to.be.at.most(100); }));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-22\" },\n  \"budget\": { \"min\": 5000, \"max\": 20000 },\n  \"group\": { \"size\": 2, \"type\": \"couple\" },\n  \"experienceTypes\": [\"beach\", \"culture\"],\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"Looking for a relaxing beach vacation with good food and nightlife\",\n  \"gender\": \"female\",\n  \"age\": 28,\n  \"weight\": 55,\n  \"height\": 162\n}"
+            }
+          }
+        },
+        {
+          "name": "Mountain Trek \u2014 overweight male with knee issue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(res.results).to.be.an('array'));",
+                  "pm.test('Each result has healthAdvisory', () => res.results.forEach(r => pm.expect(r).to.have.property('healthAdvisory')));",
+                  "pm.test('Each result has costBreakdown', () => res.results.forEach(r => pm.expect(r).to.have.property('costBreakdown')));",
+                  "pm.test('Each result has permits', () => res.results.forEach(r => pm.expect(r).to.have.property('permits')));",
+                  "pm.test('Each result has tripReadiness', () => res.results.forEach(r => pm.expect(r).to.have.property('tripReadiness')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-06-01\", \"to\": \"2026-06-08\" },\n  \"budget\": { \"min\": 8000, \"max\": 30000 },\n  \"group\": { \"size\": 4, \"type\": \"friends\" },\n  \"experienceTypes\": [\"adventure\", \"trekking\", \"nature\"],\n  \"departureCity\": \"Delhi\",\n  \"freeText\": \"Want to trek in the mountains, something adventurous with snow\",\n  \"gender\": \"male\",\n  \"age\": 45,\n  \"weight\": 95,\n  \"height\": 172,\n  \"medicalConditions\": [\"knee_issue\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Family Trip \u2014 senior with asthma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(res.results).to.be.an('array'));",
+                  "pm.test('Each result has healthAdvisory', () => res.results.forEach(r => pm.expect(r).to.have.property('healthAdvisory')));",
+                  "pm.test('Each result has tripReadiness', () => res.results.forEach(r => pm.expect(r).to.have.property('tripReadiness')));",
+                  "pm.test('tripReadiness has actionItems array', () => res.results.forEach(r => pm.expect(r.tripReadiness.actionItems).to.be.an('array')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-12-20\", \"to\": \"2026-12-27\" },\n  \"budget\": { \"min\": 3000, \"max\": 10000 },\n  \"group\": { \"size\": 4, \"type\": \"family\" },\n  \"experienceTypes\": [\"nature\", \"culture\", \"beach\"],\n  \"departureCity\": \"Bangalore\",\n  \"freeText\": \"Family vacation with elderly parents, want something peaceful and scenic\",\n  \"gender\": \"male\",\n  \"age\": 62,\n  \"weight\": 78,\n  \"height\": 168,\n  \"medicalConditions\": [\"asthma\", \"diabetes\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Solo Cultural \u2014 no health profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(res.results).to.be.an('array'));",
+                  "pm.test('Still has healthAdvisory', () => res.results.forEach(r => pm.expect(r).to.have.property('healthAdvisory')));",
+                  "pm.test('Still has costBreakdown', () => res.results.forEach(r => pm.expect(r).to.have.property('costBreakdown')));",
+                  "pm.test('Still has permits', () => res.results.forEach(r => pm.expect(r).to.have.property('permits')));",
+                  "pm.test('Still has tripReadiness', () => res.results.forEach(r => pm.expect(r).to.have.property('tripReadiness')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-02-10\", \"to\": \"2026-02-15\" },\n  \"budget\": { \"min\": 4000, \"max\": 12000 },\n  \"group\": { \"size\": 1, \"type\": \"solo\" },\n  \"experienceTypes\": [\"culture\", \"heritage\", \"food\"],\n  \"departureCity\": \"Chennai\",\n  \"freeText\": \"Solo trip to explore temples, local food and heritage sites\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Adventure \u2014 fit young male, high altitude",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has results', () => pm.expect(res.results).to.be.an('array'));",
+                  "pm.test('Each result has healthAdvisory', () => res.results.forEach(r => pm.expect(r).to.have.property('healthAdvisory')));",
+                  "pm.test('Each result has costBreakdown', () => res.results.forEach(r => pm.expect(r).to.have.property('costBreakdown')));",
+                  "pm.test('Each result has permits', () => res.results.forEach(r => pm.expect(r).to.have.property('permits')));",
+                  "pm.test('Each result has tripReadiness', () => res.results.forEach(r => pm.expect(r).to.have.property('tripReadiness')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-09-01\", \"to\": \"2026-09-10\" },\n  \"budget\": { \"min\": 10000, \"max\": 40000 },\n  \"group\": { \"size\": 2, \"type\": \"friends\" },\n  \"experienceTypes\": [\"adventure\", \"trekking\"],\n  \"departureCity\": \"Delhi\",\n  \"freeText\": \"Looking for a challenging high altitude trek, want to push our limits\",\n  \"gender\": \"male\",\n  \"age\": 25,\n  \"weight\": 68,\n  \"height\": 178\n}"
+            }
+          }
+        },
+        {
+          "name": "Trek Search \u2014 challenging high altitude",
+          "id": "f8a1b2c3-d4e5-4678-9abc-def012345678",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"mode is trek\", () => {",
+                  "  const res = pm.response.json();",
+                  "  pm.expect(res.mode).to.equal('trek');",
+                  "});",
+                  "pm.test(\"results is non-empty array\", () => {",
+                  "  const res = pm.response.json();",
+                  "  pm.expect(res.results).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test(\"each result has trek-specific fields\", () => {",
+                  "  const res = pm.response.json();",
+                  "  res.results.forEach(r => {",
+                  "    pm.expect(r).to.have.property('name');",
+                  "    pm.expect(r).to.have.property('baseCamp');",
+                  "    pm.expect(r).to.have.property('peakAltitude');",
+                  "    pm.expect(r).to.have.property('difficulty');",
+                  "    pm.expect(r).to.have.property('durationDays');",
+                  "    pm.expect(r).to.have.property('healthAdvisory');",
+                  "    pm.expect(r).to.have.property('costBreakdown');",
+                  "    pm.expect(r).to.have.property('permits');",
+                  "    pm.expect(r).to.have.property('tripReadiness');",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-06-01\", \"to\": \"2026-06-08\" },\n  \"budget\": { \"min\": 5000, \"max\": 25000 },\n  \"group\": { \"size\": 2, \"type\": \"friends\" },\n  \"experienceTypes\": [\"trekking\", \"adventure\"],\n  \"departureCity\": \"Delhi\",\n  \"freeText\": \"Looking for a challenging high altitude trek with snow and stunning views\",\n  \"gender\": \"male\",\n  \"age\": 25,\n  \"weight\": 68,\n  \"height\": 178\n}"
+            }
+          }
+        },
+        {
+          "name": "Trek Search \u2014 easy trek for senior with knee issue",
+          "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"mode is trek\", () => {",
+                  "  const res = pm.response.json();",
+                  "  pm.expect(res.mode).to.equal('trek');",
+                  "});",
+                  "pm.test(\"each result has healthAdvisory with suitability\", () => {",
+                  "  const res = pm.response.json();",
+                  "  res.results.forEach(r => {",
+                  "    pm.expect(r).to.have.property('healthAdvisory');",
+                  "    pm.expect(r.healthAdvisory).to.have.property('suitability');",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-10-15\", \"to\": \"2026-10-20\" },\n  \"budget\": { \"min\": 3000, \"max\": 15000 },\n  \"group\": { \"size\": 3, \"type\": \"family\" },\n  \"experienceTypes\": [\"trekking\", \"nature\"],\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"Easy trek suitable for older adults, scenic nature walk\",\n  \"gender\": \"male\",\n  \"age\": 60,\n  \"weight\": 75,\n  \"height\": 168,\n  \"medicalConditions\": [\"knee_issue\"]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Itinerary",
+      "item": [
+        {
+          "name": "Itinerary \u2014 Goa beach couple",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has destination', () => pm.expect(res).to.have.property('destination'));",
+                  "pm.test('Has totalEstimate', () => pm.expect(res).to.have.property('totalEstimate'));",
+                  "pm.test('Has itinerary array', () => pm.expect(res.itinerary).to.be.an('array'));",
+                  "pm.test('Itinerary not empty', () => pm.expect(res.itinerary.length).to.be.greaterThan(0));",
+                  "pm.test('Has packingList', () => pm.expect(res.packingList).to.be.an('array'));",
+                  "pm.test('Has healthAdvisory', () => pm.expect(res).to.have.property('healthAdvisory'));",
+                  "pm.test('Has permits', () => pm.expect(res).to.have.property('permits'));",
+                  "pm.test('Each day has activities', () => res.itinerary.forEach(d => pm.expect(d.activities).to.be.an('array')));",
+                  "pm.test('Each day has meals', () => res.itinerary.forEach(d => pm.expect(d).to.have.property('meals')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/itinerary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "itinerary"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Goa\",\n  \"state\": \"Goa\",\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-18\" },\n  \"budget\": { \"min\": 5000, \"max\": 20000 },\n  \"group\": { \"size\": 2, \"type\": \"couple\" },\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"Relaxing beach vacation, love seafood and sunset views\",\n  \"gender\": \"female\",\n  \"age\": 28,\n  \"weight\": 55,\n  \"height\": 162\n}"
+            }
+          }
+        },
+        {
+          "name": "Itinerary \u2014 Ladakh trek with knee issue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has itinerary array', () => pm.expect(res.itinerary).to.be.an('array'));",
+                  "pm.test('Has healthAdvisory', () => pm.expect(res).to.have.property('healthAdvisory'));",
+                  "pm.test('Has permits', () => pm.expect(res).to.have.property('permits'));",
+                  "pm.test('Permits required for Ladakh', () => pm.expect(res.permits.required).to.be.true);",
+                  "pm.test('packingList has items', () => pm.expect(res.packingList.length).to.be.greaterThan(0));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/itinerary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "itinerary"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Leh\",\n  \"state\": \"Ladakh\",\n  \"dates\": { \"from\": \"2026-07-10\", \"to\": \"2026-07-17\" },\n  \"budget\": { \"min\": 15000, \"max\": 50000 },\n  \"group\": { \"size\": 2, \"type\": \"friends\" },\n  \"departureCity\": \"Delhi\",\n  \"freeText\": \"High altitude adventure, monasteries and Pangong Lake\",\n  \"gender\": \"male\",\n  \"age\": 38,\n  \"weight\": 80,\n  \"height\": 175,\n  \"medicalConditions\": [\"knee_issue\"]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food Guide",
+      "item": [
+        {
+          "name": "Food Guide \u2014 Jaipur non-veg, diabetic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has destination', () => pm.expect(res).to.have.property('destination'));",
+                  "pm.test('Has overview', () => pm.expect(res).to.have.property('overview'));",
+                  "pm.test('Has mustTryDishes array', () => pm.expect(res.mustTryDishes).to.be.an('array'));",
+                  "pm.test('mustTryDishes not empty', () => pm.expect(res.mustTryDishes.length).to.be.greaterThan(0));",
+                  "pm.test('Has healthConscious array', () => pm.expect(res.healthConscious).to.be.an('array'));",
+                  "pm.test('Has streetFood', () => pm.expect(res).to.have.property('streetFood'));",
+                  "pm.test('Has mealPlan array', () => pm.expect(res.mealPlan).to.be.an('array'));",
+                  "pm.test('Has dietaryInfo', () => pm.expect(res).to.have.property('dietaryInfo'));",
+                  "pm.test('Each dish has healthNote', () => res.mustTryDishes.forEach(d => pm.expect(d).to.have.property('healthNote')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/food-guide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "food-guide"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Jaipur\",\n  \"state\": \"Rajasthan\",\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-18\" },\n  \"group\": { \"size\": 2, \"type\": \"couple\" },\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"Love bold flavors and trying local specialties\",\n  \"dietType\": \"non-veg\",\n  \"spiceTolerance\": \"high\",\n  \"foodBudget\": \"moderate\",\n  \"age\": 45,\n  \"weight\": 90,\n  \"height\": 170,\n  \"medicalConditions\": [\"diabetes\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Food Guide \u2014 Kerala veg, no allergies",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has destination', () => pm.expect(res).to.have.property('destination'));",
+                  "pm.test('Has mustTryDishes', () => pm.expect(res.mustTryDishes).to.be.an('array'));",
+                  "pm.test('Has mealPlan', () => pm.expect(res.mealPlan).to.be.an('array'));",
+                  "pm.test('Has dietaryInfo', () => pm.expect(res).to.have.property('dietaryInfo'));",
+                  "pm.test('vegFriendly info present', () => pm.expect(res.dietaryInfo).to.have.property('vegFriendly'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/food-guide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "food-guide"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Alleppey\",\n  \"state\": \"Kerala\",\n  \"dates\": { \"from\": \"2026-12-20\", \"to\": \"2026-12-24\" },\n  \"group\": { \"size\": 3, \"type\": \"family\" },\n  \"departureCity\": \"Bangalore\",\n  \"freeText\": \"Exploring Kerala backwaters and traditional cuisine\",\n  \"dietType\": \"veg\",\n  \"spiceTolerance\": \"medium\",\n  \"foodBudget\": \"street\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "No Auth Header \u2192 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 Unauthorized', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-22\" },\n  \"budget\": { \"min\": 5000, \"max\": 20000 },\n  \"group\": { \"size\": 2, \"type\": \"couple\" },\n  \"experienceTypes\": [\"beach\"],\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"beach trip\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Invalid DTO - missing required fields \u2192 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has validation errors', () => pm.expect(res.message).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-22\" }\n}"
+            }
+          }
+        },
+        {
+          "name": "Invalid group type \u2192 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-22\" },\n  \"budget\": { \"min\": 5000, \"max\": 20000 },\n  \"group\": { \"size\": 2, \"type\": \"gang\" },\n  \"experienceTypes\": [\"beach\"],\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"beach trip\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Itinerary \u2014 missing destination \u2192 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/itinerary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "itinerary"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-18\" },\n  \"budget\": { \"min\": 5000, \"max\": 20000 }\n}"
+            }
+          }
+        },
+        {
+          "name": "Food Guide \u2014 invalid dietType \u2192 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/destination-finder/food-guide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "destination-finder",
+                "food-guide"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Jaipur\",\n  \"state\": \"Rajasthan\",\n  \"dates\": { \"from\": \"2026-11-15\", \"to\": \"2026-11-18\" },\n  \"group\": { \"size\": 2, \"type\": \"couple\" },\n  \"departureCity\": \"Mumbai\",\n  \"freeText\": \"test\",\n  \"dietType\": \"keto\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Saved Trips",
+      "item": [
+        {
+          "name": "Save a Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has trip id', () => pm.expect(res).to.have.property('id'));",
+                  "pm.test('Name defaults to destination Trip', () => pm.expect(res.name).to.equal('Goa Trip'));",
+                  "pm.test('Has userId', () => pm.expect(res).to.have.property('userId'));",
+                  "pm.test('Has destinationData', () => pm.expect(res).to.have.property('destinationData'));",
+                  "pm.collectionVariables.set('tripId', res.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Goa\",\n  \"state\": \"Goa\",\n  \"dates\": {\"from\": \"2026-11-10\", \"to\": \"2026-11-14\"},\n  \"travelMode\": \"train\",\n  \"destinationData\": {\n    \"name\": \"Goa\",\n    \"state\": \"Goa\",\n    \"isHiddenGem\": false,\n    \"budgetEstimate\": \"\u20b98k-15k\",\n    \"weatherSnapshot\": \"Warm and pleasant\",\n    \"travelTime\": \"14h train\",\n    \"highlights\": [\"Beaches\", \"Nightlife\", \"Water sports\"]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "List My Trips",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Returns array', () => pm.expect(res).to.be.an('array'));",
+                  "pm.test('Each trip has required fields', () => res.forEach(t => {",
+                  "  pm.expect(t).to.have.property('id');",
+                  "  pm.expect(t).to.have.property('name');",
+                  "  pm.expect(t).to.have.property('destination');",
+                  "  pm.expect(t).to.have.property('hasItinerary');",
+                  "  pm.expect(t).to.have.property('hasFoodGuide');",
+                  "}));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Trip by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has id', () => pm.expect(res).to.have.property('id'));",
+                  "pm.test('Has destinationData', () => pm.expect(res).to.have.property('destinationData'));",
+                  "pm.test('Has dates', () => pm.expect(res).to.have.property('dates'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips",
+                "{{tripId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Name updated', () => pm.expect(res.name).to.equal('My Goa Adventure'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips",
+                "{{tripId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Goa Adventure\",\n  \"travelMode\": \"flight\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Enable Sharing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has shareToken', () => pm.expect(res).to.have.property('shareToken'));",
+                  "pm.test('Has url', () => pm.expect(res).to.have.property('url'));",
+                  "pm.collectionVariables.set('shareToken', res.shareToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips/{{tripId}}/share",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips",
+                "{{tripId}}",
+                "share"
+              ]
+            }
+          }
+        },
+        {
+          "name": "View Shared Trip (No Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.test('Has sharedBy', () => pm.expect(res).to.have.property('sharedBy'));",
+                  "pm.test('Has destinationData', () => pm.expect(res).to.have.property('destinationData'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/shared-trips/{{shareToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "shared-trips",
+                "{{shareToken}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Disable Sharing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips/{{tripId}}/share",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips",
+                "{{tripId}}",
+                "share"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Trip",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{idToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/saved-trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "saved-trips",
+                "{{tripId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
