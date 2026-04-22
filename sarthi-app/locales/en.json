@@ -1,0 +1,47 @@
+{
+  "welcome": {
+    "overline": "EXPLORE INDIA YOUR WAY",
+    "title": "Your personal travel companion",
+    "body": "AI-powered destination finder, itineraries, and food guides — built for Indian travelers.",
+    "cta": "Get Started",
+    "signIn": "Already have an account? Sign in"
+  },
+  "login": {
+    "title": "Welcome back",
+    "body": "Sign in to continue planning your trips",
+    "phonePlaceholder": "98765 XXXXX",
+    "sendOtp": "Send OTP",
+    "orContinueWith": "or continue with",
+    "continueGoogle": "Continue with Google",
+    "continueEmail": "Continue with Email",
+    "terms": "By continuing you agree to our",
+    "termsLink": "Terms",
+    "privacyLink": "Privacy"
+  },
+  "otp": {
+    "title": "Enter OTP",
+    "codeSentTo": "Code sent to",
+    "changeNumber": "Change number",
+    "verify": "Verify & Continue",
+    "resendIn": "Resend code in",
+    "resend": "Resend OTP",
+    "errorWrong": "Incorrect code. Try again.",
+    "errorTooMany": "Too many attempts. Request a new code."
+  },
+  "email": {
+    "title": "Continue with email",
+    "emailLabel": "EMAIL",
+    "passwordLabel": "PASSWORD",
+    "confirmLabel": "CONFIRM PASSWORD",
+    "continue": "Continue",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "forgotPassword": "Forgot password?",
+    "resetSent": "Reset email sent"
+  },
+  "tabs": {
+    "search": "Search",
+    "trips": "Trips",
+    "profile": "Profile"
+  }
+}
