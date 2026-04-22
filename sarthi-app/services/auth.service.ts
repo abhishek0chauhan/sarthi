@@ -1,28 +1,52 @@
+import auth from '@react-native-firebase/auth';
+import * as SecureStore from 'expo-secure-store';
 import { useAuthStore } from '@/stores/auth.store';
 
+const TOKEN_KEY = 'sarthi_firebase_token';
+
 export const authService = {
-  init: () => {
-    const { setLoading, setUser, setAuthenticated } = useAuthStore.getState();
+  init() {
+    return auth().onAuthStateChanged(async (user) => {
+      useAuthStore.getState().setUser(user);
+      if (user) {
+        const token = await user.getIdToken();
+        await SecureStore.setItemAsync(TOKEN_KEY, token);
+      } else {
+        await SecureStore.deleteItemAsync(TOKEN_KEY);
+      }
+      useAuthStore.getState().setLoading(false);
+    });
+  },
 
-    // Initialize auth state
-    // In a real app, this would check Firebase auth state
-    // For now, we'll just set loading to false after a brief delay
-    const timer = setTimeout(() => {
-      setLoading(false);
-      // Uncomment when Firebase auth is integrated
-      // const unsubscribe = auth().onAuthStateChanged((user) => {
-      //   if (user) {
-      //     setUser({ uid: user.uid, email: user.email || undefined });
-      //     setAuthenticated(true);
-      //   } else {
-      //     setUser(null);
-      //     setAuthenticated(false);
-      //   }
-      //   setLoading(false);
-      // });
-      // return unsubscribe;
-    }, 0);
+  async getToken(): Promise<string | null> {
+    const user = auth().currentUser;
+    if (!user) return null;
+    return user.getIdToken();
+  },
 
-    return () => clearTimeout(timer);
+  async sendOTP(phoneNumber: string) {
+    return auth().signInWithPhoneNumber(phoneNumber);
+  },
+
+  async signInWithGoogle(idToken: string) {
+    const credential = auth.GoogleAuthProvider.credential(idToken);
+    return auth().signInWithCredential(credential);
+  },
+
+  async signInWithEmail(email: string, password: string) {
+    return auth().signInWithEmailAndPassword(email, password);
+  },
+
+  async createAccount(email: string, password: string) {
+    return auth().createUserWithEmailAndPassword(email, password);
+  },
+
+  async sendPasswordReset(email: string) {
+    return auth().sendPasswordResetEmail(email);
+  },
+
+  async signOut() {
+    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    return auth().signOut();
   },
 };
