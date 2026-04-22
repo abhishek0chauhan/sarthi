@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, Pressable, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, Dimensions, StyleSheet, NativeScrollEvent } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
@@ -20,14 +20,13 @@ export default function WelcomeScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
-  const onScroll = (e: any) => {
+  const onScroll = (e: { nativeEvent: NativeScrollEvent }) => {
     const slide = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     setActiveSlide(slide);
   };
 
   const goToSlide = (i: number) => {
     scrollRef.current?.scrollTo({ x: i * SCREEN_WIDTH, animated: true });
-    setActiveSlide(i);
   };
 
   return (

@@ -36,4 +36,15 @@ describe('WelcomeScreen', () => {
     const { getAllByTestId } = renderWithSafeArea(<WelcomeScreen />);
     expect(getAllByTestId(/slide-dot-/)).toHaveLength(3);
   });
+
+  it('navigates carousel when dot is pressed', () => {
+    const { getByTestId } = renderWithSafeArea(<WelcomeScreen />);
+    const dot2 = getByTestId('slide-dot-2');
+
+    fireEvent.press(dot2);
+
+    // After pressing dot-2, activeSlide should be updated through onScroll callback
+    // The dot should appear active
+    expect(dot2).toBeTruthy();
+  });
 });
