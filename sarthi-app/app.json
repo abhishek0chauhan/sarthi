@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Sarthi",
+    "slug": "sarthi",
+    "scheme": "sarthi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": false },
+    "android": { "adaptiveIcon": { "backgroundColor": "#FDF8F0" } },
+    "web": { "bundler": "metro" },
+    "plugins": [
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
+    ]
+  }
+}
