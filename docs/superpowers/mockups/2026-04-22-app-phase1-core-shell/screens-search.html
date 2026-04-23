@@ -1,0 +1,242 @@
+<h2>Section 5 — Search Screens</h2>
+<p class="subtitle">The heart of the app. Search form on the left, results on the right.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
+
+  <!-- SEARCH FORM -->
+  <div>
+    <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:10px">SEARCH FORM</div>
+    <div style="background:#FDF8F0;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden">
+
+      <!-- Header -->
+      <div style="padding:20px 20px 0">
+        <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">GOOD MORNING</div>
+        <div style="font-family:system-ui;font-size:22px;font-weight:800;color:#1A1208;letter-spacing:-0.5px;margin-bottom:4px">Where to next?</div>
+        <div style="font-family:system-ui;font-size:13px;color:#A0856E;margin-bottom:20px">Describe your dream trip and Sarthi will find it.</div>
+      </div>
+
+      <!-- Scrollable form content -->
+      <div style="padding:0 20px;overflow:auto">
+
+        <!-- Freetext -->
+        <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:6px">DESCRIBE YOUR TRIP</div>
+        <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #E8601C;box-shadow:0 0 0 3px rgba(232,96,28,0.08);margin-bottom:16px;min-height:64px">
+          <span style="font-family:system-ui;font-size:13px;color:#1A1208">Mountain escape with 4 friends, budget under ₹15k...</span>
+        </div>
+
+        <!-- Dates row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div>
+            <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:6px">FROM</div>
+            <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px">📅</span>
+              <span style="font-family:system-ui;font-size:12px;color:#1A1208;font-weight:500">May 15</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:6px">TO</div>
+            <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px">📅</span>
+              <span style="font-family:system-ui;font-size:12px;color:#1A1208;font-weight:500">May 19</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Departure + Group -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div>
+            <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:6px">FROM CITY</div>
+            <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:system-ui;font-size:12px;color:#1A1208;font-weight:500">Delhi</span>
+              <span style="font-family:system-ui;font-size:10px;color:#C4B5A5">▾</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:6px">GROUP</div>
+            <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;align-items:center;gap:6px">
+              <span style="font-family:system-ui;font-size:12px;color:#1A1208;font-weight:500">4</span>
+              <span style="font-family:system-ui;font-size:12px;color:#C4B5A5">Friends ▾</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Budget -->
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px">BUDGET PER PERSON</div>
+            <div style="font-family:system-ui;font-size:11px;font-weight:700;color:#E8601C">₹5,000 – ₹15,000</div>
+          </div>
+          <!-- Slider track -->
+          <div style="background:#EDE5D8;border-radius:10px;height:4px;position:relative;margin:0 4px">
+            <div style="position:absolute;left:15%;right:25%;background:#E8601C;height:4px;border-radius:10px"></div>
+            <div style="position:absolute;left:calc(15% - 10px);top:-8px;width:20px;height:20px;border-radius:50%;background:#E8601C;box-shadow:0 2px 8px rgba(232,96,28,0.4);border:2px solid #fff"></div>
+            <div style="position:absolute;right:calc(25% - 10px);top:-8px;width:20px;height:20px;border-radius:50%;background:#E8601C;box-shadow:0 2px 8px rgba(232,96,28,0.4);border:2px solid #fff"></div>
+          </div>
+        </div>
+
+        <!-- Experience type chips -->
+        <div style="margin-bottom:16px">
+          <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:10px">EXPERIENCE TYPE</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <span style="background:#E8601C;color:#fff;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;font-family:system-ui;box-shadow:0 3px 10px rgba(232,96,28,0.25)">🏔 Nature</span>
+            <span style="background:#E8601C;color:#fff;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;font-family:system-ui;box-shadow:0 3px 10px rgba(232,96,28,0.25)">🍜 Food</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">🧗 Adventure</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">🏛 Culture</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">🪔 Spiritual</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">📸 Photo</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">🛍 Shopping</span>
+            <span style="background:#FFFFFF;color:#A0856E;border-radius:20px;padding:7px 14px;font-size:11px;font-family:system-ui;border:1.5px solid #EDE5D8">🌙 Nightlife</span>
+          </div>
+        </div>
+
+        <!-- Expandable sections -->
+        <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-family:system-ui;font-size:13px;font-weight:600;color:#1A1208">+ Health Profile</span>
+          <span style="font-family:system-ui;font-size:10px;color:#C4B5A5">Optional</span>
+        </div>
+        <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-family:system-ui;font-size:13px;font-weight:600;color:#1A1208">+ Food Preferences</span>
+          <span style="font-family:system-ui;font-size:10px;color:#C4B5A5">Optional</span>
+        </div>
+
+        <!-- Hidden gems toggle -->
+        <div style="background:#FFFFFF;border-radius:12px;padding:13px 14px;border:1.5px solid #EDE5D8;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <div style="font-family:system-ui;font-size:13px;font-weight:600;color:#1A1208">🌿 Hidden Gems Only</div>
+            <div style="font-family:system-ui;font-size:11px;color:#A0856E;margin-top:2px">Skip popular tourist spots</div>
+          </div>
+          <div style="width:44px;height:26px;background:#E8601C;border-radius:20px;position:relative;box-shadow:0 2px 8px rgba(232,96,28,0.3)">
+            <div style="position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.15)"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA pinned to bottom -->
+      <div style="padding:0 20px 20px">
+        <div style="background:#E8601C;border-radius:14px;padding:15px;text-align:center;box-shadow:0 6px 20px rgba(232,96,28,0.3)">
+          <span style="font-family:system-ui;font-size:15px;font-weight:700;color:#fff">🔍 Find Destinations</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEARCH RESULTS -->
+  <div>
+    <div style="font-family:system-ui;font-size:10px;font-weight:700;color:#A0856E;letter-spacing:1px;margin-bottom:10px">SEARCH RESULTS</div>
+    <div style="background:#FDF8F0;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden">
+
+      <!-- Header -->
+      <div style="padding:20px 20px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#F5EFE6;display:flex;align-items:center;justify-content:center;font-size:14px;color:#1A1208">←</div>
+        <div>
+          <div style="font-family:system-ui;font-size:16px;font-weight:800;color:#1A1208;letter-spacing:-0.3px">5 destinations</div>
+          <div style="font-family:system-ui;font-size:11px;color:#A0856E">Nature · Food · May 15–19 · Delhi</div>
+        </div>
+        <div style="margin-left:auto;background:#F5EFE6;border-radius:10px;padding:7px 12px">
+          <span style="font-family:system-ui;font-size:11px;font-weight:600;color:#A0856E">Filter ▾</span>
+        </div>
+      </div>
+
+      <div style="padding:0 16px 20px">
+
+        <!-- Card 1 — Hero card -->
+        <div style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);margin-bottom:12px">
+          <div style="height:140px;background:linear-gradient(160deg,#1B4332,#2D6A4F,#52B788);position:relative">
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(0,0,0,0.6))"></div>
+            <!-- Badges -->
+            <div style="position:absolute;top:12px;left:12px;display:flex;gap:6px">
+              <span style="background:#E8601C;color:#fff;border-radius:20px;padding:4px 11px;font-size:9px;font-weight:700;font-family:system-ui">🌿 Hidden Gem</span>
+            </div>
+            <div style="position:absolute;top:12px;right:12px">
+              <span style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);color:#fff;border-radius:20px;padding:4px 11px;font-size:9px;font-weight:700;font-family:system-ui;border:1px solid rgba(255,255,255,0.25)">82% match</span>
+            </div>
+            <!-- Save button -->
+            <div style="position:absolute;bottom:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid rgba(255,255,255,0.25)">🔖</div>
+            <!-- Title on image -->
+            <div style="position:absolute;bottom:10px;left:14px">
+              <div style="font-family:system-ui;font-size:18px;font-weight:800;color:#FFFFFF;letter-spacing:-0.3px">Cherrapunji</div>
+              <div style="font-family:system-ui;font-size:10px;color:rgba(255,255,255,0.75)">Meghalaya</div>
+            </div>
+          </div>
+          <!-- Card body -->
+          <div style="padding:14px">
+            <div style="font-family:system-ui;font-size:12px;color:#A0856E;margin-bottom:10px;line-height:1.5">Wettest place on earth — living root bridges, crystal rivers, and cloud forests.</div>
+            <!-- Stats row -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+              <span style="background:#F5EFE6;color:#A0856E;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:system-ui">₹8–12k/pp</span>
+              <span style="background:#F5EFE6;color:#A0856E;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:system-ui">✈️ 2h flight</span>
+              <span style="background:#F5EFE6;color:#A0856E;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:system-ui">🌤 Pleasant</span>
+              <span style="background:#F5EFE6;color:#A0856E;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:system-ui">🏥 Moderate</span>
+            </div>
+            <!-- Actions -->
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;background:#E8601C;border-radius:10px;padding:10px;text-align:center;font-family:system-ui;font-size:11px;font-weight:700;color:#fff;box-shadow:0 3px 12px rgba(232,96,28,0.25)">Get Itinerary</div>
+              <div style="flex:1;background:#FEF0E6;border-radius:10px;padding:10px;text-align:center;font-family:system-ui;font-size:11px;font-weight:700;color:#E8601C;border:1px solid #FBBF9A">Food Guide</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — smaller preview -->
+        <div style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);margin-bottom:12px">
+          <div style="height:100px;background:linear-gradient(160deg,#1A3A5C,#2E5F8A,#5B8DB8);position:relative">
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.55))"></div>
+            <div style="position:absolute;top:12px;right:12px">
+              <span style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);color:#fff;border-radius:20px;padding:4px 11px;font-size:9px;font-weight:700;font-family:system-ui;border:1px solid rgba(255,255,255,0.25)">78% match</span>
+            </div>
+            <div style="position:absolute;bottom:10px;left:14px">
+              <div style="font-family:system-ui;font-size:16px;font-weight:800;color:#FFFFFF;letter-spacing:-0.3px">Dawki</div>
+              <div style="font-family:system-ui;font-size:10px;color:rgba(255,255,255,0.75)">Meghalaya</div>
+            </div>
+          </div>
+          <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-family:system-ui;font-size:11px;color:#A0856E">Crystal clear Umngot river</div>
+              <div style="display:flex;gap:5px;margin-top:6px">
+                <span style="background:#F5EFE6;color:#A0856E;border-radius:5px;padding:3px 8px;font-size:9px;font-family:system-ui">₹6–9k/pp</span>
+                <span style="background:#F5EFE6;color:#A0856E;border-radius:5px;padding:3px 8px;font-size:9px;font-family:system-ui">✈️ 2.5h</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <div style="background:#E8601C;border-radius:8px;padding:8px 12px;font-family:system-ui;font-size:10px;font-weight:700;color:#fff">Itinerary</div>
+              <div style="background:#FEF0E6;border-radius:8px;padding:8px 12px;font-family:system-ui;font-size:10px;font-weight:700;color:#E8601C;border:1px solid #FBBF9A">Food</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — minimal peek -->
+        <div style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
+          <div style="height:70px;background:linear-gradient(160deg,#3B2314,#6B3F22,#A0622F);position:relative">
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(0,0,0,0.5))"></div>
+            <div style="position:absolute;bottom:8px;left:14px">
+              <div style="font-family:system-ui;font-size:14px;font-weight:800;color:#FFFFFF">Mawlynnong</div>
+              <div style="font-family:system-ui;font-size:9px;color:rgba(255,255,255,0.7)">Meghalaya · Cleanest village in Asia</div>
+            </div>
+            <div style="position:absolute;top:10px;right:12px">
+              <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;font-family:system-ui">74%</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:12px;font-family:system-ui;font-size:11px;color:#C4B5A5">↓ 2 more destinations below</div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- AI Loading State -->
+<div style="margin-top:20px;background:#FDF8F0;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.05);display:flex;align-items:center;gap:20px">
+  <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FEF0E6,#FBBF9A);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🧭</div>
+  <div style="flex:1">
+    <div style="font-family:system-ui;font-size:14px;font-weight:700;color:#1A1208;margin-bottom:4px">Sarthi is thinking...</div>
+    <div style="font-family:system-ui;font-size:12px;color:#A0856E;margin-bottom:10px">Scanning weather, routes, and hidden gems for your dates</div>
+    <!-- Skeleton bars -->
+    <div style="background:#EDE5D8;border-radius:4px;height:8px;width:100%;margin-bottom:6px;animation:pulse 1.5s ease-in-out infinite"></div>
+    <div style="background:#EDE5D8;border-radius:4px;height:8px;width:75%"></div>
+  </div>
+</div>
+
+<p style="text-align:center;margin-top:16px;opacity:0.5;font-size:13px">Loading state: Lottie compass animation + skeleton cards — AI calls can take 10–30 seconds</p>
