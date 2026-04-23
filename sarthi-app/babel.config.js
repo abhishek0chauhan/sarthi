@@ -3,7 +3,9 @@ module.exports = function (api) {
   api.cache(!isTest);
 
   return {
-    presets: ['babel-preset-expo'],
-    plugins: isTest ? [] : ['nativewind/babel', 'react-native-reanimated/plugin'],
+    presets: [
+      ['babel-preset-expo', { jsxImportSource: 'nativewind' }],
+    ],
+    plugins: isTest ? [] : ['react-native-worklets/plugin'],
   };
 };

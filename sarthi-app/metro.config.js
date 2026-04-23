@@ -1,3 +1,6 @@
+// metro.config.js
+// Uses createRequire so this file works whether Metro loads it as CJS or ESM
+const { createRequire } = require('module');
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 
