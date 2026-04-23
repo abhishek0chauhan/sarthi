@@ -22,9 +22,23 @@ export default function RootLayout() {
   const isAuthLoading = useAuthStore(s => s.isLoading);
 
   useEffect(() => {
-    const unsubscribe = authService.init();
-    return unsubscribe;
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = authService.init();
+    } catch (err) {
+      console.warn('[RootLayout] authService.init failed', err);
+      useAuthStore.getState().setLoading(false);
+    }
+    return () => {
+      try { unsubscribe?.(); } catch {}
+    };
   }, []);
+
+  useEffect(() => {
+    if (fontsLoaded && !isAuthLoading) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, isAuthLoading]);
 
   if (!fontsLoaded || isAuthLoading) return null;
 
