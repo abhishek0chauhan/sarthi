@@ -4,7 +4,7 @@ import { lightColors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface InputProps extends TextInputProps {
-  label: string;
+  label?: string;
   error?: string;
   testID?: string;
 }
@@ -14,9 +14,11 @@ export function Input({ label, error, style, testID, ...rest }: InputProps) {
 
   return (
     <View style={styles.wrapper}>
-      <Text style={[styles.label, focused && styles.labelFocused, error && styles.labelError]}>
-        {label}
-      </Text>
+      {label ? (
+        <Text style={[styles.label, focused && styles.labelFocused, error && styles.labelError]}>
+          {label}
+        </Text>
+      ) : null}
       <TextInput
         testID={testID}
         style={[
