@@ -20,9 +20,13 @@ export default function TabLayout() {
         <View style={[styles.pillWrapper, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.pill}>
             {TABS.map((tab) => {
-              const route = state.routes.find((r) => r.name === tab.name);
-              if (!route) return null;
-              const focused = state.routes[state.index].name === tab.name;
+              // Expo Router may name routes 'search' or 'search/index' depending on version
+              const routeIndex = state.routes.findIndex(
+                (r) => r.name === tab.name || r.name === `${tab.name}/index`
+              );
+              if (routeIndex === -1) return null;
+              const route = state.routes[routeIndex];
+              const focused = state.index === routeIndex;
               return (
                 <Pressable
                   key={tab.name}
