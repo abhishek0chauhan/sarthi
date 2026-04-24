@@ -22,6 +22,8 @@ export interface ItineraryData {
   packingList: string[];
   permits?: { required: boolean; details?: string; estimatedCost?: string };
   healthAdvisory: { suitability: string; physicalDemand: string; considerations: string[]; recommendations: string[] };
+  tripReadiness?: number;   // 0–100, populated by backend in future
+  highlights?: string[];    // key highlights for the destination
 }
 
 export interface SavedTrip {
