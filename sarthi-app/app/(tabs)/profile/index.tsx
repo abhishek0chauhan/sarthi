@@ -2,6 +2,7 @@ import { View, Text, Pressable, StyleSheet, Alert, ScrollView } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/auth.store';
 import { authService } from '@/services/auth.service';
+import { useThemeStore } from '@/stores/theme.store';
 import { lightColors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
@@ -26,6 +27,13 @@ function MenuItem({ icon, label, onPress, destructive }: MenuItemProps) {
 
 export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
+  const { override, setOverride } = useThemeStore();
+
+  const isDark = override === 'dark';
+
+  const handleToggleDarkMode = () => {
+    setOverride(isDark ? 'light' : 'dark');
+  };
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -53,7 +61,7 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>ACCOUNT</Text>
           <MenuItem icon="🔔" label="Notifications" onPress={() => {}} />
-          <MenuItem icon="🌙" label="Dark Mode" onPress={() => {}} />
+          <MenuItem icon="🌙" label={isDark ? 'Dark Mode (On)' : 'Dark Mode (Off)'} onPress={handleToggleDarkMode} />
           <MenuItem icon="🌐" label="Language" onPress={() => {}} />
         </View>
 

@@ -5,9 +5,9 @@ import { lightColors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 const TABS = [
-  { name: 'search/index', label: 'SEARCH', icon: '🧭' },
-  { name: 'trips/index',  label: 'TRIPS',  icon: '🗺' },
-  { name: 'profile/index',label: 'PROFILE',icon: '👤' },
+  { name: 'search',  label: 'SEARCH',  icon: '🧭' },
+  { name: 'trips',   label: 'TRIPS',   icon: '🗺' },
+  { name: 'profile', label: 'PROFILE', icon: '👤' },
 ];
 
 export default function TabLayout() {
@@ -19,12 +19,16 @@ export default function TabLayout() {
       tabBar={({ state, navigation }) => (
         <View style={[styles.pillWrapper, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.pill}>
-            {TABS.map((tab, i) => {
-              const focused = state.index === i;
+            {TABS.map((tab) => {
+              const route = state.routes.find((r) => r.name === tab.name);
+              if (!route) return null;
+              const focused = state.routes[state.index].name === tab.name;
               return (
                 <Pressable
                   key={tab.name}
-                  onPress={() => navigation.navigate(tab.name)}
+                  onPress={() =>
+                    navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true })
+                  }
                   style={[styles.tabItem, focused && styles.tabItemActive]}
                 >
                   <Text style={styles.icon}>{tab.icon}</Text>

@@ -61,10 +61,15 @@ export default function TripsScreen() {
   }
 
   if (error) {
+    const isNetworkError = error instanceof Error && (
+      error.message.includes('fetch') || error.message.includes('network') || error.message.includes('Failed')
+    );
     return (
       <EmptyState
-        title="Couldn't load trips"
-        description="Check your connection and try again."
+        title="Backend unavailable"
+        description={isNetworkError
+          ? "The Sarthi server isn't reachable right now. In Expo Go dev mode, trips require the backend to be running."
+          : "Couldn't load trips. Check your connection and try again."}
         action={
           <Pressable onPress={() => refetch()} style={styles.retryBtn}>
             <Text style={styles.retryText}>Retry</Text>
