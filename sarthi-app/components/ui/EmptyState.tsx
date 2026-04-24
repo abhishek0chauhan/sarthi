@@ -1,5 +1,7 @@
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface EmptyStateProps {
@@ -10,6 +12,9 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ title, description, illustration, action }: EmptyStateProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <View style={styles.container}>
       {illustration && <View style={styles.illustrationWrapper}>{illustration}</View>}
@@ -20,16 +25,18 @@ export function EmptyState({ title, description, illustration, action }: EmptySt
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 48,
-  },
-  illustrationWrapper: { marginBottom: 24 },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, textAlign: 'center', marginBottom: 8 },
-  description: { ...type.body, color: lightColors.textSecondary, textAlign: 'center', marginBottom: 24 },
-  actionWrapper: { width: '100%' },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+      paddingVertical: 48,
+    },
+    illustrationWrapper: { marginBottom: 24 },
+    title: { ...type.screenTitle, color: colors.textPrimary, textAlign: 'center', marginBottom: 8 },
+    description: { ...type.body, color: colors.textSecondary, textAlign: 'center', marginBottom: 24 },
+    actionWrapper: { width: '100%' },
+  });
+}

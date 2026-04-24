@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 const OTP_LENGTH = 6;
@@ -13,6 +14,9 @@ interface OTPInputProps {
 }
 
 export function OTPInput({ value, onChange, hasError, testID }: OTPInputProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   const inputRef = useRef<TextInput>(null);
 
   const digits = value.split('');
@@ -56,24 +60,26 @@ export function OTPInput({ value, onChange, hasError, testID }: OTPInputProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 10, justifyContent: 'center' },
-  box: {
-    width: 46, height: 54,
-    borderRadius: 12, borderWidth: 1.5,
-    borderColor: lightColors.border,
-    backgroundColor: lightColors.bgCard,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  boxActive: {
-    borderColor: lightColors.primary500,
-    shadowColor: lightColors.primary500,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  boxError: { borderColor: lightColors.danger },
-  digit: { ...type.screenTitle, color: lightColors.textPrimary },
-  cursor: { width: 2, height: 26, borderRadius: 2, backgroundColor: lightColors.primary500 },
-  hiddenInput: { position: 'absolute', opacity: 0, width: 1, height: 1 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    row: { flexDirection: 'row', gap: 10, justifyContent: 'center' },
+    box: {
+      width: 46, height: 54,
+      borderRadius: 12, borderWidth: 1.5,
+      borderColor: colors.border,
+      backgroundColor: colors.bgCard,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    boxActive: {
+      borderColor: colors.primary500,
+      shadowColor: colors.primary500,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+    },
+    boxError: { borderColor: colors.danger },
+    digit: { ...type.screenTitle, color: colors.textPrimary },
+    cursor: { width: 2, height: 26, borderRadius: 2, backgroundColor: colors.primary500 },
+    hiddenInput: { position: 'absolute', opacity: 0, width: 1, height: 1 },
+  });
+}

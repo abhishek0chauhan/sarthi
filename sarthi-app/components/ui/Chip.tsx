@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface ChipProps {
@@ -10,6 +11,9 @@ interface ChipProps {
 }
 
 export function Chip({ label, selected, onPress }: ChipProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <Pressable
       onPress={onPress}
@@ -20,17 +24,19 @@ export function Chip({ label, selected, onPress }: ChipProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  chip: {
-    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7,
-    backgroundColor: lightColors.bgCard,
-    borderWidth: 1.5, borderColor: lightColors.border,
-  },
-  chipSelected: {
-    backgroundColor: lightColors.primary500, borderColor: lightColors.primary500,
-    shadowColor: lightColors.primary500,
-    shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6,
-  },
-  label:         { ...type.caption, fontFamily: 'Inter_500Medium', color: lightColors.textSecondary },
-  labelSelected: { color: '#fff', fontFamily: 'Inter_700Bold' },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    chip: {
+      borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7,
+      backgroundColor: colors.bgCard,
+      borderWidth: 1.5, borderColor: colors.border,
+    },
+    chipSelected: {
+      backgroundColor: colors.primary500, borderColor: colors.primary500,
+      shadowColor: colors.primary500,
+      shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6,
+    },
+    label:         { ...type.caption, fontFamily: 'Inter_500Medium', color: colors.textSecondary },
+    labelSelected: { color: '#fff', fontFamily: 'Inter_700Bold' },
+  });
+}
