@@ -7,13 +7,16 @@ import { Button } from '@/components/ui/Button';
 import { useGenerateItinerary } from '@/hooks/useSearch';
 import { useCreateTrip } from '@/hooks/useTrips';
 import { useSearchStore } from '@/stores/search.store';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 export default function NewItineraryScreen() {
   const router = useRouter();
   const { destination, state } = useLocalSearchParams<{ destination: string; state: string }>();
   const { formValues } = useSearchStore();
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const itineraryMutation = useGenerateItinerary();
   const createTripMutation = useCreateTrip();
@@ -89,11 +92,13 @@ export default function NewItineraryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 16 },
-  emoji: { fontSize: 48 },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, textAlign: 'center' },
-  subtitle: { ...type.body, color: lightColors.textSecondary, textAlign: 'center', marginBottom: 8 },
-  error: { ...type.body, color: lightColors.danger, textAlign: 'center', marginBottom: 16 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 16 },
+    emoji: { fontSize: 48 },
+    title: { ...type.screenTitle, color: colors.textPrimary, textAlign: 'center' },
+    subtitle: { ...type.body, color: colors.textSecondary, textAlign: 'center', marginBottom: 8 },
+    error: { ...type.body, color: colors.danger, textAlign: 'center', marginBottom: 16 },
+  });
+}

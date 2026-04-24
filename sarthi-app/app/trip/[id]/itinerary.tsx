@@ -8,7 +8,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { DayTabs } from '@/components/trip/DayTabs';
 import { ActivityCard } from '@/components/trip/ActivityCard';
 import { CostBreakdown } from '@/components/trip/CostBreakdown';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { ItineraryData } from '@/types/trip.types';
 
@@ -16,6 +17,8 @@ export default function TripItineraryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: trip, isLoading } = useTrip(id ?? '');
   const [activeDay, setActiveDay] = useState(1);
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   if (isLoading) return <LoadingSpinner />;
   if (!trip?.itineraryData) return <EmptyState title="No itinerary" />;
@@ -54,9 +57,11 @@ export default function TripItineraryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  content: { padding: 20, gap: 16 },
-  dayTitle: { ...type.screenTitle, color: lightColors.textPrimary, marginBottom: 16 },
-  dayTotal: { ...type.caption, color: lightColors.textSecondary, textAlign: 'right', marginTop: 8 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    content: { padding: 20, gap: 16 },
+    dayTitle: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 16 },
+    dayTotal: { ...type.caption, color: colors.textSecondary, textAlign: 'right', marginTop: 8 },
+  });
+}

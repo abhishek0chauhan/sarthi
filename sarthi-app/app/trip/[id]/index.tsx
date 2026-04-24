@@ -5,13 +5,16 @@ import { useTrip, useDeleteTrip } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: trip, isLoading, error } = useTrip(id ?? '');
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   if (isLoading) return <LoadingSpinner />;
   if (error || !trip) return <EmptyState title="Trip not found" />;
@@ -62,20 +65,22 @@ export default function TripDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  content: { padding: 20, gap: 20 },
-  header: { flexDirection: 'row', gap: 12 },
-  backBtn: {
-    width: 36, height: 36, borderRadius: 10,
-    backgroundColor: lightColors.bgSurface,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  backIcon: { fontSize: 16, color: lightColors.textPrimary },
-  headerInfo: { flex: 1, gap: 4 },
-  name: { ...type.screenTitle, color: lightColors.textPrimary },
-  dest: { ...type.body, color: lightColors.textSecondary },
-  dates: { ...type.caption, color: lightColors.textTertiary },
-  actions: { flexDirection: 'row', gap: 10 },
-  actionBtn: { flex: 1 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    content: { padding: 20, gap: 20 },
+    header: { flexDirection: 'row', gap: 12 },
+    backBtn: {
+      width: 36, height: 36, borderRadius: 10,
+      backgroundColor: colors.bgSurface,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    backIcon: { fontSize: 16, color: colors.textPrimary },
+    headerInfo: { flex: 1, gap: 4 },
+    name: { ...type.screenTitle, color: colors.textPrimary },
+    dest: { ...type.body, color: colors.textSecondary },
+    dates: { ...type.caption, color: colors.textTertiary },
+    actions: { flexDirection: 'row', gap: 10 },
+    actionBtn: { flex: 1 },
+  });
+}

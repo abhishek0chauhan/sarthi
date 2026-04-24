@@ -5,13 +5,16 @@ import { useTrip } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DishCard } from '@/components/food/DishCard';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { FoodGuideData } from '@/types/food.types';
 
 export default function TripFoodGuideScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: trip, isLoading } = useTrip(id ?? '');
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   if (isLoading) return <LoadingSpinner />;
   if (!trip?.foodGuideData) return <EmptyState title="No food guide" />;
@@ -56,32 +59,34 @@ export default function TripFoodGuideScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  content: { padding: 20, gap: 8 },
-  section: { ...type.overline, color: lightColors.textSecondary, marginTop: 16, marginBottom: 8 },
-  overview: { ...type.body, color: lightColors.textPrimary },
-  safetyTip: { ...type.caption, color: lightColors.warning, marginBottom: 8 },
-  streetItem: {
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    gap: 4,
-  },
-  streetName: { ...type.body, color: lightColors.textPrimary, fontFamily: 'Inter_600SemiBold' },
-  streetMeta: { ...type.caption, color: lightColors.textSecondary },
-  streetSafety: { ...type.caption, color: lightColors.warning },
-  dietaryCard: {
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    gap: 6,
-    marginTop: 8,
-  },
-  dietaryItem: { ...type.body, color: lightColors.textSecondary },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    content: { padding: 20, gap: 8 },
+    section: { ...type.overline, color: colors.textSecondary, marginTop: 16, marginBottom: 8 },
+    overview: { ...type.body, color: colors.textPrimary },
+    safetyTip: { ...type.caption, color: colors.warning, marginBottom: 8 },
+    streetItem: {
+      backgroundColor: colors.bgCard,
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 4,
+    },
+    streetName: { ...type.body, color: colors.textPrimary, fontFamily: 'Inter_600SemiBold' },
+    streetMeta: { ...type.caption, color: colors.textSecondary },
+    streetSafety: { ...type.caption, color: colors.warning },
+    dietaryCard: {
+      backgroundColor: colors.bgCard,
+      borderRadius: 12,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 6,
+      marginTop: 8,
+    },
+    dietaryItem: { ...type.body, color: colors.textSecondary },
+  });
+}

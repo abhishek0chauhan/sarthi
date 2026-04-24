@@ -4,7 +4,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { useTrip, useEnableSharing, useDisableSharing } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 export default function TripShareScreen() {
@@ -12,6 +13,8 @@ export default function TripShareScreen() {
   const { data: trip, isLoading } = useTrip(id ?? '');
   const enableSharing = useEnableSharing(id ?? '');
   const disableSharing = useDisableSharing(id ?? '');
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   if (isLoading) return <LoadingSpinner />;
   if (!trip) return null;
@@ -77,20 +80,22 @@ export default function TripShareScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  content: { flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  emoji: { fontSize: 48 },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, textAlign: 'center' },
-  subtitle: { ...type.body, color: lightColors.textSecondary, textAlign: 'center' },
-  linkBox: {
-    backgroundColor: lightColors.bgSurface,
-    borderRadius: 10,
-    padding: 12,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: lightColors.border,
-  },
-  link: { ...type.caption, color: lightColors.primary500 },
-  actions: { width: '100%', gap: 10 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    content: { flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 16 },
+    emoji: { fontSize: 48 },
+    title: { ...type.screenTitle, color: colors.textPrimary, textAlign: 'center' },
+    subtitle: { ...type.body, color: colors.textSecondary, textAlign: 'center' },
+    linkBox: {
+      backgroundColor: colors.bgSurface,
+      borderRadius: 10,
+      padding: 12,
+      width: '100%',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    link: { ...type.caption, color: colors.primary500 },
+    actions: { width: '100%', gap: 10 },
+  });
+}
