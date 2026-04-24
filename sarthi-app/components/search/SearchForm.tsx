@@ -27,7 +27,7 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
       <Text style={styles.sectionTitle}>Where do you want to go?</Text>
 
       <Input
-        label="Describe your trip"
+        label=""
         placeholder="Describe your dream trip... beaches, mountains, culture?"
         value={formValues.freeText ?? ''}
         onChangeText={(v) => updateFormValues({ freeText: v })}
