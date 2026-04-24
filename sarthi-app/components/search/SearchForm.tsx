@@ -3,7 +3,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { FilterChips } from './FilterChips';
 import { useSearchStore } from '@/stores/search.store';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface SearchFormProps {
@@ -13,6 +14,8 @@ interface SearchFormProps {
 
 export function SearchForm({ onSubmit, loading }: SearchFormProps) {
   const { formValues, updateFormValues } = useSearchStore();
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const toggleExperience = (expType: string) => {
     const current = formValues.experienceTypes ?? [];
@@ -119,8 +122,8 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         <Switch
           value={formValues.hiddenGem ?? false}
           onValueChange={(v) => updateFormValues({ hiddenGem: v })}
-          trackColor={{ true: lightColors.primary500, false: lightColors.border }}
-          thumbColor={lightColors.bgCard}
+          trackColor={{ true: colors.primary500, false: colors.border }}
+          thumbColor={colors.bgCard}
         />
       </View>
 
@@ -134,13 +137,15 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { gap: 16, paddingBottom: 32 },
-  sectionTitle: { ...type.screenTitle, color: lightColors.textPrimary },
-  row: { flexDirection: 'row', gap: 10 },
-  flex: { flex: 1 },
-  section: { gap: 8 },
-  label: { ...type.overline, color: lightColors.textSecondary },
-  toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  toggleLabel: { ...type.body, color: lightColors.textPrimary },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: { gap: 16, paddingBottom: 32 },
+    sectionTitle: { ...type.screenTitle, color: colors.textPrimary },
+    row: { flexDirection: 'row', gap: 10 },
+    flex: { flex: 1 },
+    section: { gap: 8 },
+    label: { ...type.overline, color: colors.textSecondary },
+    toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    toggleLabel: { ...type.body, color: colors.textPrimary },
+  });
+}

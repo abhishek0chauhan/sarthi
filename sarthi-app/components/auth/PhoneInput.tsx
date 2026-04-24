@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface PhoneInputProps {
@@ -11,6 +12,9 @@ interface PhoneInputProps {
 }
 
 export function PhoneInput({ value, onChangeText, dialCode = '+91', flag = '🇮🇳' }: PhoneInputProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <View style={styles.container}>
       <Pressable style={styles.dialCode}>
@@ -23,7 +27,7 @@ export function PhoneInput({ value, onChangeText, dialCode = '+91', flag = '🇮
         value={value}
         onChangeText={text => onChangeText(text.replace(/\D/g, '').slice(0, 10))}
         placeholder="98765 XXXXX"
-        placeholderTextColor={lightColors.textTertiary}
+        placeholderTextColor={colors.textTertiary}
         keyboardType="phone-pad"
         style={styles.input}
       />
@@ -31,17 +35,19 @@ export function PhoneInput({ value, onChangeText, dialCode = '+91', flag = '🇮
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 12, borderWidth: 1.5, borderColor: lightColors.border,
-    paddingHorizontal: 14, height: 50,
-  },
-  dialCode: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 12 },
-  flag: { fontSize: 18 },
-  code: { ...type.body, fontFamily: 'Inter_600SemiBold', color: lightColors.textPrimary },
-  chevron: { ...type.caption, color: lightColors.textTertiary },
-  divider: { width: 1, height: 20, backgroundColor: lightColors.border, marginRight: 12 },
-  input: { flex: 1, ...type.body, color: lightColors.textPrimary },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row', alignItems: 'center',
+      backgroundColor: colors.bgCard,
+      borderRadius: 12, borderWidth: 1.5, borderColor: colors.border,
+      paddingHorizontal: 14, height: 50,
+    },
+    dialCode: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 12 },
+    flag: { fontSize: 18 },
+    code: { ...type.body, fontFamily: 'Inter_600SemiBold', color: colors.textPrimary },
+    chevron: { ...type.caption, color: colors.textTertiary },
+    divider: { width: 1, height: 20, backgroundColor: colors.border, marginRight: 12 },
+    input: { flex: 1, ...type.body, color: colors.textPrimary },
+  });
+}

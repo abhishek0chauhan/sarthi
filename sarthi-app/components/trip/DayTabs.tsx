@@ -1,5 +1,6 @@
 import { ScrollView, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface DayTabsProps {
@@ -9,6 +10,9 @@ interface DayTabsProps {
 }
 
 export function DayTabs({ days, activeDay, onSelect }: DayTabsProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll}>
       <View style={styles.row}>
@@ -30,16 +34,18 @@ export function DayTabs({ days, activeDay, onSelect }: DayTabsProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: { marginBottom: 16 },
-  row: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingVertical: 4 },
-  tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: lightColors.bgSurface,
-  },
-  tabActive: { backgroundColor: lightColors.primary500 },
-  label: { ...type.caption, color: lightColors.textSecondary },
-  labelActive: { color: lightColors.textInverse },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    scroll: { marginBottom: 16 },
+    row: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingVertical: 4 },
+    tab: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      backgroundColor: colors.bgSurface,
+    },
+    tabActive: { backgroundColor: colors.primary500 },
+    label: { ...type.caption, color: colors.textSecondary },
+    labelActive: { color: colors.textInverse },
+  });
+}

@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +13,9 @@ interface DestinationCardProps {
 }
 
 export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }: DestinationCardProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -45,24 +49,26 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    gap: 12,
-  },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  headerText: { flex: 1, gap: 4 },
-  name: { ...type.screenTitle, color: lightColors.textPrimary },
-  why: { ...type.body, color: lightColors.textSecondary },
-  gemIcon: { fontSize: 20, marginLeft: 8 },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  meta: { ...type.caption, color: lightColors.textSecondary },
-  badges: { flexDirection: 'row', gap: 8 },
-  actions: { flexDirection: 'row', gap: 10 },
-  actionBtn: { flex: 1 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 12,
+    },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+    headerText: { flex: 1, gap: 4 },
+    name: { ...type.screenTitle, color: colors.textPrimary },
+    why: { ...type.body, color: colors.textSecondary },
+    gemIcon: { fontSize: 20, marginLeft: 8 },
+    metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+    meta: { ...type.caption, color: colors.textSecondary },
+    badges: { flexDirection: 'row', gap: 8 },
+    actions: { flexDirection: 'row', gap: 10 },
+    actionBtn: { flex: 1 },
+  });
+}

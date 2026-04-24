@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 interface CostBreakdownProps {
@@ -14,6 +15,9 @@ const ITEMS = [
 ];
 
 export function CostBreakdown({ breakdown }: CostBreakdownProps) {
+  const colors = useColors();
+  const styles = makeStyles(colors);
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Cost Breakdown</Text>
@@ -31,20 +35,22 @@ export function CostBreakdown({ breakdown }: CostBreakdownProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    gap: 2,
-  },
-  title: { ...type.body, color: lightColors.textPrimary, fontFamily: 'Inter_600SemiBold', marginBottom: 8 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: lightColors.border },
-  rowLabel: { ...type.body, color: lightColors.textSecondary },
-  rowValue: { ...type.body, color: lightColors.textPrimary },
-  totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 },
-  totalLabel: { ...type.body, color: lightColors.textPrimary, fontFamily: 'Inter_700Bold' },
-  totalValue: { ...type.body, color: lightColors.primary500, fontFamily: 'Inter_700Bold' },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: 16,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 2,
+    },
+    title: { ...type.body, color: colors.textPrimary, fontFamily: 'Inter_600SemiBold', marginBottom: 8 },
+    row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
+    rowLabel: { ...type.body, color: colors.textSecondary },
+    rowValue: { ...type.body, color: colors.textPrimary },
+    totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 },
+    totalLabel: { ...type.body, color: colors.textPrimary, fontFamily: 'Inter_700Bold' },
+    totalValue: { ...type.body, color: colors.primary500, fontFamily: 'Inter_700Bold' },
+  });
+}
