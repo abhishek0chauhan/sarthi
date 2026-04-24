@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withSequence, withTiming } from 'react-native-reanimated';
 import { OTPInput } from '@/components/ui/OTPInput';
 import { Button } from '@/components/ui/Button';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 const RESEND_SECONDS = 30;
@@ -23,6 +24,8 @@ export default function VerifyOTPScreen() {
   const confirmationRef = useRef<any>(null);
   const shakeX = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const triggerShake = () => {
     shakeX.value = withSequence(
@@ -130,45 +133,47 @@ export default function VerifyOTPScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: lightColors.bgBase, paddingHorizontal: 20 },
-  back: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: lightColors.bgSurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  backIcon: { fontSize: 16, color: lightColors.textPrimary },
-  iconWrapper: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: lightColors.primary50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  icon: { fontSize: 32 },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, marginBottom: 6 },
-  sent: { ...type.body, color: lightColors.textSecondary, marginBottom: 4 },
-  phone: { color: lightColors.textPrimary, fontFamily: 'Inter_600SemiBold' },
-  changeNumber: {
-    ...type.body,
-    color: lightColors.primary500,
-    fontFamily: 'Inter_600SemiBold',
-    marginBottom: 28,
-  },
-  otpWrapper: { marginBottom: 16 },
-  errorText: { ...type.caption, color: lightColors.danger, textAlign: 'center', marginBottom: 16 },
-  resendRow: { alignItems: 'center', marginTop: 16 },
-  resendTimer: { ...type.caption, color: lightColors.textSecondary },
-  resendCount: { fontFamily: 'Inter_700Bold', color: lightColors.textPrimary },
-  resendLink: {
-    ...type.body,
-    color: lightColors.primary500,
-    fontFamily: 'Inter_600SemiBold',
-  },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bgBase, paddingHorizontal: 20 },
+    back: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: colors.bgSurface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 24,
+    },
+    backIcon: { fontSize: 16, color: colors.textPrimary },
+    iconWrapper: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      backgroundColor: colors.primary50,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+    },
+    icon: { fontSize: 32 },
+    title: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 6 },
+    sent: { ...type.body, color: colors.textSecondary, marginBottom: 4 },
+    phone: { color: colors.textPrimary, fontFamily: 'Inter_600SemiBold' },
+    changeNumber: {
+      ...type.body,
+      color: colors.primary500,
+      fontFamily: 'Inter_600SemiBold',
+      marginBottom: 28,
+    },
+    otpWrapper: { marginBottom: 16 },
+    errorText: { ...type.caption, color: colors.danger, textAlign: 'center', marginBottom: 16 },
+    resendRow: { alignItems: 'center', marginTop: 16 },
+    resendTimer: { ...type.caption, color: colors.textSecondary },
+    resendCount: { fontFamily: 'Inter_700Bold', color: colors.textPrimary },
+    resendLink: {
+      ...type.body,
+      color: colors.primary500,
+      fontFamily: 'Inter_600SemiBold',
+    },
+  });
+}

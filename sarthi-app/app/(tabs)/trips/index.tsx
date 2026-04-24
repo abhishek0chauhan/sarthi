@@ -4,14 +4,16 @@ import { useRouter } from 'expo-router';
 import { useTrips, useDeleteTrip } from '@/hooks/useTrips';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { TripSummary } from '@/types/trip.types';
 
-function TripCard({ trip, onPress, onDelete }: {
+function TripCard({ trip, onPress, onDelete, styles }: {
   trip: TripSummary;
   onPress: () => void;
   onDelete: () => void;
+  styles: ReturnType<typeof makeStyles>;
 }) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
@@ -38,6 +40,8 @@ export default function TripsScreen() {
   const router = useRouter();
   const { data: trips, isLoading, error, refetch } = useTrips();
   const deleteMutation = useDeleteTrip();
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const handleDelete = (id: string, name: string) => {
     Alert.alert('Delete Trip', `Delete "${name}"?`, [
@@ -95,6 +99,7 @@ export default function TripsScreen() {
         renderItem={({ item }) => (
           <TripCard
             trip={item}
+            styles={styles}
             onPress={() => router.push(`/trip/${item.id}` as any)}
             onDelete={() => handleDelete(item.id, item.name)}
           />
@@ -106,28 +111,30 @@ export default function TripsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  content: { padding: 20 },
-  heading: { ...type.screenTitle, color: lightColors.textPrimary, marginBottom: 16 },
-  card: {
-    backgroundColor: lightColors.bgCard,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: lightColors.border,
-    gap: 10,
-  },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between' },
-  cardInfo: { flex: 1, gap: 3 },
-  tripName: { ...type.body, fontFamily: 'Inter_600SemiBold', color: lightColors.textPrimary },
-  tripDest: { ...type.body, color: lightColors.textSecondary },
-  tripDates: { ...type.caption, color: lightColors.textTertiary },
-  deleteBtn: { padding: 4 },
-  deleteIcon: { fontSize: 18 },
-  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  badge: { ...type.caption, color: lightColors.textSecondary },
-  retryBtn: { backgroundColor: lightColors.primary500, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
-  retryText: { ...type.body, color: lightColors.textInverse, fontFamily: 'Inter_600SemiBold' },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    content: { padding: 20 },
+    heading: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 16 },
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 10,
+    },
+    cardHeader: { flexDirection: 'row', justifyContent: 'space-between' },
+    cardInfo: { flex: 1, gap: 3 },
+    tripName: { ...type.body, fontFamily: 'Inter_600SemiBold', color: colors.textPrimary },
+    tripDest: { ...type.body, color: colors.textSecondary },
+    tripDates: { ...type.caption, color: colors.textTertiary },
+    deleteBtn: { padding: 4 },
+    deleteIcon: { fontSize: 18 },
+    badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    badge: { ...type.caption, color: colors.textSecondary },
+    retryBtn: { backgroundColor: colors.primary500, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 10 },
+    retryText: { ...type.body, color: colors.textInverse, fontFamily: 'Inter_600SemiBold' },
+  });
+}

@@ -3,7 +3,8 @@ import { View, Text, ScrollView, Pressable, Dimensions, StyleSheet, NativeScroll
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -19,6 +20,8 @@ export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const [activeSlide, setActiveSlide] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const onScroll = (e: { nativeEvent: NativeScrollEvent }) => {
     const slide = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -85,26 +88,28 @@ export default function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: lightColors.bgBase, paddingHorizontal: 20 },
-  circle1: { position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(232,96,28,0.06)' },
-  circle2: { position: 'absolute', bottom: 80, left: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(232,96,28,0.04)' },
-  logo: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32, marginTop: 8 },
-  logoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: lightColors.primary500, alignItems: 'center', justifyContent: 'center' },
-  logoEmoji: { fontSize: 20 },
-  logoText: { ...type.cardHeading, fontFamily: 'Inter_800ExtraBold', color: lightColors.textPrimary },
-  carousel: { flexGrow: 0, marginBottom: 16, marginHorizontal: -20 },
-  slide: { marginHorizontal: 20, height: 200, backgroundColor: lightColors.bgSurface, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  slideEmoji: { fontSize: 48 },
-  slideLabel: { ...type.caption, color: lightColors.textSecondary },
-  dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginBottom: 28 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: lightColors.border },
-  dotActive: { width: 20, height: 8, borderRadius: 4, backgroundColor: lightColors.primary500 },
-  textBlock: { marginBottom: 28 },
-  overline: { ...type.overline, color: lightColors.textSecondary, marginBottom: 6 },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, marginBottom: 10 },
-  body: { ...type.body, color: lightColors.textSecondary, lineHeight: 22 },
-  signInRow: { alignItems: 'center', marginTop: 12 },
-  signInText: { ...type.caption, color: lightColors.textSecondary },
-  signInLink: { color: lightColors.primary500, fontFamily: 'Inter_600SemiBold' },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bgBase, paddingHorizontal: 20 },
+    circle1: { position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(232,96,28,0.06)' },
+    circle2: { position: 'absolute', bottom: 80, left: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(232,96,28,0.04)' },
+    logo: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32, marginTop: 8 },
+    logoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.primary500, alignItems: 'center', justifyContent: 'center' },
+    logoEmoji: { fontSize: 20 },
+    logoText: { ...type.cardHeading, fontFamily: 'Inter_800ExtraBold', color: colors.textPrimary },
+    carousel: { flexGrow: 0, marginBottom: 16, marginHorizontal: -20 },
+    slide: { marginHorizontal: 20, height: 200, backgroundColor: colors.bgSurface, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
+    slideEmoji: { fontSize: 48 },
+    slideLabel: { ...type.caption, color: colors.textSecondary },
+    dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginBottom: 28 },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.border },
+    dotActive: { width: 20, height: 8, borderRadius: 4, backgroundColor: colors.primary500 },
+    textBlock: { marginBottom: 28 },
+    overline: { ...type.overline, color: colors.textSecondary, marginBottom: 6 },
+    title: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 10 },
+    body: { ...type.body, color: colors.textSecondary, lineHeight: 22 },
+    signInRow: { alignItems: 'center', marginTop: 12 },
+    signInText: { ...type.caption, color: colors.textSecondary },
+    signInLink: { color: colors.primary500, fontFamily: 'Inter_600SemiBold' },
+  });
+}

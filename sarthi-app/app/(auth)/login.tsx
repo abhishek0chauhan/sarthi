@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { PhoneInput } from '@/components/auth/PhoneInput';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { authService } from '@/services/auth.service';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
 export default function LoginScreen() {
@@ -15,6 +16,8 @@ export default function LoginScreen() {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const handleSendOTP = async () => {
     if (phone.length < 10) return;
@@ -78,21 +81,23 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flexGrow: 1, backgroundColor: lightColors.bgBase, paddingHorizontal: 20 },
-  back: { width: 36, height: 36, borderRadius: 10, backgroundColor: lightColors.bgSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  backIcon: { fontSize: 16, color: lightColors.textPrimary },
-  logoRow: { alignItems: 'center', marginBottom: 28 },
-  logoIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: lightColors.primary500, alignItems: 'center', justifyContent: 'center' },
-  title: { ...type.screenTitle, color: lightColors.textPrimary, marginBottom: 6 },
-  body: { ...type.body, color: lightColors.textSecondary, marginBottom: 24 },
-  label: { ...type.overline, color: lightColors.textSecondary, marginBottom: 6 },
-  error: { ...type.caption, color: lightColors.danger, marginTop: -8, marginBottom: 12 },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: lightColors.border },
-  dividerText: { ...type.caption, color: lightColors.textTertiary },
-  altBtn: { height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: lightColors.border, backgroundColor: lightColors.bgCard, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  altBtnText: { ...type.body, fontFamily: 'Inter_600SemiBold', color: lightColors.textPrimary },
-  terms: { ...type.caption, color: lightColors.textTertiary, textAlign: 'center', marginTop: 'auto', paddingTop: 24 },
-  termsLink: { color: lightColors.primary500 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: { flexGrow: 1, backgroundColor: colors.bgBase, paddingHorizontal: 20 },
+    back: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.bgSurface, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+    backIcon: { fontSize: 16, color: colors.textPrimary },
+    logoRow: { alignItems: 'center', marginBottom: 28 },
+    logoIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.primary500, alignItems: 'center', justifyContent: 'center' },
+    title: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 6 },
+    body: { ...type.body, color: colors.textSecondary, marginBottom: 24 },
+    label: { ...type.overline, color: colors.textSecondary, marginBottom: 6 },
+    error: { ...type.caption, color: colors.danger, marginTop: -8, marginBottom: 12 },
+    dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 20 },
+    dividerLine: { flex: 1, height: 1, backgroundColor: colors.border },
+    dividerText: { ...type.caption, color: colors.textTertiary },
+    altBtn: { height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.bgCard, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+    altBtnText: { ...type.body, fontFamily: 'Inter_600SemiBold', color: colors.textPrimary },
+    terms: { ...type.caption, color: colors.textTertiary, textAlign: 'center', marginTop: 'auto', paddingTop: 24 },
+    termsLink: { color: colors.primary500 },
+  });
+}

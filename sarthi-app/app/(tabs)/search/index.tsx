@@ -4,13 +4,16 @@ import { useRouter } from 'expo-router';
 import { SearchForm } from '@/components/search/SearchForm';
 import { useSearchDestinations } from '@/hooks/useSearch';
 import { useSearchStore } from '@/stores/search.store';
-import { lightColors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColorScheme';
+import type { Colors } from '@/constants/colors';
 import type { SearchDto } from '@/types/search.types';
 
 export default function SearchScreen() {
   const router = useRouter();
   const { formValues } = useSearchStore();
   const searchMutation = useSearchDestinations();
+  const colors = useColors();
+  const styles = makeStyles(colors);
 
   const handleSearch = () => {
     searchMutation.mutate(formValues as SearchDto, {
@@ -34,8 +37,10 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: lightColors.bgBase },
-  scroll: { flex: 1 },
-  content: { padding: 20 },
-});
+function makeStyles(colors: Colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.bgBase },
+    scroll: { flex: 1 },
+    content: { padding: 20 },
+  });
+}
