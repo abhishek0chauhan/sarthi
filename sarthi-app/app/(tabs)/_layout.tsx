@@ -30,9 +30,12 @@ export default function TabLayout() {
               return (
                 <Pressable
                   key={tab.name}
-                  onPress={() =>
-                    navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true })
-                  }
+                  onPress={() => {
+                    const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                    if (!event.defaultPrevented) {
+                      navigation.navigate(route.name);
+                    }
+                  }}
                   style={[styles.tabItem, focused && styles.tabItemActive]}
                 >
                   <Text style={styles.icon}>{tab.icon}</Text>
