@@ -3,8 +3,8 @@ import { create } from 'zustand';
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: { uid: string; email?: string } | null;
-  setUser: (user: { uid: string; email?: string } | null) => void;
+  user: { uid: string; email?: string; displayName?: string; phoneNumber?: string } | null;
+  setUser: (user: { uid: string; email?: string; displayName?: string; phoneNumber?: string } | null) => void;
   setLoading: (loading: boolean) => void;
 }
 
