@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import type { SearchResultDestination } from '@/types/search.types';
+import { destinationGradient } from '@/utils/destinationGradient';
 
 interface DestinationCardProps {
   destination: SearchResultDestination;
@@ -18,30 +19,58 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
 
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.name}>{destination.name}, {destination.state}</Text>
-          <Text style={styles.why}>{destination.whyItMatches}</Text>
+      {/* Hero gradient section */}
+      <View style={styles.heroContainer}>
+        <LinearGradient colors={destinationGradient(destination.name) as [string, string, string]} style={styles.hero}>
+          {/* Destination name overlaid bottom-left */}
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroName}>{destination.name}, {destination.state}</Text>
+          </View>
+
+          {/* Match % badge top-right */}
+          <View style={styles.matchBadge}>
+            <Text style={styles.matchText}>{destination.tripReadiness.score}%</Text>
+          </View>
+
+          {/* Hidden gem badge top-left */}
+          {destination.isHiddenGem && (
+            <View style={styles.gemBadge}>
+              <Text style={styles.gemBadgeText}>✨ Hidden Gem</Text>
+            </View>
+          )}
+
+          {/* Bookmark button bottom-right */}
+          <Pressable style={styles.saveBtn}>
+            <Text style={styles.saveBtnIcon}>🔖</Text>
+          </Pressable>
+        </LinearGradient>
+      </View>
+
+      {/* Card body content */}
+      <View style={styles.cardBody}>
+        <Text style={styles.why}>{destination.whyItMatches}</Text>
+
+        <View style={styles.statsRow}>
+          <View style={styles.statChip}>
+            <Text style={styles.statIcon}>💰</Text>
+            <Text style={styles.statText}>{destination.budgetEstimate}</Text>
+          </View>
+          <View style={styles.statChip}>
+            <Text style={styles.statIcon}>⛅</Text>
+            <Text style={styles.statText}>{destination.weatherNow}</Text>
+          </View>
+          <View style={styles.statChip}>
+            <Text style={styles.statIcon}>🕐</Text>
+            <Text style={styles.statText}>{destination.travelTime}</Text>
+          </View>
+          <View style={styles.statChip}>
+            <Text style={styles.statIcon}>❤️</Text>
+            <Text style={styles.statText}>{destination.healthAdvisory.suitability}</Text>
+          </View>
         </View>
-        {destination.isHiddenGem && <Text style={styles.gemIcon}>💎</Text>}
-      </View>
 
-      <View style={styles.metaRow}>
-        <Text style={styles.meta}>💰 {destination.budgetEstimate}</Text>
-        <Text style={styles.meta}>⛅ {destination.weatherNow}</Text>
-        <Text style={styles.meta}>🕐 {destination.travelTime}</Text>
-      </View>
-
-      <View style={styles.badges}>
-        <Badge label={`Ready: ${destination.tripReadiness.score}/100`} variant="match" />
-        <Badge label={destination.healthAdvisory.suitability} variant="success" />
-      </View>
-
-      <View style={styles.actions}>
-        <View style={styles.actionBtn}>
+        <View style={styles.actions}>
           <Button label="Get Itinerary" onPress={onGetItinerary} />
-        </View>
-        <View style={styles.actionBtn}>
           <Button label="Food Guide" onPress={onGetFoodGuide} variant="secondary" />
         </View>
       </View>
@@ -54,21 +83,27 @@ function makeStyles(colors: Colors) {
     card: {
       backgroundColor: colors.bgCard,
       borderRadius: 16,
-      padding: 16,
+      overflow: 'hidden',
       marginBottom: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      gap: 12,
     },
-    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-    headerText: { flex: 1, gap: 4 },
-    name: { ...type.screenTitle, color: colors.textPrimary },
+    heroContainer: { overflow: 'hidden', borderRadius: 16 },
+    hero: { height: 140, position: 'relative', justifyContent: 'space-between', padding: 12 },
+    heroOverlay: { position: 'absolute', bottom: 12, left: 12 },
+    heroName: { color: '#FFFFFF', fontFamily: 'Inter_700Bold', fontSize: 16 },
+    matchBadge: { position: 'absolute', top: 12, right: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 },
+    matchText: { color: '#FFFFFF', fontFamily: 'Inter_600SemiBold', fontSize: 12 },
+    gemBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(232,96,28,0.9)', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 4 },
+    gemBadgeText: { color: '#FFFFFF', fontSize: 12, fontFamily: 'Inter_600SemiBold' },
+    saveBtn: { position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 10, width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+    saveBtnIcon: { fontSize: 18 },
+    cardBody: { padding: 16, gap: 12 },
     why: { ...type.body, color: colors.textSecondary },
-    gemIcon: { fontSize: 20, marginLeft: 8 },
-    metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-    meta: { ...type.caption, color: colors.textSecondary },
-    badges: { flexDirection: 'row', gap: 8 },
+    statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    statChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgBase, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, gap: 4 },
+    statIcon: { fontSize: 14 },
+    statText: { ...type.caption, color: colors.textSecondary },
     actions: { flexDirection: 'row', gap: 10 },
-    actionBtn: { flex: 1 },
   });
 }
