@@ -89,7 +89,7 @@ export default function TripsScreen() {
       <EmptyState
         title="Backend unavailable"
         description={isNetworkError
-          ? "The Sarthi server isn't reachable right now. In Expo Go dev mode, trips require the backend to be running."
+          ? "The SarthiGo server isn't reachable right now. In Expo Go dev mode, trips require the backend to be running."
           : "Couldn't load trips. Check your connection and try again."}
         action={
           <Pressable onPress={() => refetch()} style={styles.retryBtn}>

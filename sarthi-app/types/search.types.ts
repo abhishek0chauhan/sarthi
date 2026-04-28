@@ -49,28 +49,52 @@ export interface FoodGuideDto {
 
 export interface HealthAdvisory {
   suitability: string;
+  altitude: string;
   physicalDemand: string;
-  considerations: string[];
-  recommendations: string[];
+  alerts: string[];
+  prepTips: string[];
+}
+
+export interface CostBreakdown {
+  transport: string;
+  stay: string;
+  food: string;
+  activities: string;
+  total: string;
+}
+
+export interface Permits {
+  required: boolean;
+  documents: string[];
+  notes: string;
 }
 
 export interface TripReadiness {
   score: number;
-  breakdown: { weather: number; budget: number; accessibility: number; safety: number };
-  tips: string[];
+  label: string;
+  fitness: string;
+  weather: string;
+  documents: string;
+  budget: string;
+  actionItems: string[];
 }
 
 export interface SearchResultDestination {
   name: string;
   state: string;
-  whyItMatches: string;
-  budgetEstimate: string;
-  weatherNow: string;
-  travelTime: string;
-  healthAdvisory: HealthAdvisory;
-  tripReadiness: TripReadiness;
   isHiddenGem: boolean;
+  budgetEstimate: string;
+  weatherSnapshot: string;
+  travelTime: string;
   highlights: string[];
+  whyItMatches: string;
+  // Slim fields for free-tier models; expand when using paid model:
+  suitability: string;
+  readinessScore: number;
+  // healthAdvisory?: HealthAdvisory;
+  // costBreakdown?: CostBreakdown;
+  // permits?: Permits;
+  // tripReadiness?: TripReadiness;
 }
 
 export interface TrekResult {
@@ -88,7 +112,6 @@ export interface TrekResult {
 }
 
 export interface SearchResponse {
-  destinations?: SearchResultDestination[];
-  treks?: TrekResult[];
-  isTrekMode: boolean;
+  mode: 'hybrid' | 'ai_full' | 'trek';
+  results: SearchResultDestination[] | TrekResult[];
 }

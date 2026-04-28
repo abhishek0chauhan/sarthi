@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTrip } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -14,6 +15,7 @@ export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: trip, isLoading, error } = useTrip(id ?? '');
+  const insets = useSafeAreaInsets();
   const colors = useColors();
   const styles = makeStyles(colors);
 
@@ -26,13 +28,13 @@ export default function TripDetailScreen() {
     ? trip.itineraryData.highlights
     : ['Discover local culture', 'Explore natural landscapes', 'Taste regional cuisine'];
 
-  const foodDishCount = (trip.foodGuideData as any)?.dishes?.length ?? 0;
+  const foodDishCount = (trip.foodGuideData as any)?.mustTryDishes?.length ?? 0;
 
   return (
     <View style={styles.root}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 1. Hero gradient */}
-        <LinearGradient colors={gradientColors} style={styles.hero}>
+        <LinearGradient colors={gradientColors} style={[styles.hero, { paddingTop: insets.top + 12 }]}>
           <Pressable onPress={() => router.back()} style={styles.heroBack}>
             <Text style={styles.heroBackIcon}>←</Text>
           </Pressable>
@@ -65,17 +67,21 @@ export default function TripDetailScreen() {
               <Text style={styles.navTileIcon}>📅</Text>
               <Text style={[styles.navTileLabel, { color: colors.textInverse }]}>Itinerary</Text>
               <Text style={[styles.navTileDetail, { color: 'rgba(255,255,255,0.7)' }]}>
-                {trip.itineraryData ? `${trip.itineraryData.days?.length ?? 0} days` : 'Not generated'}
+                {trip.itineraryData ? `${trip.itineraryData.itinerary?.length ?? 0} days` : 'Not generated'}
               </Text>
             </Pressable>
             <Pressable
               style={[styles.navTile, styles.navTileSecondary]}
-              onPress={() => trip.foodGuideData && router.push(`/trip/${id}/food-guide` as any)}
+              onPress={() =>
+                trip.foodGuideData
+                  ? router.push(`/trip/${id}/food-guide` as any)
+                  : router.push(`/trip/${id}/generate-food-guide` as any)
+              }
             >
               <Text style={styles.navTileIcon}>🍽️</Text>
               <Text style={[styles.navTileLabel, { color: colors.textPrimary }]}>Food Guide</Text>
               <Text style={[styles.navTileDetail, { color: colors.textTertiary }]}>
-                {trip.foodGuideData ? `${foodDishCount} dishes` : 'Not generated'}
+                {trip.foodGuideData ? `${foodDishCount} dishes` : 'Tap to generate'}
               </Text>
             </Pressable>
           </View>
@@ -116,7 +122,7 @@ function makeStyles(colors: Colors) {
     scrollContent: { paddingBottom: 32 },
 
     // Hero
-    hero: { height: 120, justifyContent: 'space-between', padding: 16 },
+    hero: { minHeight: 140, justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 16 },
     heroBack: {
       backgroundColor: 'rgba(255,255,255,0.2)',
       borderRadius: 10,

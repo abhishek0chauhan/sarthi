@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Pressable, Dimensions, StyleSheet, NativeScroll
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
+import { SarthiGoLogo } from '@/components/ui/SarthiGoLogo';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
@@ -40,8 +41,7 @@ export default function WelcomeScreen() {
 
       {/* Logo */}
       <View style={styles.logo}>
-        <View style={styles.logoIcon}><Text style={styles.logoEmoji}>🧭</Text></View>
-        <Text style={styles.logoText}>Sarthi</Text>
+        <SarthiGoLogo size={42} wordmarkSize={22} />
       </View>
 
       {/* Illustration carousel */}
@@ -93,10 +93,7 @@ function makeStyles(colors: Colors) {
     container: { flex: 1, backgroundColor: colors.bgBase, paddingHorizontal: 20 },
     circle1: { position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(232,96,28,0.06)' },
     circle2: { position: 'absolute', bottom: 80, left: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(232,96,28,0.04)' },
-    logo: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32, marginTop: 8 },
-    logoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.primary500, alignItems: 'center', justifyContent: 'center' },
-    logoEmoji: { fontSize: 20 },
-    logoText: { ...type.cardHeading, fontFamily: 'Inter_800ExtraBold', color: colors.textPrimary },
+    logo: { marginBottom: 32, marginTop: 8 },
     carousel: { flexGrow: 0, marginBottom: 16, marginHorizontal: -20 },
     slide: { marginHorizontal: 20, height: 200, backgroundColor: colors.bgSurface, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 8 },
     slideEmoji: { fontSize: 48 },

@@ -5,10 +5,20 @@ import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 
+// Old floating pill nav kept for reference:
+// const TABS = [
+//   { name: 'search',  label: 'SEARCH',  icon: '🧭' },
+//   { name: 'trips',   label: 'TRIPS',   icon: '🗺' },
+//   { name: 'profile', label: 'PROFILE', icon: '👤' },
+// ];
+// pillWrapper: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20 }
+// pill: { backgroundColor: colors.bgSurface, borderRadius: 32, flexDirection: 'row', ... }
+// tabItemActive: { backgroundColor: colors.primary500, opacity: 1 }
+
 const TABS = [
-  { name: 'search',  label: 'SEARCH',  icon: '🧭' },
-  { name: 'trips',   label: 'TRIPS',   icon: '🗺' },
-  { name: 'profile', label: 'PROFILE', icon: '👤' },
+  { name: 'search',  label: 'Search',  icon: '🧭' },
+  { name: 'trips',   label: 'Trips',   icon: '🗺' },
+  { name: 'profile', label: 'Profile', icon: '👤' },
 ];
 
 export default function TabLayout() {
@@ -20,35 +30,31 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{ headerShown: false }}
       tabBar={({ state, navigation }) => (
-        <View style={[styles.pillWrapper, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.pill}>
-            {TABS.map((tab) => {
-              // Expo Router may name routes 'search' or 'search/index' depending on version
-              const routeIndex = state.routes.findIndex(
-                (r) => r.name === tab.name || r.name === `${tab.name}/index`
-              );
-              if (routeIndex === -1) return null;
-              const route = state.routes[routeIndex];
-              const focused = state.index === routeIndex;
-              return (
-                <Pressable
-                  key={tab.name}
-                  onPress={() => {
-                    const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-                    if (!event.defaultPrevented) {
-                      navigation.navigate(route.name);
-                    }
-                  }}
-                  style={[styles.tabItem, focused && styles.tabItemActive]}
-                >
-                  <Text style={styles.icon}>{tab.icon}</Text>
-                  <Text style={[styles.label, focused && styles.labelActive]}>
-                    {tab.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+        <View style={[styles.bar, { paddingBottom: insets.bottom || 12 }]}>
+          {TABS.map((tab) => {
+            const routeIndex = state.routes.findIndex(
+              (r) => r.name === tab.name || r.name === `${tab.name}/index`,
+            );
+            if (routeIndex === -1) return null;
+            const route = state.routes[routeIndex];
+            const focused = state.index === routeIndex;
+
+            return (
+              <Pressable
+                key={tab.name}
+                onPress={() => {
+                  const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                  if (!event.defaultPrevented) navigation.navigate(route.name);
+                }}
+                style={styles.tabItem}
+              >
+                {focused && <View style={styles.indicator} />}
+
+                <Text style={[styles.icon, focused && styles.iconActive]}>{tab.icon}</Text>
+                <Text style={[styles.label, focused && styles.labelActive]}>{tab.label}</Text>
+              </Pressable>
+            );
+          })}
         </View>
       )}
     />
@@ -57,28 +63,40 @@ export default function TabLayout() {
 
 function makeStyles(colors: Colors) {
   return StyleSheet.create({
-    pillWrapper: {
-      position: 'absolute', bottom: 0, left: 0, right: 0,
-      paddingHorizontal: 20, paddingTop: 0,
-    },
-    pill: {
-      backgroundColor: colors.bgSurface,
-      borderRadius: 32, flexDirection: 'row',
-      justifyContent: 'space-around', alignItems: 'center',
-      paddingVertical: 6, paddingHorizontal: 8,
-      shadowColor: colors.primary500,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12, shadowRadius: 16,
-      elevation: 8,
+    bar: {
+      backgroundColor: colors.bgCard,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      flexDirection: 'row',
+      paddingTop: 10,
     },
     tabItem: {
-      flexDirection: 'column', alignItems: 'center', gap: 3,
-      paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
-      opacity: 0.4,
+      flex: 1,
+      alignItems: 'center',
+      gap: 5,
     },
-    tabItemActive: { backgroundColor: colors.primary500, opacity: 1 },
-    icon:  { fontSize: 16 },
-    label: { ...type.overline, color: colors.textSecondary, letterSpacing: 0.5 },
-    labelActive: { color: '#fff' },
+    indicator: {
+      position: 'absolute',
+      top: -10,
+      width: 28,
+      height: 3,
+      borderRadius: 2,
+      backgroundColor: colors.primary500,
+    },
+    label: {
+      ...type.caption,
+      color: colors.textTertiary,
+    },
+    labelActive: {
+      color: colors.primary500,
+      fontFamily: 'Inter_600SemiBold',
+    },
+    icon: {
+      fontSize: 20,
+      marginTop: 2,
+    },
+    iconActive: {
+      opacity: 1,
+    },
   });
 }

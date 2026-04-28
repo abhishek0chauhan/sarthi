@@ -87,20 +87,13 @@ export default function ProfileScreen() {
 
         {/* ── Header gradient ── */}
         <LinearGradient colors={['#2C1A08', '#5A3214']} style={styles.header}>
-          {/* Decorative circle */}
           <View style={styles.headerCircle} />
-
-          {/* Avatar */}
           <LinearGradient colors={['#E8601C', '#F5926A']} style={styles.avatarGradient}>
             <Text style={styles.avatarText}>{initial}</Text>
           </LinearGradient>
-        </LinearGradient>
-
-        {/* ── Name / contact ── */}
-        <View style={styles.profileInfo}>
           <Text style={styles.name}>{user?.displayName ?? 'Traveller'}</Text>
           <Text style={styles.contact}>{user?.email ?? user?.phoneNumber ?? ''}</Text>
-        </View>
+        </LinearGradient>
 
         {/* ── Stats row ── */}
         <View style={styles.statsRow}>
@@ -189,7 +182,7 @@ export default function ProfileScreen() {
 
         {/* ── Footer ── */}
         <View style={styles.footer}>
-          <Text style={styles.version}>Sarthi v1.0.0</Text>
+          <Text style={styles.version}>SarthiGo v1.0.0</Text>
           <View style={styles.footerLinks}>
             <Text style={styles.footerLink}>Terms</Text>
             <Text style={styles.footerSep}> · </Text>
@@ -216,64 +209,57 @@ function makeStyles(colors: Colors) {
       flex: 1,
     },
     content: {
-      paddingBottom: 40,
+      paddingBottom: 32,
     },
 
     // Header
     header: {
-      height: 200,
-      justifyContent: 'flex-end',
       paddingHorizontal: 24,
-      paddingBottom: 0,
+      paddingTop: 24,
+      paddingBottom: 24,
+      gap: 10,
       overflow: 'hidden',
     },
     headerCircle: {
       position: 'absolute',
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: 'rgba(255,255,255,0.05)',
+      width: 180,
+      height: 180,
+      borderRadius: 90,
+      backgroundColor: 'rgba(255,255,255,0.06)',
       top: -40,
-      right: -40,
+      right: -30,
     },
 
     // Avatar
     avatarGradient: {
-      width: 80,
-      height: 80,
-      borderRadius: 18,
+      width: 64,
+      height: 64,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: -40,
-      alignSelf: 'flex-start',
     },
     avatarText: {
-      fontSize: 28,
+      fontSize: 24,
       fontFamily: 'Inter_700Bold',
-      color: colors.textInverse,
+      color: '#FFFFFF',
     },
 
-    // Profile info
-    profileInfo: {
-      paddingHorizontal: 24,
-      paddingTop: 52,
-      paddingBottom: 16,
-      gap: 4,
-    },
+    // Profile info (now inside header)
+    profileInfo: {},
     name: {
       ...type.screenTitle,
-      color: colors.textPrimary,
+      color: '#FFFFFF',
     },
     contact: {
       ...type.body,
-      color: colors.textSecondary,
-      marginBottom: 16,
+      color: 'rgba(255,255,255,0.65)',
     },
 
     // Stats
     statsRow: {
       flexDirection: 'row',
       marginHorizontal: 24,
+      marginTop: 16,
       marginBottom: 24,
       backgroundColor: colors.bgCard,
       borderRadius: 12,

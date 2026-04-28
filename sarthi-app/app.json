@@ -1,14 +1,22 @@
 {
   "expo": {
-    "name": "Sarthi",
+    "name": "SarthiGo",
     "slug": "sarthi",
     "scheme": "sarthi",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
     "assetBundlePatterns": ["**/*"],
-    "ios": { "supportsTablet": false },
-    "android": { "adaptiveIcon": { "backgroundColor": "#FDF8F0" } },
+    "ios": { "supportsTablet": false, "icon": "./assets/icon.png" },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#E8601C"
+      },
+      "package": "com.sarthi.app",
+      "googleServicesFile": "./google-services.json"
+    },
     "web": { "bundler": "metro" },
     "plugins": [
       "expo-router",

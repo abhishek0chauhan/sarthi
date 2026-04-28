@@ -12,12 +12,12 @@ export function DishCard({ dish }: { dish: Dish }) {
     <View style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.name}>{dish.name}</Text>
-        <Text style={styles.cost}>{dish.cost}</Text>
+        <Text style={styles.cost}>{dish.priceRange}</Text>
       </View>
       <Text style={styles.description}>{dish.description}</Text>
       <Text style={styles.meta}>📍 {dish.where} · 🌶️ {dish.spiceLevel}</Text>
-      {dish.allergyWarning && (
-        <Text style={styles.warning}>⚠️ {dish.allergyWarning}</Text>
+      {dish.allergyAlert && (
+        <Text style={styles.warning}>⚠️ {dish.allergyAlert}</Text>
       )}
     </View>
   );

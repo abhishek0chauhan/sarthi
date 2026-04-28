@@ -35,12 +35,14 @@ export default function TripFoodGuideScreen() {
         {guide.streetFood?.items?.length > 0 && (
           <View>
             <Text style={styles.section}>Street Food</Text>
-            <Text style={styles.safetyTip}>⚠️ {guide.streetFood.safetyTips}</Text>
+            {guide.streetFood.safetyTips?.map((tip, i) => (
+              <Text key={i} style={styles.safetyTip}>⚠️ {tip}</Text>
+            ))}
             {guide.streetFood.items.map((item, i) => (
               <View key={i} style={styles.streetItem}>
                 <Text style={styles.streetName}>{item.name}</Text>
-                <Text style={styles.streetMeta}>📍 {item.where} · {item.cost}</Text>
-                {item.safetyTip && <Text style={styles.streetSafety}>{item.safetyTip}</Text>}
+                <Text style={styles.streetMeta}>📍 {item.where} · {item.price}</Text>
+                {item.healthNote && <Text style={styles.streetSafety}>{item.healthNote}</Text>}
               </View>
             ))}
           </View>
@@ -50,8 +52,11 @@ export default function TripFoodGuideScreen() {
           <Text style={styles.section}>Dietary Info</Text>
           <Text style={styles.dietaryItem}>🌱 {guide.dietaryInfo.vegFriendly}</Text>
           <Text style={styles.dietaryItem}>🌿 {guide.dietaryInfo.veganOptions}</Text>
-          {guide.dietaryInfo.halalOptions && (
-            <Text style={styles.dietaryItem}>☪️ {guide.dietaryInfo.halalOptions}</Text>
+          {guide.dietaryInfo.halalAvailability && (
+            <Text style={styles.dietaryItem}>☪️ {guide.dietaryInfo.halalAvailability}</Text>
+          )}
+          {guide.dietaryInfo.waterAdvice && (
+            <Text style={styles.dietaryItem}>💧 {guide.dietaryInfo.waterAdvice}</Text>
           )}
         </View>
       </ScrollView>

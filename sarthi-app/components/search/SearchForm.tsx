@@ -1,11 +1,19 @@
-import { View, Text, Switch, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Switch, StyleSheet, Alert, Pressable } from 'react-native';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { FilterChips } from './FilterChips';
 import { useSearchStore } from '@/stores/search.store';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
+
+const GROUP_TYPES = [
+  { key: 'solo',    icon: '🧍', label: 'Solo'    },
+  { key: 'couple',  icon: '👫', label: 'Couple'  },
+  { key: 'friends', icon: '👯', label: 'Friends' },
+  { key: 'family',  icon: '👨‍👩‍👧', label: 'Family'  },
+];
 
 interface SearchFormProps {
   onSubmit: () => void;
@@ -32,6 +40,38 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
     updateFormValues({ experienceTypes: updated });
   };
 
+  const validate = (): boolean => {
+    if (!formValues.freeText?.trim()) {
+      Alert.alert('Missing info', 'Please describe your dream trip.');
+      return false;
+    }
+    const from = formValues.dates?.from;
+    const to = formValues.dates?.to;
+    if (!from || !to) {
+      Alert.alert('Missing dates', 'Please select both from and to dates.');
+      return false;
+    }
+    if (new Date(to) < new Date(from)) {
+      Alert.alert('Invalid dates', '"To" date must be after "From" date.');
+      return false;
+    }
+    if (!formValues.departureCity?.trim()) {
+      Alert.alert('Missing info', 'Please enter your departure city.');
+      return false;
+    }
+    const min = formValues.budget?.min ?? 0;
+    const max = formValues.budget?.max ?? 0;
+    if (max <= min) {
+      Alert.alert('Invalid budget', 'Max budget must be greater than min budget.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = () => {
+    if (validate()) onSubmit();
+  };
+
   return (
     <View style={styles.container}>
       {/* Greeting header */}
@@ -51,23 +91,18 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
 
       <View style={styles.row}>
         <View style={styles.flex}>
-          <Input
+          <DatePicker
             label="From date"
-            placeholder="2026-05-15"
             value={formValues.dates?.from ?? ''}
-            onChangeText={(v) =>
-              updateFormValues({ dates: { from: v, to: formValues.dates?.to ?? '' } })
-            }
+            onChange={(v) => updateFormValues({ dates: { from: v, to: formValues.dates?.to ?? '' } })}
           />
         </View>
         <View style={styles.flex}>
-          <Input
+          <DatePicker
             label="To date"
-            placeholder="2026-05-20"
             value={formValues.dates?.to ?? ''}
-            onChangeText={(v) =>
-              updateFormValues({ dates: { from: formValues.dates?.from ?? '', to: v } })
-            }
+            onChange={(v) => updateFormValues({ dates: { from: formValues.dates?.from ?? '', to: v } })}
+            minDate={formValues.dates?.from}
           />
         </View>
       </View>
@@ -87,12 +122,34 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
             value={formValues.group?.size?.toString() ?? ''}
             onChangeText={(v) =>
               updateFormValues({
-                group: { size: parseInt(v) || 2, type: formValues.group?.type ?? 'friends' },
+                group: { size: Math.max(1, parseInt(v) || 1), type: formValues.group?.type ?? 'friends' },
               })
             }
             keyboardType="numeric"
           />
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>GROUP TYPE</Text>
+        <View style={styles.groupTypeRow}>
+          {GROUP_TYPES.map(({ key, icon, label }) => {
+            const active = (formValues.group?.type ?? 'friends') === key;
+            return (
+              <Pressable
+                key={key}
+                onPress={() => updateFormValues({ group: { size: formValues.group?.size ?? 2, type: key as any } })}
+                style={[styles.groupTypeBtn, active && styles.groupTypeBtnActive]}
+              >
+                <Text style={styles.groupTypeIcon}>{icon}</Text>
+                <Text style={[styles.groupTypeLabel, active && styles.groupTypeLabelActive]}>{label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.row}>
         <View style={styles.flex}>
           <Input
             label="Budget min (₹)"
@@ -100,7 +157,7 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
             value={formValues.budget?.min?.toString() ?? ''}
             onChangeText={(v) =>
               updateFormValues({
-                budget: { min: parseInt(v) || 0, max: formValues.budget?.max ?? 20000 },
+                budget: { min: Math.max(5000, parseInt(v) || 5000), max: formValues.budget?.max ?? 20000 },
               })
             }
             keyboardType="numeric"
@@ -147,9 +204,9 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
 
       <Button
         label="Find Destinations →"
-        onPress={onSubmit}
+        onPress={handleSubmit}
         loading={loading}
-        disabled={!formValues.freeText?.trim()}
+        disabled={loading}
       />
     </View>
   );
@@ -159,8 +216,8 @@ function makeStyles(colors: Colors) {
   return StyleSheet.create({
     container: { gap: 16, paddingBottom: 32 },
     sectionTitle: { ...type.screenTitle, color: colors.textPrimary },
-    greetingHeader: { marginBottom: 24, gap: 4 },
-    greetingOverline: { ...type.overline, color: colors.textTertiary },
+    greetingHeader: { marginBottom: 8, gap: 2 },
+    greetingOverline: { ...type.overline, color: colors.primary500, letterSpacing: 1 },
     greetingTitle: { ...type.screenTitle, color: colors.textPrimary },
     greetingSubtitle: { ...type.body, color: colors.textSecondary },
     row: { flexDirection: 'row', gap: 10 },
@@ -175,5 +232,14 @@ function makeStyles(colors: Colors) {
     hiddenGemsText: { flex: 1, gap: 2 },
     hiddenGemsLabel: { ...type.body, fontFamily: 'Inter_600SemiBold', color: colors.textPrimary },
     hiddenGemsDesc: { ...type.caption, color: colors.textTertiary },
+    groupTypeRow: { flexDirection: 'row', gap: 8 },
+    groupTypeBtn: {
+      flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12,
+      borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.bgCard, gap: 4,
+    },
+    groupTypeBtnActive: { backgroundColor: colors.primary500, borderColor: colors.primary500 },
+    groupTypeIcon: { fontSize: 20 },
+    groupTypeLabel: { ...type.caption, color: colors.textSecondary },
+    groupTypeLabelActive: { color: '#fff', fontFamily: 'Inter_600SemiBold' },
   });
 }

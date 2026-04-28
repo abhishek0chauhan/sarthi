@@ -10,14 +10,15 @@ import type { SearchDto } from '@/types/search.types';
 
 export default function SearchScreen() {
   const router = useRouter();
-  const { formValues } = useSearchStore();
+  const { formValues, setSearchResults } = useSearchStore();
   const searchMutation = useSearchDestinations();
   const colors = useColors();
   const styles = makeStyles(colors);
 
   const handleSearch = () => {
     searchMutation.mutate(formValues as SearchDto, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setSearchResults(data);
         router.push('/(tabs)/search/results' as any);
       },
     });
@@ -28,6 +29,7 @@ export default function SearchScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -41,6 +43,6 @@ function makeStyles(colors: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: colors.bgBase },
     scroll: { flex: 1 },
-    content: { padding: 20 },
+    content: { padding: 20, paddingBottom: 32 },
   });
 }

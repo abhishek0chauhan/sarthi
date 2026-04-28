@@ -21,23 +21,36 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
     ...((options.headers as Record<string, string>) ?? {}),
   };
 
+  const url = `${API_BASE}${path}`;
+  console.log(`[API] ${options.method ?? 'GET'} ${url}`);
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const response = await fetch(url, {
       ...options,
       headers,
       signal: controller.signal,
     });
 
+    console.log(`[API] ${options.method ?? 'GET'} ${path} → ${response.status}`);
+
     if (!response.ok) {
-      throw new ApiError(response.status, await response.text());
+      const body = await response.text();
+      console.error(`[API] Error ${response.status}:`, body);
+      throw new ApiError(response.status, body);
     }
 
     if (response.status === 204) return undefined as T;
 
-    return response.json();
+    const data = await response.json();
+    console.log(`[API] ${path} response:`, JSON.stringify(data).slice(0, 300));
+    return data;
+  } catch (err: any) {
+    if (err instanceof ApiError) throw err;
+    console.error(`[API] ${path} failed:`, err?.message ?? err);
+    throw err;
   } finally {
     clearTimeout(timeout);
   }

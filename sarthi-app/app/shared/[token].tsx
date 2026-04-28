@@ -72,7 +72,7 @@ export default function SharedTripScreen() {
           </View>
         )}
 
-        <Text style={styles.footer}>Shared via Sarthi 🧭</Text>
+        <Text style={styles.footer}>Shared via SarthiGo 🧭</Text>
       </ScrollView>
     </SafeAreaView>
   );

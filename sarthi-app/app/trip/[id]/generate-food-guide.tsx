@@ -2,93 +2,55 @@ import { View, Text, Alert, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { DishCard } from '@/components/food/DishCard';
 import { useGenerateFoodGuide } from '@/hooks/useSearch';
-import { useCreateTrip, useTrips } from '@/hooks/useTrips';
-import { useSearchStore } from '@/stores/search.store';
+import { useTrip, useUpdateTrip } from '@/hooks/useTrips';
 import { useColors } from '@/hooks/useColorScheme';
-import { tripsService } from '@/services/trips.service';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { FoodGuideData } from '@/types/food.types';
 
-export default function NewFoodGuideScreen() {
+export default function GenerateFoodGuideScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { destination, state } = useLocalSearchParams<{ destination: string; state: string }>();
-  const { formValues } = useSearchStore();
   const colors = useColors();
   const styles = makeStyles(colors);
-  const queryClient = useQueryClient();
 
+  const { data: trip, isLoading: tripLoading } = useTrip(id ?? '');
   const foodGuideMutation = useGenerateFoodGuide();
-  const createTripMutation = useCreateTrip();
-  const { data: existingTrips } = useTrips();
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, dto }: { id: string; dto: { foodGuideData: Record<string, unknown> } }) =>
-      tripsService.update(id, dto),
-    onSuccess: (trip) => {
-      queryClient.invalidateQueries({ queryKey: ['trips'] });
-      queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
-      router.replace(`/trip/${trip.id}` as any);
-    },
-    onError: () => Alert.alert('Error', 'Failed to save trip'),
-  });
+  const updateTripMutation = useUpdateTrip(id ?? '');
 
   const generate = () => {
+    if (!trip) return;
     foodGuideMutation.mutate({
-      destination: destination ?? '',
-      state: state ?? '',
-      dates: formValues.dates ?? { from: '', to: '' },
-      group: formValues.group ?? { size: 2, type: 'friends' },
-      departureCity: formValues.departureCity ?? '',
-      freeText: formValues.freeText ?? '',
-      dietType: formValues.dietType,
-      spiceTolerance: formValues.spiceTolerance,
-      foodBudget: formValues.foodBudget,
-      allergies: formValues.allergies,
+      destination: trip.destination,
+      state: trip.state,
+      dates: trip.dates,
+      group: { size: 2, type: 'friends' },
+      departureCity: '',
+      freeText: '',
     });
   };
 
   useEffect(() => {
-    generate();
+    if (trip) generate();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const isSaving = createTripMutation.isPending || updateMutation.isPending;
+  }, [trip]);
 
   const handleSave = () => {
     if (!foodGuideMutation.data) return;
-    const data = foodGuideMutation.data as unknown as Record<string, unknown>;
-
-    const existing = existingTrips?.find(
-      (t) => t.destination === destination && t.state === state,
+    updateTripMutation.mutate(
+      { foodGuideData: foodGuideMutation.data as unknown as Record<string, unknown> },
+      {
+        onSuccess: () => router.replace(`/trip/${id}/food-guide` as any),
+        onError: () => Alert.alert('Error', 'Failed to save food guide'),
+      },
     );
-
-    if (existing) {
-      updateMutation.mutate({ id: existing.id, dto: { foodGuideData: data } });
-    } else {
-      createTripMutation.mutate(
-        {
-          destination: destination ?? '',
-          state: state ?? '',
-          dates: formValues.dates ?? { from: '', to: '' },
-          destinationData: {},
-          name: `${destination} Trip`,
-          foodGuideData: data,
-        },
-        {
-          onSuccess: (trip) => router.replace(`/trip/${trip.id}` as any),
-          onError: () => Alert.alert('Error', 'Failed to save trip'),
-        },
-      );
-    }
   };
 
-  if (foodGuideMutation.isPending) {
+  if (tripLoading || (foodGuideMutation.isPending && !foodGuideMutation.data)) {
     return <LoadingSpinner message="SarthiGo is finding the best food... 🍽️" />;
   }
 
@@ -103,14 +65,14 @@ export default function NewFoodGuideScreen() {
     );
   }
 
-  if (!foodGuideMutation.data) return null;
+  if (!foodGuideMutation.data || !trip) return null;
 
   const guide = foodGuideMutation.data as unknown as FoodGuideData;
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.title}>🍽️ {destination} Food Guide</Text>
+        <Text style={styles.title}>🍽️ {trip.destination} Food Guide</Text>
         <Text style={styles.subtitle}>{guide.overview}</Text>
       </View>
       <View style={styles.divider} />
@@ -155,7 +117,11 @@ export default function NewFoodGuideScreen() {
           </View>
         )}
 
-        <Button label="Save Trip" onPress={handleSave} loading={isSaving} />
+        <Button
+          label="Save Food Guide to Trip"
+          onPress={handleSave}
+          loading={updateTripMutation.isPending}
+        />
       </ScrollView>
     </SafeAreaView>
   );

@@ -4,23 +4,48 @@ export interface Dish {
   name: string;
   description: string;
   where: string;
-  cost: string;
+  priceRange: string;
   spiceLevel: string;
-  dietaryInfo?: string[];
+  healthNote?: string;
+  allergens?: string[];
+  allergyAlert?: string;
   tasteProfile?: TasteProfile;
-  allergyWarning?: string;
 }
 
-export interface StreetFoodItem { name: string; where: string; cost: string; safetyTip?: string }
+export interface HealthConsciousDish {
+  name: string;
+  description: string;
+  healthNote?: string;
+  allergens?: string[];
+  allergyAlert?: string;
+  tasteProfile?: TasteProfile;
+}
 
-export interface MealSuggestion { meal: string; dish: string; where: string; cost: string }
+export interface StreetFoodItem {
+  name: string;
+  where: string;
+  price: string;
+  healthNote?: string;
+  allergens?: string[];
+  allergyAlert?: string;
+  tasteProfile?: TasteProfile;
+}
 
-export interface MealPlanDay { day: number; meals: MealSuggestion[] }
+export interface MealSuggestion { suggestion: string; cost: string; healthNote?: string }
+
+export interface MealPlanDay {
+  day: number;
+  breakfast: MealSuggestion;
+  lunch: MealSuggestion;
+  dinner: MealSuggestion;
+}
 
 export interface FoodGuideData {
+  destination: string;
   overview: string;
   mustTryDishes: Dish[];
-  streetFood: { safetyTips: string; items: StreetFoodItem[] };
+  healthConscious: HealthConsciousDish[];
+  streetFood: { safetyTips: string[]; items: StreetFoodItem[] };
   mealPlan: MealPlanDay[];
-  dietaryInfo: { vegFriendly: string; veganOptions: string; halalOptions?: string; allergyNotes?: string };
+  dietaryInfo: { vegFriendly: string; veganOptions: string; halalAvailability: string; waterAdvice: string };
 }

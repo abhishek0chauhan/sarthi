@@ -24,15 +24,17 @@ export default function TripItineraryScreen() {
   if (!trip?.itineraryData) return <EmptyState title="No itinerary" />;
 
   const itinerary = trip.itineraryData as unknown as ItineraryData;
-  const currentDay = itinerary.days.find((d) => d.day === activeDay) ?? itinerary.days[0];
+  const days = itinerary.itinerary ?? [];
+  const currentDay = days.find((d) => d.day === activeDay) ?? days[0];
 
   return (
     <SafeAreaView style={styles.safe}>
       <DayTabs
-        days={itinerary.days.length}
+        days={days.length}
         activeDay={activeDay}
         onSelect={setActiveDay}
       />
+      <View style={styles.divider} />
       <ScrollView contentContainerStyle={styles.content}>
         {currentDay && (
           <View>
@@ -44,12 +46,9 @@ export default function TripItineraryScreen() {
                 isLast={i === currentDay.activities.length - 1}
               />
             ))}
-            {currentDay.dayTotal && (
-              <Text style={styles.dayTotal}>Day total: {currentDay.dayTotal}</Text>
-            )}
           </View>
         )}
-        {activeDay === itinerary.days.length && (
+        {activeDay === days.length && itinerary.costBreakdown && (
           <CostBreakdown breakdown={itinerary.costBreakdown} />
         )}
       </ScrollView>
@@ -60,6 +59,7 @@ export default function TripItineraryScreen() {
 function makeStyles(colors: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: colors.bgBase },
+    divider: { height: 1, backgroundColor: colors.border, marginHorizontal: 20, marginBottom: 4 },
     content: { padding: 20, gap: 16 },
     dayTitle: { ...type.screenTitle, color: colors.textPrimary, marginBottom: 16 },
     dayTotal: { ...type.caption, color: colors.textSecondary, textAlign: 'right', marginTop: 8 },

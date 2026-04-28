@@ -29,7 +29,7 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
 
           {/* Match % badge top-right */}
           <View style={styles.matchBadge}>
-            <Text style={styles.matchText}>{destination.tripReadiness.score}%</Text>
+            <Text style={styles.matchText}>{destination.readinessScore}%</Text>
           </View>
 
           {/* Hidden gem badge top-left */}
@@ -57,7 +57,7 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
           </View>
           <View style={styles.statChip}>
             <Text style={styles.statIcon}>⛅</Text>
-            <Text style={styles.statText}>{destination.weatherNow}</Text>
+            <Text style={styles.statText}>{destination.weatherSnapshot}</Text>
           </View>
           <View style={styles.statChip}>
             <Text style={styles.statIcon}>🕐</Text>
@@ -65,7 +65,7 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
           </View>
           <View style={styles.statChip}>
             <Text style={styles.statIcon}>❤️</Text>
-            <Text style={styles.statText}>{destination.healthAdvisory.suitability}</Text>
+            <Text style={styles.statText}>{destination.suitability}</Text>
           </View>
         </View>
 

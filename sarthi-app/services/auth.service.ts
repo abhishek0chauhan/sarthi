@@ -34,7 +34,13 @@ export const authService = {
   init() {
     const auth = getAuth();
     if (!auth) {
-      useAuthStore.getState().setUser(null);
+      // In Expo Go, inject a mock user so the app routes to the main tabs.
+      // Remove this block before production / EAS build.
+      useAuthStore.getState().setUser({
+        uid: 'dev-user',
+        phoneNumber: '+918320697284',
+        displayName: 'Dev User',
+      });
       useAuthStore.getState().setLoading(false);
       return () => {};
     }

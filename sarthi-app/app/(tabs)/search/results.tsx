@@ -4,8 +4,7 @@ import { useRouter } from 'expo-router';
 import { DestinationCard } from '@/components/search/DestinationCard';
 import { TrekCard } from '@/components/search/TrekCard';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { useSearchDestinations } from '@/hooks/useSearch';
+import { useSearchStore } from '@/stores/search.store';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
@@ -13,23 +12,16 @@ import type { SearchResultDestination, TrekResult } from '@/types/search.types';
 
 export default function SearchResultsScreen() {
   const router = useRouter();
-  const searchMutation = useSearchDestinations();
-  const data = searchMutation.data;
+  const data = useSearchStore((s) => s.searchResults);
   const colors = useColors();
   const styles = makeStyles(colors);
-
-  if (searchMutation.isPending) {
-    return <LoadingSpinner message="Sarthi is thinking... ✨" />;
-  }
 
   if (!data) {
     return <EmptyState title="No results yet" description="Go back and search for a destination." />;
   }
 
-  const isTrekMode = data.isTrekMode;
-  const items: (SearchResultDestination | TrekResult)[] = isTrekMode
-    ? (data.treks ?? [])
-    : (data.destinations ?? []);
+  const isTrekMode = data.mode === 'trek';
+  const items: (SearchResultDestination | TrekResult)[] = data.results ?? [];
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -74,7 +66,7 @@ export default function SearchResultsScreen() {
 function makeStyles(colors: Colors) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: colors.bgBase },
-    content: { padding: 20 },
+    content: { padding: 20, paddingBottom: 32 },
     header: { ...type.overline, color: colors.textSecondary, marginBottom: 16 },
   });
 }

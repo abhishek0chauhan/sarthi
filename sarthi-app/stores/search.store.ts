@@ -1,25 +1,30 @@
 import { create } from 'zustand';
-import type { SearchDto } from '@/types/search.types';
+import type { SearchDto, SearchResponse } from '@/types/search.types';
 
 type PartialSearchDto = Partial<SearchDto>;
 
 interface SearchState {
   formValues: PartialSearchDto;
+  searchResults: SearchResponse | null;
   setFormValues: (values: PartialSearchDto) => void;
   updateFormValues: (values: PartialSearchDto) => void;
+  setSearchResults: (results: SearchResponse) => void;
   resetForm: () => void;
 }
 
 const initialFormValues: PartialSearchDto = {
   experienceTypes: [],
   group: { size: 2, type: 'friends' },
+  budget: { min: 5000, max: 20000 },
   hiddenGem: false,
 };
 
 export const useSearchStore = create<SearchState>((set) => ({
   formValues: initialFormValues,
+  searchResults: null,
   setFormValues: (formValues) => set({ formValues }),
   updateFormValues: (values) =>
     set((state) => ({ formValues: { ...state.formValues, ...values } })),
+  setSearchResults: (searchResults) => set({ searchResults }),
   resetForm: () => set({ formValues: initialFormValues }),
 }));

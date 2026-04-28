@@ -5,25 +5,34 @@ export interface TripDates { from: string; to: string }
 export interface ItineraryActivity {
   time: string;
   activity: string;
-  cost?: string;
+  cost: string;
   healthNote?: string;
+}
+
+export interface ItineraryMeals {
+  breakfast: string;
+  lunch: string;
+  dinner: string;
 }
 
 export interface ItineraryDay {
   day: number;
   title: string;
   activities: ItineraryActivity[];
-  dayTotal?: string;
+  meals: ItineraryMeals;
+  healthNote?: string;
 }
 
 export interface ItineraryData {
-  days: ItineraryDay[];
-  costBreakdown: { transport: string; stay: string; food: string; activities: string; total: string };
+  destination: string;
+  totalEstimate: string;
+  itinerary: ItineraryDay[];
   packingList: string[];
-  permits?: { required: boolean; details?: string; estimatedCost?: string };
-  healthAdvisory: { suitability: string; physicalDemand: string; considerations: string[]; recommendations: string[] };
-  tripReadiness?: number;   // 0–100, populated by backend in future
-  highlights?: string[];    // key highlights for the destination
+  permits?: { required: boolean; documents?: string[]; notes?: string };
+  healthAdvisory: { suitability: string; altitude?: string; physicalDemand: string; alerts?: string[]; prepTips?: string[] };
+  costBreakdown?: { transport: string; stay: string; food: string; activities: string; total: string };
+  tripReadiness?: number;
+  highlights?: string[];
 }
 
 export interface SavedTrip {
