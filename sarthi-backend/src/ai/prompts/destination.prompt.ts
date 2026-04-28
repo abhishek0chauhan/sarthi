@@ -108,6 +108,56 @@ ${seasonRule}
 - Budget: If realistic cost exceeds ₹${params.budget.min}–${params.budget.max}/person, set costBreakdown.total to the honest number and explain the gap in tripReadiness.budget (e.g. "₹2000 over — drop to budget guesthouses and local transport to fit").${nearbyGemsRule}`;
 }
 
+export interface TravelerProfileSnapshot {
+  travelPace?: string | null;
+  depthVsBreadth?: string | null;
+  comfortLevel?: string | null;
+  crowdTolerance?: string | null;
+  travelMotivations?: string[];
+  physicalReadiness?: string | null;
+  spendingStyle?: string | null;
+  groundReality?: string | null;
+  languageComfort?: string | null;
+  completeness?: number;
+}
+
+export function buildPersonalityBlock(profile: TravelerProfileSnapshot | null): string {
+  if (!profile) return '';
+
+  const lines: string[] = [];
+  if (profile.travelPace)       lines.push(`- Pace: ${profile.travelPace}`);
+  if (profile.depthVsBreadth)   lines.push(`- Depth: ${profile.depthVsBreadth}`);
+  if (profile.comfortLevel)     lines.push(`- Comfort: ${profile.comfortLevel}`);
+  if (profile.crowdTolerance)   lines.push(`- Crowds: ${profile.crowdTolerance}`);
+  if (profile.travelMotivations?.length) lines.push(`- Motivations: ${profile.travelMotivations.join(', ')}`);
+  if (profile.physicalReadiness) lines.push(`- Physical: ${profile.physicalReadiness}`);
+  if (profile.spendingStyle)    lines.push(`- Spending: ${profile.spendingStyle}`);
+  if (profile.groundReality)    lines.push(`- Ground reality: ${profile.groundReality}`);
+  if (profile.languageComfort)  lines.push(`- Language: ${profile.languageComfort}`);
+
+  if (lines.length === 0) return '';
+
+  return `\n## Traveler Personality\n${lines.join('\n')}\n\nFor each result include: "personalMatch":{"matchLevel":"<great_match|good_match|heads_up|not_your_style>","reason":"<one sentence why this fits or doesn't fit this specific traveler>"}`;
+}
+
+export interface CorrectionRecord {
+  type: string;
+  context: Record<string, unknown>;
+}
+
+export function buildCorrectionsBlock(corrections: CorrectionRecord[] | null): string {
+  if (!corrections?.length) return '';
+
+  const lines = corrections.map((c) => {
+    const ctx = c.context as any;
+    const place = ctx.place ?? ctx.name ?? 'unknown place';
+    const reason = ctx.reason ? ` (${ctx.reason})` : '';
+    return `- ${c.type}: "${place}"${reason}`;
+  });
+
+  return `\n## Past Preferences (learned from your trips)\n${lines.join('\n')}\n\nAvoid places similar to removed/thumbs-down items. Favour places similar to thumbs-up items.`;
+}
+
 function buildHealthContext(params: HealthProfile): string {
   const lines: string[] = [];
 
@@ -137,8 +187,11 @@ const PERMITS_FORMAT = `"permits":{"required":<true/false>,"documents":["<permit
 
 const TRIP_READINESS_FORMAT = `"tripReadiness":{"score":<0-100>,"label":"<Ready/Needs Preparation/Not Recommended>","fitness":"<one line>","weather":"<one line>","documents":"<one line>","budget":"<one line>","actionItems":["<action item>"]}`;
 
+// NOTE: Hybrid prompt uses the FULL format (all sub-schemas) because it ranks DB-fetched
+// destinations — fewer results, shorter context. If truncation occurs on a very small model,
+// slim it the same way as buildAiFullPrompt (drop to suitability + readinessScore only).
 export function buildHybridPrompt(
-  params: PromptParams & { destinations: CompactDestination[] },
+  params: PromptParams & { destinations: CompactDestination[]; profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] },
 ): { system: string; user: string } {
   const destinationList = params.destinations
     .map(d => `  {"id":"${d.id}","name":"${d.name}","state":"${d.state}"}`)
@@ -146,12 +199,14 @@ export function buildHybridPrompt(
 
   const healthContext = buildHealthContext(params);
   const searchContext = buildSearchContext(params);
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   return {
     system: SYSTEM_PROMPT,
     user: `Traveler: ${params.freeText}${healthContext}
 
-${searchContext}
+${searchContext}${personalityBlock}${correctionsBlock}
 
 Rank these destinations best to worst match and write one sentence explaining why each matches.
 For each destination, assess health/fitness suitability based on the traveler's profile.
@@ -167,21 +222,32 @@ Max 5 results, best match first.`,
   };
 }
 
-export function buildAiFullPrompt(params: PromptParams): { system: string; user: string } {
+export function buildAiFullPrompt(params: PromptParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
   const searchContext = buildSearchContext(params);
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
+
+  // --- FREE MODEL (Gemma 3n / NVIDIA free tier) ---
+  // Slim format prevents JSON truncation on small-context models.
+  // To switch to a paid model (GPT-4o, Claude, Gemini Pro):
+  //   1. Comment out the slim responseFormat line below
+  //   2. Uncomment the paid responseFormat line
+  const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`;
+
+  // --- PAID MODEL format (uncomment to enable, comment out slim above) ---
+  // const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}]}`;
 
   return {
     system: SYSTEM_PROMPT,
     user: `Traveler: ${params.freeText}${healthContext}
 
-${searchContext}
+${searchContext}${personalityBlock}${correctionsBlock}
 
-Recommend up to 5 Indian travel destinations that best match this traveler.
-For each destination, assess health/fitness suitability based on the traveler's profile.
+Recommend up to 3 Indian travel destinations that best match this traveler.
 
 Respond ONLY with a JSON object in exactly this format (no extra text):
-{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<e.g. ₹8000-15000/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h flight from Mumbai>","highlights":["<highlight1>","<highlight2>","<highlight3>"],"whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}]}`,
+${responseFormat}`,
   };
 }
 
@@ -196,7 +262,11 @@ export interface ItineraryParams extends HealthProfile {
   travelMode?: string;
 }
 
-export function buildItineraryPrompt(params: ItineraryParams): { system: string; user: string } {
+// NOTE: Itinerary prompt uses the FULL format (includes healthAdvisory + permits).
+// Gemma 3n handles this acceptably — fields are made optional in the schema with safe defaults.
+// If truncation becomes an issue on a smaller model, slim it by removing packingList,
+// healthAdvisory, and permits from the JSON format string below.
+export function buildItineraryPrompt(params: ItineraryParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
   const travelerProfile = [
     `Group: ${params.group.size} ${params.group.type}`,
     `Budget: ₹${params.budget.min}–${params.budget.max}/person`,
@@ -211,12 +281,14 @@ export function buildItineraryPrompt(params: ItineraryParams): { system: string;
   const numDays = Math.ceil(
     (new Date(params.dates.to).getTime() - new Date(params.dates.from).getTime()) / 86400000,
   ) + 1;
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   return {
     system: 'You are an expert Indian travel itinerary planner. You create detailed day-by-day plans personalized to the traveler\'s health, budget, and interests.',
     user: `Plan a ${numDays}-day itinerary for ${params.destination}, ${params.state}.
 Traveler: ${params.freeText}
-${travelerProfile}${healthContext}${travelLine}
+${travelerProfile}${healthContext}${travelLine}${personalityBlock}${correctionsBlock}
 
 Create a detailed day-by-day plan with specific activities, timings, meal suggestions with costs, and health notes.
 
@@ -267,7 +339,7 @@ export function buildTasteProfileBlock(params: FoodGuideParams): string {
   return `\n## Taste Profile\n${lines}`;
 }
 
-export function buildFoodGuidePrompt(params: FoodGuideParams): { system: string; user: string } {
+export function buildFoodGuidePrompt(params: FoodGuideParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
   const numDays = Math.ceil(
     (new Date(params.dates.to).getTime() - new Date(params.dates.from).getTime()) / 86400000,
@@ -281,31 +353,64 @@ export function buildFoodGuidePrompt(params: FoodGuideParams): { system: string;
   const dietContext = dietLines.length > 0 ? `\nFood preferences: ${dietLines.join(' | ')}` : '';
 
   const tasteProfileBlock = buildTasteProfileBlock(params);
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   const allergyAlertRule = params.allergies?.length
     ? `- allergyAlert: string (ONLY include if this dish contains one or more of these exact allergens: [${params.allergies.join(', ')}]. Cross-reference dish ingredients against this list only. If none match, omit the field. Format: "⚠️ Contains X — listed in your allergies")`
     : `- allergyAlert: omit this field (no allergies specified by this traveler)`;
 
+  // --- FREE MODEL (Gemma 3n / NVIDIA free tier) ---
+  // Slim format: fewer dishes, no tasteProfile, 1-day meal plan — prevents JSON truncation.
+  // To switch to a paid model (GPT-4o, Claude, Gemini Pro):
+  //   1. Comment out the slim slimRules + slimFormat below
+  //   2. Uncomment the paid paidRules + paidFormat block
+  const slimRules = [
+    `- allergens: string[] per dish (major allergens only; [] if none)`,
+    `- ${allergyAlertRule}`,
+    `- Prioritize dishes matching any taste/cuisine preferences provided.`,
+  ].join('\n');
+
+  const slimFormat = `{"result":{"destination":"${params.destination}","overview":"<2 sentences>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<area>","priceRange":"<₹>","spiceLevel":"<mild/medium/hot>","healthNote":"<one line>","allergens":[]}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<one line>","allergens":[]}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<area>","price":"<₹>","healthNote":"<one line>","allergens":[]}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<one line>","veganOptions":"<one line>","halalAvailability":"<one line>","waterAdvice":"<one line>"}}}`;
+
+  const slimCount = `Include exactly 3 must-try dishes, 2 healthy alternatives, 2 street food items, and a 1-day meal plan.`;
+
+  const activeRules = slimRules;
+  const activeFormat = slimFormat;
+  const activeCount = slimCount;
+
+  // --- PAID MODEL format (uncomment to enable, comment out slim blocks above) ---
+  // const paidRules = [
+  //   `- allergens: string[] per dish (major allergens only; [] if none)`,
+  //   `- ${allergyAlertRule}`,
+  //   `- tasteProfile: { sweet, spicy, sour, salty, umami } — each integer 0-5 per dish`,
+  //   `- When Taste Profile is present, prioritize dishes matching cuisines/cooking styles/flavors.`,
+  //   `- For non-veg travelers with meatPreferences, bias toward those meats; skip meats they don't eat.`,
+  //   `- adventurousness=familiar → prefer widely-known dishes; very_adventurous → include niche local specialties.`,
+  //   `- mealPlan entries do NOT need allergens or tasteProfile (keep lean).`,
+  // ].join('\n');
+  //
+  // const paidFormat = `{"result":{"destination":"${params.destination}","overview":"<2-3 sentences about local cuisine + health-aware notes>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<restaurant/area>","priceRange":"<₹ range>","spiceLevel":"<mild/medium/hot>","healthNote":"<health advice for this traveler>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<why it's healthy>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<location>","price":"<₹>","healthNote":"<note>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<assessment>","veganOptions":"<assessment>","halalAvailability":"<assessment>","waterAdvice":"<advice>"}}}`;
+  //
+  // const paidCount = `Include 5-8 must-try dishes, 2-3 healthy alternatives, 3-5 street food items, and a ${numDays}-day meal plan.`;
+  //
+  // const activeRules = paidRules;
+  // const activeFormat = paidFormat;
+  // const activeCount = paidCount;
+
   return {
     system: 'You are an expert Indian food and travel cuisine guide. You recommend local food personalized to the traveler\'s health conditions, dietary preferences, and allergies.',
     user: `Create a personalized food guide for ${params.destination}, ${params.state} (${numDays} days).
 Traveler: ${params.freeText}
-Group: ${params.group.size} ${params.group.type} | From: ${params.departureCity}${dietContext}${healthContext}${tasteProfileBlock}
+Group: ${params.group.size} ${params.group.type} | From: ${params.departureCity}${dietContext}${healthContext}${tasteProfileBlock}${personalityBlock}${correctionsBlock}
 
 ## Rules
-- For each dish in mustTryDishes, healthConscious, and streetFood.items, populate:
-  - allergens: string[] (list major allergens present in the dish; empty array if none)
-  ${allergyAlertRule}
-  - tasteProfile: { sweet, spicy, sour, salty, umami } — each integer 0-5
-- When Taste Profile is present, prioritize dishes matching cuisines/cooking styles/flavors.
-- For non-veg travelers with meatPreferences, bias toward those meats; skip meats they don't eat.
-- adventurousness=familiar → prefer widely-known dishes; very_adventurous → include niche local specialties.
-- mealPlan entries do NOT need allergens or tasteProfile (keep lean).
+${activeRules}
 
 Respond ONLY with a JSON object in exactly this format (no extra text):
-{"result":{"destination":"${params.destination}","overview":"<2-3 sentences about local cuisine + health-aware notes>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<restaurant/area>","priceRange":"<₹ range>","spiceLevel":"<mild/medium/hot>","healthNote":"<health advice for this traveler>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<why it's healthy>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<location>","price":"<₹>","healthNote":"<note>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<assessment>","veganOptions":"<assessment>","halalAvailability":"<assessment>","waterAdvice":"<advice>"}}}
+${activeFormat}
 
-Include 5-8 must-try dishes, 2-3 healthy alternatives, 3-5 street food items, and a ${numDays}-day meal plan.`,
+${activeCount}`,
   };
 }
 
@@ -332,9 +437,11 @@ export interface TrekPromptParams extends HealthProfile {
   }>;
 }
 
-export function buildTrekPrompt(params: TrekPromptParams): { system: string; user: string } {
+export function buildTrekPrompt(params: TrekPromptParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
   const searchContext = buildSearchContext(params, { mode: 'trek' });
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   const trekList = params.treks
     .map(t => `  - ${t.name} | ${t.region} | ${t.peakAltitude}m | ${t.difficulty} | ${t.durationDays} days | Base: ${t.baseCamp} | Nearest city: ${t.nearestCity} | Terrain: ${t.terrain.join(', ')} | Highlights: ${t.highlights.join(', ')} | Permits: ${t.permits ? 'Yes' : 'No'} | Fitness: ${t.fitnessDemand}`)
@@ -344,7 +451,7 @@ export function buildTrekPrompt(params: TrekPromptParams): { system: string; use
     system: 'You are an expert Indian trek recommendation engine. You recommend specific named treks (not cities) based on the traveler\'s fitness, experience, dates, and preferences. You assess health and fitness suitability for each trek.',
     user: `Traveler: ${params.freeText}${healthContext}
 
-${searchContext}
+${searchContext}${personalityBlock}${correctionsBlock}
 
 Recommend the best matching treks from this list. Rank best match first. For each, explain why it matches and assess health/fitness suitability.
 

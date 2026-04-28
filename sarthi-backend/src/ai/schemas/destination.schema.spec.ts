@@ -116,13 +116,12 @@ describe('generateResultSchema', () => {
       travelTime: '14h bus from Mumbai',
       highlights: ['Kheerganga trek', 'Parvati Valley'],
       whyItMatches: 'Offbeat hill town perfect for trekking friends',
-      healthAdvisory: validAdvisory,
-      costBreakdown: validCostBreakdown,
-      permits: validPermits,
-      tripReadiness: validTripReadiness,
+      suitability: 'moderate',
+      readinessScore: 75,
     };
     const result = generateResultSchema.parse(input);
-    expect(result).toEqual(input);
+    expect(result.name).toBe('Kasol');
+    expect(result.readinessScore).toBe(75);
   });
 
   it('rejects missing name', () => {
@@ -261,10 +260,8 @@ describe('generateResultsSchema', () => {
         travelTime: '14h bus',
         highlights: ['Kheerganga trek'],
         whyItMatches: 'Great for trekking',
-        healthAdvisory: validAdvisory,
-        costBreakdown: validCostBreakdown,
-        permits: validPermits,
-        tripReadiness: validTripReadiness,
+        suitability: 'easy',
+        readinessScore: 80,
       }],
     });
     expect(result.destinations).toHaveLength(1);
@@ -326,16 +323,16 @@ describe('itineraryResponseSchema', () => {
     ).toThrow();
   });
 
-  it('rejects missing healthAdvisory', () => {
-    expect(() =>
-      itineraryResponseSchema.parse({
-        destination: 'Goa',
-        totalEstimate: '₹34k',
-        itinerary: [],
-        packingList: [],
-        permits: validPermits,
-      }),
-    ).toThrow();
+  it('parses without healthAdvisory (optional field)', () => {
+    const result = itineraryResponseSchema.parse({
+      destination: 'Goa',
+      totalEstimate: '₹34k',
+      itinerary: [],
+      packingList: [],
+      permits: validPermits,
+    });
+    expect(result.destination).toBe('Goa');
+    expect(result.healthAdvisory).toBeUndefined();
   });
 });
 

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sarthi-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sarthi
+    ports:
+      - '5433:5432'
+    volumes:
+      - sarthi_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: sarthi-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - sarthi_redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  sarthi_postgres_data:
+  sarthi_redis_data:

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { DestinationFinderService } from './destination-finder.service';
@@ -14,8 +14,8 @@ export class DestinationFinderController {
   @Post('search')
   @HttpCode(200)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
-  async search(@Body() dto: SearchDestinationsDto, @Query('bust') bust?: string) {
-    return this.service.search(dto, bust === '1');
+  async search(@Body() dto: SearchDestinationsDto, @Query('bust') bust?: string, @Req() req?: any) {
+    return this.service.search(dto, bust === '1', req?.user?.uid);
   }
 
   @Post('itinerary')

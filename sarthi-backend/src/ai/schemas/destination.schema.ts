@@ -65,6 +65,11 @@ export const tripReadinessSchema = z.object({
   actionItems: stringArray,
 });
 
+export const personalMatchSchema = z.object({
+  matchLevel: z.enum(['great_match', 'good_match', 'heads_up', 'not_your_style']),
+  reason: z.string(),
+}).optional();
+
 export const rankResultSchema = z.object({
   id: z.string(),
   whyItMatches: z.string(),
@@ -72,6 +77,7 @@ export const rankResultSchema = z.object({
   costBreakdown: costBreakdownSchema,
   permits: permitsSchema,
   tripReadiness: tripReadinessSchema,
+  personalMatch: personalMatchSchema,
 });
 
 export const rankResultsSchema = z.object({
@@ -87,10 +93,14 @@ export const generateResultSchema = z.object({
   travelTime: z.string(),
   highlights: stringArray,
   whyItMatches: z.string(),
-  healthAdvisory: healthAdvisorySchema,
-  costBreakdown: costBreakdownSchema,
-  permits: permitsSchema,
-  tripReadiness: tripReadinessSchema,
+  // Slim fields for free-tier models — uncomment full schemas when using a paid model:
+  suitability: suitabilityEnum,
+  readinessScore: z.number().min(0).max(100),
+  personalMatch: personalMatchSchema,
+  // healthAdvisory: healthAdvisorySchema,
+  // costBreakdown: costBreakdownSchema.optional(),
+  // permits: permitsSchema.optional(),
+  // tripReadiness: tripReadinessSchema,
 });
 
 export const generateResultsSchema = z.object({
@@ -111,6 +121,7 @@ export const trekResultSchema = z.object({
   costBreakdown: costBreakdownSchema,
   permits: permitsSchema,
   tripReadiness: tripReadinessSchema,
+  personalMatch: personalMatchSchema,
 });
 
 export const trekResultsSchema = z.object({
@@ -118,33 +129,33 @@ export const trekResultsSchema = z.object({
 });
 
 export const itineraryActivitySchema = z.object({
-  time: z.string(),
+  time: z.string().optional().default(''),
   activity: z.string(),
-  cost: z.string(),
-  healthNote: z.string(),
+  cost: z.string().optional().default(''),
+  healthNote: z.string().optional().default(''),
 });
 
 export const itineraryMealsSchema = z.object({
-  breakfast: z.string(),
-  lunch: z.string(),
-  dinner: z.string(),
+  breakfast: z.string().optional().default(''),
+  lunch: z.string().optional().default(''),
+  dinner: z.string().optional().default(''),
 });
 
 export const itineraryDaySchema = z.object({
   day: z.number(),
-  title: z.string(),
-  activities: z.array(itineraryActivitySchema),
-  meals: itineraryMealsSchema,
-  healthNote: z.string(),
+  title: z.string().optional().default(''),
+  activities: z.array(itineraryActivitySchema).optional().default([]),
+  meals: itineraryMealsSchema.optional().default({ breakfast: '', lunch: '', dinner: '' }),
+  healthNote: z.string().optional().default(''),
 });
 
 export const itineraryResponseSchema = z.object({
   destination: z.string(),
-  totalEstimate: z.string(),
-  itinerary: z.array(itineraryDaySchema),
-  packingList: z.array(z.string()),
-  healthAdvisory: healthAdvisorySchema,
-  permits: permitsSchema,
+  totalEstimate: z.string().optional().default(''),
+  itinerary: z.array(itineraryDaySchema).optional().default([]),
+  packingList: z.array(z.string()).optional().default([]),
+  healthAdvisory: healthAdvisorySchema.optional(),
+  permits: permitsSchema.optional(),
 });
 
 export const itineraryResponseWrapperSchema = z.object({
@@ -167,8 +178,8 @@ export const dishSchema = z.object({
   spiceLevel: z.string(),
   healthNote: z.string(),
   allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.string().optional(),
-  tasteProfile: tasteProfileSchema,
+  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  tasteProfile: tasteProfileSchema.optional(),
 });
 
 export const healthConsciousDishSchema = z.object({
@@ -176,8 +187,8 @@ export const healthConsciousDishSchema = z.object({
   description: z.string(),
   healthNote: z.string(),
   allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.string().optional(),
-  tasteProfile: tasteProfileSchema,
+  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  tasteProfile: tasteProfileSchema.optional(),
 });
 
 export const streetFoodItemSchema = z.object({
@@ -186,14 +197,14 @@ export const streetFoodItemSchema = z.object({
   price: z.string(),
   healthNote: z.string(),
   allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.string().optional(),
-  tasteProfile: tasteProfileSchema,
+  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  tasteProfile: tasteProfileSchema.optional(),
 });
 
 export const mealSuggestionSchema = z.object({
   suggestion: z.string(),
   cost: z.string(),
-  healthNote: z.string(),
+  healthNote: z.string().optional().default(''),
 });
 
 export const dailyMealPlanSchema = z.object({
@@ -212,13 +223,13 @@ export const foodGuideResponseSchema = z.object({
     safetyTips: z.array(z.string()),
     items: z.array(streetFoodItemSchema),
   }),
-  mealPlan: z.array(dailyMealPlanSchema),
+  mealPlan: z.array(dailyMealPlanSchema).optional().default([]),
   dietaryInfo: z.object({
     vegFriendly: z.string(),
     veganOptions: z.string(),
     halalAvailability: z.string(),
     waterAdvice: z.string(),
-  }),
+  }).optional().default({ vegFriendly: '', veganOptions: '', halalAvailability: '', waterAdvice: '' }),
 });
 
 export const foodGuideResponseWrapperSchema = z.object({
@@ -226,6 +237,7 @@ export const foodGuideResponseWrapperSchema = z.object({
 });
 
 export type HealthAdvisory = z.infer<typeof healthAdvisorySchema>;
+export type PersonalMatch = z.infer<typeof personalMatchSchema>;
 export type RankResult = z.infer<typeof rankResultSchema>;
 export type GenerateResult = z.infer<typeof generateResultSchema>;
 export type CostBreakdown = z.infer<typeof costBreakdownSchema>;

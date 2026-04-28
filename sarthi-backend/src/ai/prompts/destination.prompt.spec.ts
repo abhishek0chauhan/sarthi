@@ -1,4 +1,4 @@
-import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTasteProfileBlock, buildTrekPrompt, computeBmi, computeTripDays, monthNameFromDate, buildSearchContext } from './destination.prompt';
+import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTasteProfileBlock, buildTrekPrompt, computeBmi, computeTripDays, monthNameFromDate, buildSearchContext, buildPersonalityBlock, buildCorrectionsBlock } from './destination.prompt';
 
 const baseParams = {
   freeText: 'want something offbeat',
@@ -177,9 +177,9 @@ describe('buildAiFullPrompt', () => {
     expect(prompt).toHaveProperty('user');
   });
 
-  it('asks to recommend up to 5 destinations', () => {
+  it('asks to recommend up to 3 destinations (slim free-model format)', () => {
     const { user } = buildAiFullPrompt(baseParams);
-    expect(user).toContain('up to 5');
+    expect(user).toContain('up to 3');
   });
 
   it('includes departure city', () => {
@@ -220,18 +220,12 @@ describe('buildAiFullPrompt', () => {
     expect(user).toContain('total');
   });
 
-  it('user prompt includes permits format', () => {
+  // Slim free-model format uses suitability+readinessScore instead of full sub-schemas.
+  // permits and tripReadiness are in the PAID MODEL format (commented out in prompt).
+  it('user prompt includes slim suitability field (free-model format)', () => {
     const { user } = buildAiFullPrompt(baseParams);
-    expect(user).toContain('permits');
-    expect(user).toContain('required');
-    expect(user).toContain('documents');
-  });
-
-  it('user prompt includes tripReadiness format', () => {
-    const { user } = buildAiFullPrompt(baseParams);
-    expect(user).toContain('tripReadiness');
-    expect(user).toContain('score');
-    expect(user).toContain('actionItems');
+    expect(user).toContain('suitability');
+    expect(user).toContain('readinessScore');
   });
 
   it('includes the Context block with Rules', () => {
@@ -727,14 +721,16 @@ describe('buildFoodGuidePrompt — rules section', () => {
     expect(user).toContain('allergens');
   });
 
-  it('user text always includes tasteProfile rule', () => {
+  // tasteProfile is in the PAID MODEL format (commented out in prompt).
+  // Slim free-model format uses allergens only (no tasteProfile per dish).
+  it('user text includes allergens rule (slim free-model format)', () => {
     const { user } = buildFoodGuidePrompt({
       destination: 'Goa', state: 'Goa', freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
     });
-    expect(user).toContain('tasteProfile');
+    expect(user).toContain('allergens');
   });
 
   it('user text includes Taste Profile block when cuisinePreferences provided', () => {
@@ -747,5 +743,60 @@ describe('buildFoodGuidePrompt — rules section', () => {
     });
     expect(user).toContain('## Taste Profile');
     expect(user).toContain('Cuisines: Konkani');
+  });
+});
+
+describe('buildPersonalityBlock', () => {
+  it('returns empty string when profile is null', () => {
+    expect(buildPersonalityBlock(null)).toBe('');
+  });
+
+  it('returns empty string when profile has no dimensions set', () => {
+    expect(buildPersonalityBlock({ travelPace: null, completeness: 0 } as any)).toBe('');
+  });
+
+  it('includes filled dimensions', () => {
+    const block = buildPersonalityBlock({
+      travelPace: 'loose',
+      comfortLevel: 'homestay',
+      crowdTolerance: 'avoid',
+      travelMotivations: ['nature', 'culture'],
+      completeness: 44,
+    } as any);
+    expect(block).toContain('## Traveler Personality');
+    expect(block).toContain('Pace: loose');
+    expect(block).toContain('Comfort: homestay');
+    expect(block).toContain('Crowds: avoid');
+    expect(block).toContain('Motivations: nature, culture');
+  });
+
+  it('omits dimensions that are null/undefined', () => {
+    const block = buildPersonalityBlock({ travelPace: 'packed', completeness: 11 } as any);
+    expect(block).not.toContain('Comfort:');
+    expect(block).not.toContain('Crowds:');
+  });
+
+  it('includes personalMatch instruction', () => {
+    const block = buildPersonalityBlock({ travelPace: 'loose', completeness: 11 } as any);
+    expect(block).toContain('personalMatch');
+    expect(block).toContain('matchLevel');
+  });
+});
+
+describe('buildCorrectionsBlock', () => {
+  it('returns empty string for empty corrections array', () => {
+    expect(buildCorrectionsBlock([])).toBe('');
+  });
+
+  it('returns empty string for null', () => {
+    expect(buildCorrectionsBlock(null as any)).toBe('');
+  });
+
+  it('includes corrections summary heading', () => {
+    const block = buildCorrectionsBlock([
+      { type: 'thumbs_down', context: { place: 'Elephant Falls', reason: 'touristy' } },
+    ] as any);
+    expect(block).toContain('## Past Preferences');
+    expect(block).toContain('thumbs_down');
   });
 });

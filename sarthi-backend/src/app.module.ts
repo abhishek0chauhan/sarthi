@@ -7,6 +7,8 @@ import { AiModule } from './ai/ai.module';
 import { DestinationFinderModule } from './destination-finder/destination-finder.module';
 import { SavedTripsModule } from './saved-trips/saved-trips.module';
 import { SharedTripsModule } from './shared-trips/shared-trips.module';
+import { ProfileModule } from './profile/profile.module';
+import { CorrectionsModule } from './corrections/corrections.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { SharedTripsModule } from './shared-trips/shared-trips.module';
     DestinationFinderModule,
     SavedTripsModule,
     SharedTripsModule,
+    ProfileModule,
+    CorrectionsModule,
   ],
 })
 export class AppModule {}

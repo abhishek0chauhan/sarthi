@@ -2,12 +2,6 @@ import { generateText } from 'ai';
 import type { LanguageModel } from 'ai';
 import type { ZodSchema } from 'zod';
 
-/**
- * Provider-agnostic structured-output helper.
- * Uses generateText + manual JSON parse + Zod validation so free models
- * (Gemma, etc.) that don't support tool-calling or strict JSON schema
- * still produce validated, typed output.
- */
 export async function generateJson<T>(opts: {
   model: LanguageModel;
   schema: ZodSchema<T>;
@@ -16,15 +10,12 @@ export async function generateJson<T>(opts: {
 }): Promise<T> {
   const { text } = await generateText({
     model: opts.model,
-    system: `${opts.system}\n\nRespond with ONLY valid JSON matching the requested shape. No markdown fences, no prose, no explanations.`,
+    maxOutputTokens: 8192,
+    system: `${opts.system}\n\nRespond with ONLY valid JSON. No markdown fences, no prose, no explanations.`,
     prompt: opts.prompt,
   });
 
-  // Strip markdown fences in case the model wraps JSON anyway
-  const cleaned = text
-    .trim()
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/, '');
+  const cleaned = extractJson(text);
 
   let parsed: unknown;
   try {
@@ -36,4 +27,70 @@ export async function generateJson<T>(opts: {
   }
 
   return opts.schema.parse(parsed);
+}
+
+function extractJson(text: string): string {
+  const trimmed = text.trim();
+
+  // Strip markdown fences
+  const fenced = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+
+  const start = Math.min(
+    fenced.indexOf('{') === -1 ? Infinity : fenced.indexOf('{'),
+    fenced.indexOf('[') === -1 ? Infinity : fenced.indexOf('['),
+  );
+
+  if (start === Infinity) return fenced;
+
+  return extractOrRepair(fenced, start);
+}
+
+function extractOrRepair(text: string, start: number): string {
+  const stack: string[] = [];
+  let inString = false;
+  let escape = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\' && inString) { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{' || ch === '[') stack.push(ch === '{' ? '}' : ']');
+    else if (ch === '}' || ch === ']') {
+      stack.pop();
+      if (stack.length === 0) {
+        const complete = text.slice(start, i + 1);
+        // Even a "complete" response might have trailing commas from the model
+        return sanitize(complete);
+      }
+    }
+  }
+
+  // ── Truncated response — repair ───────────────────────────────────────────
+  let repaired = text.slice(start);
+
+  // Close any unclosed string literal
+  if (inString) repaired += '"';
+
+  // Strip trailing incomplete key-value fragments before closing brackets:
+  //   ,"key": partial_value   (unquoted partial: numbers, booleans)
+  //   ,"key":                 (colon with no value)
+  //   ,"key"                  (key with no colon)
+  //   ,                       (bare trailing comma)
+  repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*[^,{[\]}"]*$/, '');
+  repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  repaired = repaired.replace(/,\s*"[^"]*"\s*$/, '');
+  repaired = repaired.replace(/,\s*$/, '');
+
+  // Close all open brackets/braces in reverse stack order
+  while (stack.length > 0) repaired += stack.pop()!;
+
+  return sanitize(repaired);
+}
+
+// Remove trailing commas inside objects/arrays — models sometimes emit them,
+// and JSON.parse rejects them even though the overall structure is valid.
+function sanitize(json: string): string {
+  return json.replace(/,(\s*[}\]])/g, '$1');
 }

@@ -15,6 +15,8 @@ import type {
   FoodGuideResponse,
   TrekResult,
 } from './schemas/destination.schema';
+import { profileExtractionWrapperSchema } from './schemas/profile.schema';
+import type { ProfileExtraction } from './schemas/profile.schema';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -52,7 +54,7 @@ const gemini = createOpenAICompatible({
 });
 
 const AI_PROVIDER = (process.env.AI_PROVIDER ?? 'nvidia').toLowerCase();
-const NVIDIA_MODEL_ID = 'google/gemma-3n-e2b-it';
+const NVIDIA_MODEL_ID = 'google/gemma-3n-e4b-it';
 const GEMINI_MODEL_ID = 'gemini-2.0-flash';
 
 @Injectable()
@@ -138,5 +140,25 @@ export class AiService {
     });
 
     return (result?.treks ?? []).slice(0, 5);
+  }
+
+  async extractPersonality(story: string): Promise<ProfileExtraction> {
+    const system = 'You are a travel personality analyst. Extract the traveler\'s personality dimensions from their story. Only extract dimensions you are confident about from the story — leave others absent.';
+    const user = `Analyze this traveler story and extract personality dimensions:
+
+"${story}"
+
+Respond ONLY with a JSON object in exactly this format (no extra text):
+{"result":{"travelPace":"<packed|loose|no_plan or omit>","depthVsBreadth":"<deep|balanced|cover or omit>","comfortLevel":"<hotel|homestay|rough or omit>","crowdTolerance":"<worth_it|hidden|avoid or omit>","travelMotivations":["<food|nature|culture|adventure|photography|spiritual|nightlife|shopping|relaxation>"],"physicalReadiness":"<yes|maybe|no or omit>","spendingStyle":"<experience|budget|comfort or omit>","groundReality":"<bring_it|tolerate|need_comfort or omit>","languageComfort":"<fine|hindi|english or omit>","confidence":<0-100>}}
+
+Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimensions clear).`;
+
+    const result = await generateJson({
+      model: this.model,
+      schema: profileExtractionWrapperSchema,
+      system,
+      prompt: user,
+    });
+    return result.result;
   }
 }

@@ -47,9 +47,9 @@ describe('DestinationFinderController', () => {
     const serviceResult = { mode: 'hybrid', results: [{ name: 'Kasol' }] };
     mockService.search.mockResolvedValue(serviceResult);
 
-    const result = await controller.search(dto as any);
+    const result = await controller.search(dto as any, undefined, undefined);
 
-    expect(mockService.search).toHaveBeenCalledWith(dto, false);
+    expect(mockService.search).toHaveBeenCalledWith(dto, false, undefined);
     expect(result).toEqual(serviceResult);
   });
 
