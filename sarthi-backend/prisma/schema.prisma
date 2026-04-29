@@ -55,7 +55,9 @@ model SavedTrip {
   destinationData Json
   itineraryData   Json?
   foodGuideData   Json?
+  phrasebookData  Json?
   shareToken      String?     @unique
+  chatMessages    TripChatMessage[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -93,4 +95,15 @@ model Correction {
 
   @@index([userId])
   @@index([tripId])
+}
+
+model TripChatMessage {
+  id        String   @id @default(uuid())
+  tripId    String
+  trip      SavedTrip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([tripId, createdAt])
 }
