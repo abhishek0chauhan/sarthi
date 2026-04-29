@@ -2,9 +2,11 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, 
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
+import { TripChatService } from './trip-chat.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
+import { ChatMessageDto } from './dto/chat-message.dto';
 
 @Controller('saved-trips')
 @UseGuards(FirebaseAuthGuard)
@@ -12,6 +14,7 @@ export class SavedTripsController {
   constructor(
     private readonly service: SavedTripsService,
     private readonly phrasebookService: PhrasebookService,
+    private readonly chatService: TripChatService,
   ) {}
 
   @Post()
@@ -113,5 +116,26 @@ export class SavedTripsController {
     @Req() req: any,
   ) {
     return this.service.suggestReplacement(id, Number(day), Number(index), req.user);
+  }
+
+  @Post(':id/chat')
+  @HttpCode(200)
+  async sendChatMessage(
+    @Param('id') id: string,
+    @Body() dto: ChatMessageDto,
+    @Req() req: any,
+  ) {
+    return this.chatService.sendMessage(id, dto.message, req.user);
+  }
+
+  @Get(':id/chat')
+  async getChatHistory(@Param('id') id: string, @Req() req: any) {
+    return this.chatService.getHistory(id, req.user);
+  }
+
+  @Delete(':id/chat')
+  @HttpCode(204)
+  async clearChatHistory(@Param('id') id: string, @Req() req: any) {
+    await this.chatService.clearHistory(id, req.user);
   }
 }
