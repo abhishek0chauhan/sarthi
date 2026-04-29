@@ -1,4 +1,4 @@
-import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTasteProfileBlock, buildTrekPrompt, computeBmi, computeTripDays, monthNameFromDate, buildSearchContext, buildPersonalityBlock, buildCorrectionsBlock } from './destination.prompt';
+import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTasteProfileBlock, buildTrekPrompt, computeBmi, computeTripDays, monthNameFromDate, buildSearchContext, buildPersonalityBlock, buildCorrectionsBlock, buildSuggestReplacementPrompt } from './destination.prompt';
 
 const baseParams = {
   freeText: 'want something offbeat',
@@ -798,5 +798,78 @@ describe('buildCorrectionsBlock', () => {
     ] as any);
     expect(block).toContain('## Past Preferences');
     expect(block).toContain('thumbs_down');
+  });
+});
+
+describe('buildItineraryPrompt — mapQuery', () => {
+  const itineraryParams = {
+    destination: 'Cherrapunji',
+    state: 'Meghalaya',
+    freeText: 'want to see waterfalls',
+    group: { size: 2, type: 'couple' },
+    budget: { min: 8000, max: 20000 },
+    dates: { from: '2026-07-10', to: '2026-07-13' },
+    departureCity: 'Kolkata',
+  };
+
+  it('includes mapQuery in the itinerary activity format', () => {
+    const { user } = buildItineraryPrompt(itineraryParams);
+    expect(user).toContain('mapQuery');
+  });
+});
+
+describe('buildFoodGuidePrompt — mapQuery', () => {
+  const foodParams = {
+    destination: 'Shillong',
+    state: 'Meghalaya',
+    freeText: 'love local food',
+    group: { size: 2, type: 'couple' },
+    dates: { from: '2026-07-10', to: '2026-07-13' },
+    departureCity: 'Kolkata',
+  };
+
+  it('includes mapQuery in must-try dish format', () => {
+    const { user } = buildFoodGuidePrompt(foodParams);
+    expect(user).toContain('mapQuery');
+  });
+});
+
+describe('buildSuggestReplacementPrompt', () => {
+  it('returns system and user keys', () => {
+    const prompt = buildSuggestReplacementPrompt({
+      destination: 'Cherrapunji',
+      state: 'Meghalaya',
+      day: 2,
+      currentActivity: { time: '09:00 AM', activity: 'Crowded waterfall tour' },
+      dayActivities: ['09:00 AM: Crowded waterfall tour', '02:00 PM: Local market'],
+    });
+    expect(prompt).toHaveProperty('system');
+    expect(prompt).toHaveProperty('user');
+  });
+
+  it('user prompt contains the activity being replaced', () => {
+    const prompt = buildSuggestReplacementPrompt({
+      destination: 'Cherrapunji',
+      state: 'Meghalaya',
+      day: 2,
+      currentActivity: { time: '09:00 AM', activity: 'Crowded waterfall tour' },
+      dayActivities: [],
+    });
+    expect(prompt.user).toContain('Crowded waterfall tour');
+    expect(prompt.user).toContain('Day 2');
+  });
+
+  it('includes personality and corrections blocks when provided', () => {
+    const { user } = buildSuggestReplacementPrompt({
+      destination: 'Cherrapunji',
+      state: 'Meghalaya',
+      day: 1,
+      currentActivity: { time: '10:00 AM', activity: 'Touristy spot' },
+      dayActivities: [],
+      profile: { travelPace: 'loose', completeness: 11 },
+      corrections: [{ type: 'thumbs_down', context: { place: 'Dawki' } }],
+    });
+    expect(user).toContain('Traveler Personality');
+    expect(user).toContain('Past Preferences');
   });
 });

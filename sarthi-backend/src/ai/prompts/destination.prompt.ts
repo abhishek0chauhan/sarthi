@@ -158,6 +158,38 @@ export function buildCorrectionsBlock(corrections: CorrectionRecord[] | null): s
   return `\n## Past Preferences (learned from your trips)\n${lines.join('\n')}\n\nAvoid places similar to removed/thumbs-down items. Favour places similar to thumbs-up items.`;
 }
 
+export interface SuggestReplacementParams {
+  destination: string;
+  state: string;
+  day: number;
+  currentActivity: { time: string; activity: string };
+  dayActivities: string[];  // other activities in the same day as context
+  profile?: TravelerProfileSnapshot | null;
+  corrections?: CorrectionRecord[];
+}
+
+export function buildSuggestReplacementPrompt(params: SuggestReplacementParams): { system: string; user: string } {
+  const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+  const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
+
+  const dayContext = params.dayActivities.length > 0
+    ? `\nOther activities on Day ${params.day}: ${params.dayActivities.join(' | ')}`
+    : '';
+
+  return {
+    system: 'You are an expert Indian travel planner. Suggest specific, named alternative activities that fit the traveler\'s personality and avoid their past dislikes.',
+    user: `Suggest 2-3 alternative activities to replace this one:
+
+Trip: ${params.destination}, ${params.state}
+Day ${params.day}, ${params.currentActivity.time}: "${params.currentActivity.activity}"${dayContext}${personalityBlock}${correctionsBlock}
+
+Respond ONLY with a JSON object in exactly this format (no extra text):
+{"result":{"suggestions":[{"time":"${params.currentActivity.time}","activity":"<named place or activity>","cost":"<₹ or free>","healthNote":"<one line or empty>","mapQuery":"<place name, area, city, state>","personalMatch":{"matchLevel":"<great_match|good_match|heads_up|not_your_style>","reason":"<one sentence>"}}]}}
+
+Max 3 suggestions, best match first.`,
+  };
+}
+
 function buildHealthContext(params: HealthProfile): string {
   const lines: string[] = [];
 
@@ -293,7 +325,10 @@ ${travelerProfile}${healthContext}${travelLine}${personalityBlock}${correctionsB
 Create a detailed day-by-day plan with specific activities, timings, meal suggestions with costs, and health notes.
 
 Respond ONLY with a JSON object in exactly this format (no extra text):
-{"result":{"destination":"${params.destination}","totalEstimate":"<₹ total for group>","itinerary":[{"day":<number>,"title":"<day theme>","activities":[{"time":"<HH:MM AM/PM>","activity":"<description>","cost":"<₹ amount>","healthNote":"<note or empty>"}],"meals":{"breakfast":"<₹cost — suggestion>","lunch":"<₹cost — suggestion>","dinner":"<₹cost — suggestion>"},"healthNote":"<overall day health note>"}],"packingList":["<item>"],${HEALTH_ADVISORY_FORMAT},${PERMITS_FORMAT}}}`,
+{"result":{"destination":"${params.destination}","totalEstimate":"<₹ total for group>","itinerary":[{"day":<number>,"title":"<day theme>","activities":[{"time":"<HH:MM AM/PM>","activity":"<description>","cost":"<₹ amount>","healthNote":"<note or empty>","mapQuery":"<place name, area, city>"}],"meals":{"breakfast":"<₹cost — suggestion>","lunch":"<₹cost — suggestion>","dinner":"<₹cost — suggestion>"},"healthNote":"<overall day health note>"}],"packingList":["<item>"],${HEALTH_ADVISORY_FORMAT},${PERMITS_FORMAT}}}
+
+// --- PAID MODEL: add to each activity (comment out slim mapQuery, uncomment below) ---
+// "placeContext":{"whySpecial":"<one sentence>","bestTimeToVisit":"<one line>","suggestedDuration":"<e.g. 2-3 hours>","insiderTips":["<tip>"],"whatToCarry":["<item>"],"nearbyAlternative":"<or omit>"}}`,
   };
 }
 
@@ -371,7 +406,7 @@ export function buildFoodGuidePrompt(params: FoodGuideParams & { profile?: Trave
     `- Prioritize dishes matching any taste/cuisine preferences provided.`,
   ].join('\n');
 
-  const slimFormat = `{"result":{"destination":"${params.destination}","overview":"<2 sentences>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<area>","priceRange":"<₹>","spiceLevel":"<mild/medium/hot>","healthNote":"<one line>","allergens":[]}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<one line>","allergens":[]}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<area>","price":"<₹>","healthNote":"<one line>","allergens":[]}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<one line>","veganOptions":"<one line>","halalAvailability":"<one line>","waterAdvice":"<one line>"}}}`;
+  const slimFormat = `{"result":{"destination":"${params.destination}","overview":"<2 sentences>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<area>","priceRange":"<₹>","spiceLevel":"<mild/medium/hot>","healthNote":"<one line>","allergens":[],"mapQuery":"<restaurant name, area, city>"}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<one line>","allergens":[]}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<area>","price":"<₹>","healthNote":"<one line>","allergens":[],"mapQuery":"<stall name or area, city>"}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<dish>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<one line>","veganOptions":"<one line>","halalAvailability":"<one line>","waterAdvice":"<one line>"}}}`;
 
   const slimCount = `Include exactly 3 must-try dishes, 2 healthy alternatives, 2 street food items, and a 1-day meal plan.`;
 
@@ -390,7 +425,7 @@ export function buildFoodGuidePrompt(params: FoodGuideParams & { profile?: Trave
   //   `- mealPlan entries do NOT need allergens or tasteProfile (keep lean).`,
   // ].join('\n');
   //
-  // const paidFormat = `{"result":{"destination":"${params.destination}","overview":"<2-3 sentences about local cuisine + health-aware notes>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<restaurant/area>","priceRange":"<₹ range>","spiceLevel":"<mild/medium/hot>","healthNote":"<health advice for this traveler>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<why it's healthy>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<location>","price":"<₹>","healthNote":"<note>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<assessment>","veganOptions":"<assessment>","halalAvailability":"<assessment>","waterAdvice":"<advice>"}}}`;
+  // const paidFormat = `{"result":{"destination":"${params.destination}","overview":"<2-3 sentences about local cuisine + health-aware notes>","mustTryDishes":[{"name":"<dish>","description":"<one line>","where":"<restaurant/area>","priceRange":"<₹ range>","spiceLevel":"<mild/medium/hot>","healthNote":"<health advice for this traveler>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","mapQuery":"<restaurant name, area, city>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"healthConscious":[{"name":"<dish>","description":"<one line>","healthNote":"<why it's healthy>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}],"streetFood":{"safetyTips":["<tip>"],"items":[{"name":"<item>","where":"<location>","price":"<₹>","healthNote":"<note>","allergens":["<allergen>"],"allergyAlert":"<alert or omit>","mapQuery":"<stall name or area, city>","tasteProfile":{"sweet":<0-5>,"spicy":<0-5>,"sour":<0-5>,"salty":<0-5>,"umami":<0-5>}}]},"mealPlan":[{"day":<number>,"breakfast":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"lunch":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"},"dinner":{"suggestion":"<what>","cost":"<₹>","healthNote":"<note>"}}],"dietaryInfo":{"vegFriendly":"<assessment>","veganOptions":"<assessment>","halalAvailability":"<assessment>","waterAdvice":"<advice>"}}}`;
   //
   // const paidCount = `Include 5-8 must-try dishes, 2-3 healthy alternatives, 3-5 street food items, and a ${numDays}-day meal plan.`;
   //
