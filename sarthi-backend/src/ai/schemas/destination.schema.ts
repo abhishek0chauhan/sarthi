@@ -65,6 +65,20 @@ export const tripReadinessSchema = z.object({
   actionItems: stringArray,
 });
 
+export const activityPlaceContextSchema = z.object({
+  whySpecial: z.string().optional().default(''),
+  bestTimeToVisit: z.string().optional().default(''),
+  suggestedDuration: z.string().optional().default(''),
+  insiderTips: z.array(z.string()).optional().default([]),
+  whatToCarry: z.array(z.string()).optional().default([]),
+  nearbyAlternative: z.string().optional(),
+}).optional();
+
+export const dishPlaceContextSchema = z.object({
+  bestTimeToVisit: z.string().optional().default(''),
+  insiderTips: z.array(z.string()).optional().default([]),
+}).optional();
+
 export const personalMatchSchema = z.object({
   matchLevel: z.enum(['great_match', 'good_match', 'heads_up', 'not_your_style']),
   reason: z.string(),
@@ -133,6 +147,8 @@ export const itineraryActivitySchema = z.object({
   activity: z.string(),
   cost: z.string().optional().default(''),
   healthNote: z.string().optional().default(''),
+  mapQuery: z.string().optional().default(''),
+  placeContext: activityPlaceContextSchema,
 });
 
 export const itineraryMealsSchema = z.object({
@@ -180,6 +196,8 @@ export const dishSchema = z.object({
   allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
   allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
   tasteProfile: tasteProfileSchema.optional(),
+  mapQuery: z.string().optional().default(''),
+  placeContext: dishPlaceContextSchema,
 });
 
 export const healthConsciousDishSchema = z.object({
@@ -199,6 +217,7 @@ export const streetFoodItemSchema = z.object({
   allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
   allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
   tasteProfile: tasteProfileSchema.optional(),
+  mapQuery: z.string().optional().default(''),
 });
 
 export const mealSuggestionSchema = z.object({
@@ -236,6 +255,21 @@ export const foodGuideResponseWrapperSchema = z.object({
   result: foodGuideResponseSchema,
 });
 
+export const activitySuggestionSchema = z.object({
+  time: z.string().optional().default(''),
+  activity: z.string(),
+  cost: z.string().optional().default(''),
+  healthNote: z.string().optional().default(''),
+  mapQuery: z.string().optional().default(''),
+  personalMatch: personalMatchSchema,
+});
+
+export const suggestionsResponseWrapperSchema = z.object({
+  result: z.object({
+    suggestions: z.array(activitySuggestionSchema),
+  }),
+});
+
 export type HealthAdvisory = z.infer<typeof healthAdvisorySchema>;
 export type PersonalMatch = z.infer<typeof personalMatchSchema>;
 export type RankResult = z.infer<typeof rankResultSchema>;
@@ -248,3 +282,5 @@ export type TrekResults = z.infer<typeof trekResultsSchema>;
 export type ItineraryResponse = z.infer<typeof itineraryResponseSchema>;
 export type FoodGuideResponse = z.infer<typeof foodGuideResponseSchema>;
 export type TasteProfile = z.infer<typeof tasteProfileSchema>;
+export type ActivitySuggestion = z.infer<typeof activitySuggestionSchema>;
+export type ActivityPlaceContext = z.infer<typeof activityPlaceContextSchema>;

@@ -7,6 +7,7 @@ import {
   tripReadinessSchema,
   rankResultsSchema,
   generateResultsSchema,
+  itineraryActivitySchema,
   itineraryDaySchema,
   itineraryResponseSchema,
   foodGuideResponseSchema,
@@ -16,6 +17,7 @@ import {
   healthConsciousDishSchema,
   streetFoodItemSchema,
   tasteProfileSchema,
+  activitySuggestionSchema,
 } from './destination.schema';
 
 const validAdvisory = {
@@ -499,5 +501,84 @@ describe('streetFoodItemSchema allergen + tasteProfile', () => {
     });
     expect(result.allergens).toEqual([]);
     expect(result.tasteProfile).toEqual({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
+  });
+});
+
+describe('itineraryActivitySchema — placeContext + mapQuery', () => {
+  it('parses activity with mapQuery and placeContext', () => {
+    const result = itineraryActivitySchema.parse({
+      time: '09:00 AM',
+      activity: 'Living Root Bridge hike',
+      cost: '₹20',
+      healthNote: 'Moderate hike',
+      mapQuery: 'Living Root Bridge, Cherrapunji, Meghalaya',
+      placeContext: {
+        whySpecial: 'One of the oldest living root bridges',
+        bestTimeToVisit: 'Early morning',
+        suggestedDuration: '2-3 hours',
+        insiderTips: ['Wear grip shoes'],
+        whatToCarry: ['Water bottle'],
+      },
+    });
+    expect(result.mapQuery).toBe('Living Root Bridge, Cherrapunji, Meghalaya');
+    expect(result.placeContext?.whySpecial).toBe('One of the oldest living root bridges');
+  });
+
+  it('parses activity without mapQuery or placeContext (backward compat)', () => {
+    const result = itineraryActivitySchema.parse({
+      activity: 'Visit market',
+    });
+    expect(result.mapQuery).toBe('');
+    expect(result.placeContext).toBeUndefined();
+  });
+});
+
+describe('dishSchema — mapQuery + placeContext', () => {
+  it('parses dish with mapQuery and placeContext', () => {
+    const result = dishSchema.parse({
+      name: 'Jadoh',
+      description: 'Rice cooked in pork broth',
+      where: 'Police Bazaar, Shillong',
+      priceRange: '₹80-120',
+      spiceLevel: 'mild',
+      healthNote: 'High protein',
+      mapQuery: 'Police Bazaar, Shillong, Meghalaya',
+      placeContext: {
+        bestTimeToVisit: 'Lunch hours',
+        insiderTips: ['Cash only'],
+      },
+    });
+    expect(result.mapQuery).toBe('Police Bazaar, Shillong, Meghalaya');
+    expect(result.placeContext?.insiderTips).toEqual(['Cash only']);
+  });
+
+  it('parses dish without mapQuery or placeContext (backward compat)', () => {
+    const result = dishSchema.parse({
+      name: 'Jadoh',
+      description: 'Rice cooked in pork broth',
+      where: 'Police Bazaar',
+      priceRange: '₹80',
+      spiceLevel: 'mild',
+      healthNote: 'Healthy',
+    });
+    expect(result.mapQuery).toBe('');
+    expect(result.placeContext).toBeUndefined();
+  });
+});
+
+describe('activitySuggestionSchema', () => {
+  it('parses a valid suggestion', () => {
+    const result = activitySuggestionSchema.parse({
+      activity: 'Wei Sawdong Waterfall',
+      mapQuery: 'Wei Sawdong Waterfall, Meghalaya',
+      personalMatch: { matchLevel: 'great_match', reason: 'Offbeat, no crowds' },
+    });
+    expect(result.activity).toBe('Wei Sawdong Waterfall');
+    expect(result.personalMatch?.matchLevel).toBe('great_match');
+  });
+
+  it('parses suggestion without personalMatch', () => {
+    const result = activitySuggestionSchema.parse({ activity: 'Some place' });
+    expect(result.personalMatch).toBeUndefined();
   });
 });
