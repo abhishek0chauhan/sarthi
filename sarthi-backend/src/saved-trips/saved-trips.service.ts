@@ -2,11 +2,14 @@ import { Injectable, ForbiddenException, NotFoundException, BadRequestException 
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from './user.service';
 import { CorrectionsService } from '../corrections/corrections.service';
+import { ProfileService } from '../profile/profile.service';
+import { AiService } from '../ai/ai.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
 import { randomUUID } from 'crypto';
 import { Prisma } from '@prisma/client';
+import type { TravelerProfileSnapshot, CorrectionRecord } from '../ai/prompts/destination.prompt';
 
 interface FirebaseUser {
   uid: string;
@@ -20,6 +23,8 @@ export class SavedTripsService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly correctionsService: CorrectionsService,
+    private readonly profileService: ProfileService,
+    private readonly aiService: AiService,
   ) {}
 
   async create(dto: CreateSavedTripDto, fbUser: FirebaseUser) {
@@ -231,5 +236,46 @@ export class SavedTripsService {
 
     dayObj.activities = indices.map((i: number) => dayObj.activities[i]);
     return this.updateItinerary(tripId, itinerary);
+  }
+
+  async suggestReplacement(
+    tripId: string,
+    day: number,
+    activityIndex: number,
+    fbUser: FirebaseUser,
+  ) {
+    const trip = await this.getById(tripId, fbUser);
+    const itinerary = trip.itineraryData as any;
+    const dayObj = this.getItineraryDay(itinerary, day);
+
+    if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
+      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+    }
+
+    const currentActivity = dayObj.activities[activityIndex];
+    const otherActivities: string[] = dayObj.activities
+      .filter((_: any, i: number) => i !== activityIndex)
+      .map((a: any) => `${a.time}: ${a.activity}`);
+
+    // Fetch personality context (best-effort — don't fail if unavailable)
+    let profile: TravelerProfileSnapshot | null = null;
+    let corrections: CorrectionRecord[] = [];
+    try {
+      profile = await this.profileService.getProfile(fbUser.uid);
+      if (profile) {
+        const user = await this.userService.findOrCreate(fbUser.uid);
+        corrections = (await this.correctionsService.getRecentForPrompt(user.id)) as CorrectionRecord[];
+      }
+    } catch { /* non-fatal */ }
+
+    return this.aiService.suggestActivityReplacement({
+      destination: trip.destination,
+      state: trip.state,
+      day,
+      currentActivity,
+      dayActivities: otherActivities,
+      profile,
+      corrections,
+    });
   }
 }

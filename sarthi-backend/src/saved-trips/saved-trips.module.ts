@@ -4,9 +4,10 @@ import { SavedTripsService } from './saved-trips.service';
 import { UserService } from './user.service';
 import { PhrasebookService } from './phrasebook.service';
 import { CorrectionsModule } from '../corrections/corrections.module';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
-  imports: [CorrectionsModule],
+  imports: [CorrectionsModule, ProfileModule],
   controllers: [SavedTripsController],
   providers: [SavedTripsService, UserService, PhrasebookService],
   exports: [SavedTripsService],

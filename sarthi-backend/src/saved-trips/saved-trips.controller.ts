@@ -103,4 +103,15 @@ export class SavedTripsController {
   ) {
     return this.service.reorderActivities(id, Number(day), indices, req.user);
   }
+
+  @Post(':id/itinerary/day/:day/activity/:index/suggest')
+  @HttpCode(200)
+  async suggestActivityReplacement(
+    @Param('id') id: string,
+    @Param('day') day: string,
+    @Param('index') index: string,
+    @Req() req: any,
+  ) {
+    return this.service.suggestReplacement(id, Number(day), Number(index), req.user);
+  }
 }

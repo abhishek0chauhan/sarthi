@@ -53,6 +53,8 @@ const mockTripWithItinerary = {
 };
 
 let correctionsService: { create: jest.Mock };
+let profileService: { getProfile: jest.Mock };
+let aiServiceMock: { suggestActivityReplacement: jest.Mock };
 
 describe('SavedTripsService', () => {
   let service: SavedTripsService;
@@ -71,7 +73,15 @@ describe('SavedTripsService', () => {
     };
     userService = { findOrCreate: jest.fn() };
     correctionsService = { create: jest.fn().mockResolvedValue({}) };
-    service = new SavedTripsService(prisma as any, userService as any, correctionsService as any);
+    profileService = { getProfile: jest.fn().mockResolvedValue(null) };
+    aiServiceMock = { suggestActivityReplacement: jest.fn().mockResolvedValue([]) };
+    service = new SavedTripsService(
+      prisma as any,
+      userService as any,
+      correctionsService as any,
+      profileService as any,
+      aiServiceMock as any,
+    );
   });
 
   describe('create', () => {
@@ -354,6 +364,21 @@ describe('SavedTripsService', () => {
       const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
       expect(updatedDay.activities[0].activity).toBe('Beach walk');
       expect(updatedDay.activities[1].activity).toBe('Check in');
+    });
+  });
+
+  describe('suggestReplacement', () => {
+    it('calls AI with trip context and returns suggestions', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      aiServiceMock.suggestActivityReplacement.mockResolvedValue([{ activity: 'Dudhsagar Falls' }]);
+
+      const result = await service.suggestReplacement('trip-1', 1, 0, { uid: 'fb-123' } as any);
+
+      expect(aiServiceMock.suggestActivityReplacement).toHaveBeenCalledWith(
+        expect.objectContaining({ destination: 'Goa', day: 1 }),
+      );
+      expect(result[0].activity).toBe('Dudhsagar Falls');
     });
   });
 });
