@@ -1,12 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateJson } from './generate-json';
+import { generateText } from 'ai';
 import {
   rankResultsSchema,
   generateResultsSchema,
   itineraryResponseWrapperSchema,
   foodGuideResponseWrapperSchema,
   trekResultsSchema,
+  suggestionsResponseWrapperSchema,
 } from './schemas/destination.schema';
 import type {
   RankResult,
@@ -14,9 +16,15 @@ import type {
   ItineraryResponse,
   FoodGuideResponse,
   TrekResult,
+  ActivitySuggestion,
 } from './schemas/destination.schema';
 import { profileExtractionWrapperSchema } from './schemas/profile.schema';
 import type { ProfileExtraction } from './schemas/profile.schema';
+import { phrasebookWrapperSchema } from './schemas/phrasebook.schema';
+import type { Phrasebook } from './schemas/phrasebook.schema';
+import { buildPhrasebookPrompt } from './prompts/phrasebook.prompt';
+import { buildSuggestReplacementPrompt } from './prompts/destination.prompt';
+import type { SuggestReplacementParams } from './prompts/destination.prompt';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -160,5 +168,37 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
       prompt: user,
     });
     return result.result;
+  }
+
+  async generatePhrasebook(destination: string, state: string): Promise<Phrasebook> {
+    const prompt = buildPhrasebookPrompt(destination, state);
+    const result = await generateJson({
+      model: this.model,
+      schema: phrasebookWrapperSchema,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+    return result.result;
+  }
+
+  async suggestActivityReplacement(params: SuggestReplacementParams): Promise<ActivitySuggestion[]> {
+    const prompt = buildSuggestReplacementPrompt(params);
+    const result = await generateJson({
+      model: this.model,
+      schema: suggestionsResponseWrapperSchema,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+    return result.result.suggestions.slice(0, 3);
+  }
+
+  async tripChat(system: string, userMessage: string): Promise<string> {
+    const { text } = await generateText({
+      model: this.model,
+      maxOutputTokens: 1024,
+      system,
+      prompt: userMessage,
+    });
+    return text.trim();
   }
 }
