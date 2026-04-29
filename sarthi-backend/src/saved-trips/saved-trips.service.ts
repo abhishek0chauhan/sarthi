@@ -1,8 +1,9 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from './user.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
+import { AddActivityDto } from './dto/add-activity.dto';
 import { randomUUID } from 'crypto';
 import { Prisma } from '@prisma/client';
 
@@ -130,5 +131,88 @@ export class SavedTripsService {
 
     const { user, ...tripData } = trip;
     return { ...tripData, sharedBy: user.displayName ?? 'Anonymous' };
+  }
+
+  private getItineraryDay(itineraryData: any, day: number) {
+    if (!itineraryData?.itinerary) throw new NotFoundException('No itinerary on this trip');
+    const dayObj = itineraryData.itinerary.find((d: any) => d.day === day);
+    if (!dayObj) throw new NotFoundException(`Day ${day} not found in itinerary`);
+    return dayObj;
+  }
+
+  private async updateItinerary(tripId: string, itineraryData: any) {
+    return this.prisma.savedTrip.update({
+      where: { id: tripId },
+      data: { itineraryData: itineraryData as unknown as Prisma.JsonValue },
+    });
+  }
+
+  async addActivity(tripId: string, day: number, dto: AddActivityDto, fbUser: FirebaseUser) {
+    const trip = await this.getById(tripId, fbUser);
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const dayObj = this.getItineraryDay(itinerary, day);
+
+    const newActivity = {
+      time: dto.time ?? '',
+      activity: dto.activity,
+      cost: dto.cost ?? '',
+      healthNote: dto.healthNote ?? '',
+    };
+
+    if (dto.position !== undefined && dto.position >= 0 && dto.position <= dayObj.activities.length) {
+      dayObj.activities.splice(dto.position, 0, newActivity);
+    } else {
+      dayObj.activities.push(newActivity);
+    }
+
+    return this.updateItinerary(tripId, itinerary);
+  }
+
+  async removeActivity(tripId: string, day: number, activityIndex: number, fbUser: FirebaseUser) {
+    const trip = await this.getById(tripId, fbUser);
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const dayObj = this.getItineraryDay(itinerary, day);
+
+    if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
+      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+    }
+
+    const removed = dayObj.activities[activityIndex];
+    dayObj.activities.splice(activityIndex, 1);
+
+    return { removed, trip: await this.updateItinerary(tripId, itinerary) };
+  }
+
+  async swapActivity(tripId: string, day: number, activityIndex: number, dto: AddActivityDto, fbUser: FirebaseUser) {
+    const trip = await this.getById(tripId, fbUser);
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const dayObj = this.getItineraryDay(itinerary, day);
+
+    if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
+      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+    }
+
+    const old = dayObj.activities[activityIndex];
+    dayObj.activities[activityIndex] = {
+      time: dto.time ?? old.time ?? '',
+      activity: dto.activity,
+      cost: dto.cost ?? old.cost ?? '',
+      healthNote: dto.healthNote ?? old.healthNote ?? '',
+    };
+
+    return { old, trip: await this.updateItinerary(tripId, itinerary) };
+  }
+
+  async reorderActivities(tripId: string, day: number, indices: number[], fbUser: FirebaseUser) {
+    const trip = await this.getById(tripId, fbUser);
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const dayObj = this.getItineraryDay(itinerary, day);
+
+    if (indices.length !== dayObj.activities.length || !indices.every(i => i >= 0 && i < dayObj.activities.length)) {
+      throw new BadRequestException('Invalid reorder indices');
+    }
+
+    dayObj.activities = indices.map((i: number) => dayObj.activities[i]);
+    return this.updateItinerary(tripId, itinerary);
   }
 }

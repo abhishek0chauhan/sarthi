@@ -4,6 +4,33 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 const mockUser = { id: 'user-1', firebaseUid: 'fb-123', displayName: 'Abhishek', email: 'a@b.com' };
 
+const mockItinerary = {
+  destination: 'Goa',
+  totalEstimate: '₹30k',
+  itinerary: [
+    {
+      day: 1,
+      title: 'Arrival',
+      activities: [
+        { time: '10:00 AM', activity: 'Check in', cost: '₹2000', healthNote: '' },
+        { time: '03:00 PM', activity: 'Beach walk', cost: 'Free', healthNote: '' },
+      ],
+      meals: { breakfast: '', lunch: '', dinner: '' },
+      healthNote: '',
+    },
+    {
+      day: 2,
+      title: 'Explore',
+      activities: [
+        { time: '09:00 AM', activity: 'Fort tour', cost: '₹50', healthNote: '' },
+      ],
+      meals: { breakfast: '', lunch: '', dinner: '' },
+      healthNote: '',
+    },
+  ],
+  packingList: [],
+};
+
 const mockTrip = {
   id: 'trip-1',
   userId: 'user-1',
@@ -18,6 +45,11 @@ const mockTrip = {
   shareToken: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+};
+
+const mockTripWithItinerary = {
+  ...mockTrip,
+  itineraryData: mockItinerary,
 };
 
 describe('SavedTripsService', () => {
@@ -215,6 +247,110 @@ describe('SavedTripsService', () => {
       prisma.savedTrip.findUnique.mockResolvedValue(null);
 
       await expect(service.getShared('bad-token')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('addActivity', () => {
+    it('appends activity to end of day by default', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
+        ...mockTripWithItinerary,
+        itineraryData: data.itineraryData,
+      }));
+
+      await service.addActivity('trip-1', 1, { activity: 'Sunset cruise' }, { uid: 'fb-123' } as any);
+
+      const updateCall = prisma.savedTrip.update.mock.calls[0][0];
+      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      expect(updatedDay.activities).toHaveLength(3);
+      expect(updatedDay.activities[2].activity).toBe('Sunset cruise');
+    });
+
+    it('inserts activity at specified position', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
+        ...mockTripWithItinerary,
+        itineraryData: data.itineraryData,
+      }));
+
+      await service.addActivity('trip-1', 1, { activity: 'Market visit', position: 0 }, { uid: 'fb-123' } as any);
+
+      const updateCall = prisma.savedTrip.update.mock.calls[0][0];
+      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      expect(updatedDay.activities[0].activity).toBe('Market visit');
+    });
+
+    it('throws NotFoundException when itinerary has no such day', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+
+      await expect(
+        service.addActivity('trip-1', 99, { activity: 'anything' }, { uid: 'fb-123' } as any),
+      ).rejects.toThrow('Day 99 not found in itinerary');
+    });
+  });
+
+  describe('removeActivity', () => {
+    it('removes activity at given index', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
+        ...mockTripWithItinerary,
+        itineraryData: data.itineraryData,
+      }));
+
+      await service.removeActivity('trip-1', 1, 0, { uid: 'fb-123' } as any);
+
+      const updateCall = prisma.savedTrip.update.mock.calls[0][0];
+      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      expect(updatedDay.activities).toHaveLength(1);
+      expect(updatedDay.activities[0].activity).toBe('Beach walk');
+    });
+
+    it('throws BadRequestException for out-of-range index', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+
+      await expect(
+        service.removeActivity('trip-1', 1, 99, { uid: 'fb-123' } as any),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('swapActivity', () => {
+    it('replaces activity at index', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
+        ...mockTripWithItinerary,
+        itineraryData: data.itineraryData,
+      }));
+
+      await service.swapActivity('trip-1', 1, 0, { activity: 'Yoga session' }, { uid: 'fb-123' } as any);
+
+      const updateCall = prisma.savedTrip.update.mock.calls[0][0];
+      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      expect(updatedDay.activities[0].activity).toBe('Yoga session');
+    });
+  });
+
+  describe('reorderActivities', () => {
+    it('reorders activities by new index array', async () => {
+      userService.findOrCreate.mockResolvedValue(mockUser);
+      prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
+      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
+        ...mockTripWithItinerary,
+        itineraryData: data.itineraryData,
+      }));
+
+      await service.reorderActivities('trip-1', 1, [1, 0], { uid: 'fb-123' } as any);
+
+      const updateCall = prisma.savedTrip.update.mock.calls[0][0];
+      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      expect(updatedDay.activities[0].activity).toBe('Beach walk');
+      expect(updatedDay.activities[1].activity).toBe('Check in');
     });
   });
 });
