@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
+import { AddActivityDto } from './dto/add-activity.dto';
 
 @Controller('saved-trips')
 @UseGuards(FirebaseAuthGuard)
@@ -59,5 +60,47 @@ export class SavedTripsController {
   @Get(':id/phrasebook')
   async getPhrasebook(@Param('id') id: string, @Req() req: any) {
     return this.phrasebookService.getPhrasebook(id, req.user);
+  }
+
+  @Post(':id/itinerary/day/:day/activity')
+  async addActivity(
+    @Param('id') id: string,
+    @Param('day') day: string,
+    @Body() dto: AddActivityDto,
+    @Req() req: any,
+  ) {
+    return this.service.addActivity(id, Number(day), dto, req.user);
+  }
+
+  @Delete(':id/itinerary/day/:day/activity/:index')
+  @HttpCode(200)
+  async removeActivity(
+    @Param('id') id: string,
+    @Param('day') day: string,
+    @Param('index') index: string,
+    @Req() req: any,
+  ) {
+    return this.service.removeActivity(id, Number(day), Number(index), req.user);
+  }
+
+  @Put(':id/itinerary/day/:day/activity/:index')
+  async swapActivity(
+    @Param('id') id: string,
+    @Param('day') day: string,
+    @Param('index') index: string,
+    @Body() dto: AddActivityDto,
+    @Req() req: any,
+  ) {
+    return this.service.swapActivity(id, Number(day), Number(index), dto, req.user);
+  }
+
+  @Patch(':id/itinerary/day/:day/reorder')
+  async reorderActivities(
+    @Param('id') id: string,
+    @Param('day') day: string,
+    @Body('indices') indices: number[],
+    @Req() req: any,
+  ) {
+    return this.service.reorderActivities(id, Number(day), indices, req.user);
   }
 }

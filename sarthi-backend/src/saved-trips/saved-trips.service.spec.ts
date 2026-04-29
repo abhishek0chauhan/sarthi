@@ -52,6 +52,8 @@ const mockTripWithItinerary = {
   itineraryData: mockItinerary,
 };
 
+let correctionsService: { create: jest.Mock };
+
 describe('SavedTripsService', () => {
   let service: SavedTripsService;
   let prisma: { savedTrip: { create: jest.Mock; findMany: jest.Mock; findUnique: jest.Mock; update: jest.Mock; delete: jest.Mock } };
@@ -68,7 +70,8 @@ describe('SavedTripsService', () => {
       },
     };
     userService = { findOrCreate: jest.fn() };
-    service = new SavedTripsService(prisma as any, userService as any);
+    correctionsService = { create: jest.fn().mockResolvedValue({}) };
+    service = new SavedTripsService(prisma as any, userService as any, correctionsService as any);
   });
 
   describe('create', () => {

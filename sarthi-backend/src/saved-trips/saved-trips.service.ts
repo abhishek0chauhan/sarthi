@@ -1,6 +1,7 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from './user.service';
+import { CorrectionsService } from '../corrections/corrections.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
@@ -18,6 +19,7 @@ export class SavedTripsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly correctionsService: CorrectionsService,
   ) {}
 
   async create(dto: CreateSavedTripDto, fbUser: FirebaseUser) {
@@ -179,8 +181,16 @@ export class SavedTripsService {
 
     const removed = dayObj.activities[activityIndex];
     dayObj.activities.splice(activityIndex, 1);
+    const updated = await this.updateItinerary(tripId, itinerary);
 
-    return { removed, trip: await this.updateItinerary(tripId, itinerary) };
+    // Log correction so Phase 2B personalisation learns from this removal
+    await this.correctionsService.create(fbUser.uid, {
+      tripId,
+      type: 'removed_place',
+      context: { place: removed.activity, day },
+    }).catch(() => null);  // non-blocking
+
+    return { removed, trip: updated };
   }
 
   async swapActivity(tripId: string, day: number, activityIndex: number, dto: AddActivityDto, fbUser: FirebaseUser) {
@@ -199,8 +209,15 @@ export class SavedTripsService {
       cost: dto.cost ?? old.cost ?? '',
       healthNote: dto.healthNote ?? old.healthNote ?? '',
     };
+    const updated = await this.updateItinerary(tripId, itinerary);
 
-    return { old, trip: await this.updateItinerary(tripId, itinerary) };
+    await this.correctionsService.create(fbUser.uid, {
+      tripId,
+      type: 'swapped_place',
+      context: { oldPlace: old.activity, newPlace: dto.activity, day },
+    }).catch(() => null);
+
+    return { old, trip: updated };
   }
 
   async reorderActivities(tripId: string, day: number, indices: number[], fbUser: FirebaseUser) {
