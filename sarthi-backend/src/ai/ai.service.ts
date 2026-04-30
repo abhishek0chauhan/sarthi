@@ -25,6 +25,18 @@ import type { Phrasebook } from './schemas/phrasebook.schema';
 import { buildPhrasebookPrompt } from './prompts/phrasebook.prompt';
 import { buildSuggestReplacementPrompt } from './prompts/destination.prompt';
 import type { SuggestReplacementParams } from './prompts/destination.prompt';
+import { liveBriefingWrapperSchema } from './schemas/live-briefing.schema';
+import { liveReplanWrapperSchema } from './schemas/live-replan.schema';
+import { liveSuggestionWrapperSchema } from './schemas/live-suggestion.schema';
+import type { LiveBriefing } from './schemas/live-briefing.schema';
+import type { ReplanActivity } from './schemas/live-replan.schema';
+import type { LiveSuggestion } from './schemas/live-suggestion.schema';
+import { buildBriefingPrompt } from './prompts/live-briefing.prompt';
+import type { BriefingParams } from './prompts/live-briefing.prompt';
+import { buildReplanPrompt } from './prompts/live-replan.prompt';
+import type { ReplanParams } from './prompts/live-replan.prompt';
+import { buildLocationSuggestionPrompt } from './prompts/live-suggestion.prompt';
+import type { LocationSuggestionParams } from './prompts/live-suggestion.prompt';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -200,5 +212,38 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
       prompt: userMessage,
     });
     return text.trim();
+  }
+
+  async generateLiveBriefing(params: BriefingParams): Promise<LiveBriefing> {
+    const prompt = buildBriefingPrompt(params);
+    const result = await generateJson({
+      model: this.model,
+      schema: liveBriefingWrapperSchema,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+    return result.result;
+  }
+
+  async replanDay(params: ReplanParams): Promise<ReplanActivity[]> {
+    const prompt = buildReplanPrompt(params);
+    const result = await generateJson({
+      model: this.model,
+      schema: liveReplanWrapperSchema,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+    return result.result.activities;
+  }
+
+  async generateLocationSuggestion(params: LocationSuggestionParams): Promise<LiveSuggestion> {
+    const prompt = buildLocationSuggestionPrompt(params);
+    const result = await generateJson({
+      model: this.model,
+      schema: liveSuggestionWrapperSchema,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+    return result.result;
   }
 }
