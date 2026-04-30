@@ -1,4 +1,4 @@
-import { Injectable, TooManyRequestsException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { ProfileService } from '../profile/profile.service';
@@ -37,7 +37,7 @@ export class TripChatService {
       where: { tripId, role: 'user', createdAt: { gte: oneHourAgo } },
     });
     if (recentCount >= RATE_LIMIT) {
-      throw new TooManyRequestsException('Rate limit: 10 messages per trip per hour');
+      throw new HttpException('Rate limit: 10 messages per trip per hour', HttpStatus.TOO_MANY_REQUESTS);
     }
 
     // Fetch last 3 messages for context continuity
@@ -49,7 +49,7 @@ export class TripChatService {
     const recentMessages = history.reverse().map(m => ({ role: m.role, content: m.content }));
 
     // Fetch personality (best-effort)
-    let profile = null;
+    let profile: any = null;
     try { profile = await this.profileService.getProfile(fbUser.uid); } catch { /* non-fatal */ }
 
     const system = buildTripChatSystem({

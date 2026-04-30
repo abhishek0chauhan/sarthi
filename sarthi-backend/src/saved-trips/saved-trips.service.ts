@@ -1,5 +1,6 @@
 import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { UserService } from './user.service';
 import { CorrectionsService } from '../corrections/corrections.service';
 import { ProfileService } from '../profile/profile.service';
@@ -8,7 +9,6 @@ import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
 import { randomUUID } from 'crypto';
-import { Prisma } from '@prisma/client';
 import type { TravelerProfileSnapshot, CorrectionRecord } from '../ai/prompts/destination.prompt';
 
 interface FirebaseUser {
@@ -150,7 +150,7 @@ export class SavedTripsService {
   private async updateItinerary(tripId: string, itineraryData: any) {
     return this.prisma.savedTrip.update({
       where: { id: tripId },
-      data: { itineraryData: itineraryData as unknown as Prisma.JsonValue },
+      data: { itineraryData: itineraryData as unknown as Prisma.InputJsonValue },
     });
   }
 

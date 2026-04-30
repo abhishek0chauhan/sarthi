@@ -4,7 +4,7 @@ import { SavedTripsService } from './saved-trips.service';
 import { AiService } from '../ai/ai.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProfileService } from '../profile/profile.service';
-import { TooManyRequestsException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 const mockTrip = {
   id: 'trip-1',
@@ -59,14 +59,14 @@ describe('TripChatService', () => {
       expect(mockPrisma.tripChatMessage.create).toHaveBeenCalledTimes(2); // user + assistant
     });
 
-    it('throws TooManyRequestsException when rate limit exceeded', async () => {
+    it('throws HttpException when rate limit exceeded', async () => {
       mockSavedTripsService.getById.mockResolvedValue(mockTrip);
       mockPrisma.tripChatMessage.count.mockResolvedValue(10); // at limit
       mockPrisma.tripChatMessage.findMany.mockResolvedValue([]);
 
       await expect(
         service.sendMessage('trip-1', 'Another question', { uid: 'fb-1' } as any),
-      ).rejects.toThrow(TooManyRequestsException);
+      ).rejects.toThrow(HttpException);
     });
   });
 
