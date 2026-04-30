@@ -79,4 +79,31 @@ export class ProfileService {
     const user = await this.findOrCreateUser(firebaseUid);
     await this.prisma.travelerProfile.delete({ where: { userId: user.id } }).catch(() => null);
   }
+
+  async updateNotificationPrefs(
+    firebaseUid: string,
+    prefs: Partial<{
+      morningBriefing: boolean;
+      mealNudges: boolean;
+      smartSuggestions: boolean;
+      locationAlerts: boolean;
+      tripReminders: boolean;
+    }>,
+  ) {
+    const user = await this.findOrCreateUser(firebaseUid);
+    const defaults = {
+      morningBriefing: true,
+      mealNudges: true,
+      smartSuggestions: true,
+      locationAlerts: true,
+      tripReminders: true,
+    };
+    const current = (user as any).notificationPrefs ?? defaults;
+    const merged = { ...defaults, ...current, ...prefs };
+    return this.prisma.user.update({
+      where: { id: user.id },
+      data: { notificationPrefs: merged },
+      select: { notificationPrefs: true },
+    });
+  }
 }
