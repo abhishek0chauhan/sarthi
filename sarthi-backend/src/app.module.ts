@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma/prisma.module';
 import { CacheModule } from './cache/cache.module';
 import { AiModule } from './ai/ai.module';
@@ -9,11 +10,14 @@ import { SavedTripsModule } from './saved-trips/saved-trips.module';
 import { SharedTripsModule } from './shared-trips/shared-trips.module';
 import { ProfileModule } from './profile/profile.module';
 import { CorrectionsModule } from './corrections/corrections.module';
+import { DevicesModule } from './devices/devices.module';
+import { LiveGuideModule } from './live-guide/live-guide.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
+    ScheduleModule.forRoot(),
     PrismaModule,
     CacheModule,
     AiModule,
@@ -22,6 +26,8 @@ import { CorrectionsModule } from './corrections/corrections.module';
     SharedTripsModule,
     ProfileModule,
     CorrectionsModule,
+    DevicesModule,
+    LiveGuideModule,
   ],
 })
 export class AppModule {}
