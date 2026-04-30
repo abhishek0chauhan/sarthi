@@ -42,12 +42,12 @@ interface GuideActivatedPayload {
   status: 'before' | 'during' | 'after'
   briefing: string | null        // null if AI call failed
   pushSummary: string | null
-  // todayPlan is { dayIndex } with NO activities field when trip has no itinerary
-  // Check !todayPlan?.activities?.length for the empty state — do NOT null-check
+  // todayPlan is NEVER null at runtime — backend spreads null into { dayIndex } object
+  // Check !todayPlan?.activities?.length for empty state — never todayPlan === null
   todayPlan: {
     dayIndex: number             // 0-based index into trip itinerary days
     activities?: Activity[]      // absent when no itinerary exists for this day
-  } | null
+  }
 }
 ```
 
@@ -72,6 +72,7 @@ interface GuideActivatedPayload {
 | `app/trip/[id]/index.tsx` | Show Live Guide tile when today is within trip dates |
 | `app/(tabs)/profile/index.tsx` | Replace existing local-state Notifications toggle with real API-wired Morning Briefing + Meal Nudges toggles |
 | `app/_layout.tsx` | Call `notificationsService.registerDevice()` on auth, set up notification tap listener |
+| `sarthi-backend/src/profile/users.controller.ts` | Add `GET me/notification-prefs` endpoint returning `{ notificationPrefs }` |
 
 ---
 
@@ -170,7 +171,7 @@ const isActiveDay = trip.dates.from <= today && today <= trip.dates.to
 - **Meal Nudges** — "Breakfast, lunch & dinner reminders"
   - `PATCH /users/me/notification-prefs { mealNudges: bool }`
 
-On mount: fetch current prefs via `GET /users/me` (existing endpoint, `notificationPrefs` field). Each toggle updates optimistically and rolls back on API error.
+On mount: fetch current prefs via `GET /users/me/notification-prefs` — **this endpoint does not yet exist and must be added to the backend's `UsersController`** (`src/profile/users.controller.ts`). It should return `{ notificationPrefs: { morningBriefing: boolean, mealNudges: boolean } }` by reading `user.notificationPrefs` from the database. Add it alongside the existing `PATCH me/notification-prefs` route. Each toggle updates optimistically and rolls back on API error.
 
 ---
 
