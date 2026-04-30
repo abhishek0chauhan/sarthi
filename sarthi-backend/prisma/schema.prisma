@@ -41,6 +41,9 @@ model User {
   savedTrips      SavedTrip[]
   travelerProfile TravelerProfile?
   corrections     Correction[]
+  notificationPrefs Json?
+  devices           UserDevice[]
+  liveGuideSessions LiveGuideSession[]
 }
 
 model SavedTrip {
@@ -58,6 +61,7 @@ model SavedTrip {
   phrasebookData  Json?
   shareToken      String?     @unique
   chatMessages    TripChatMessage[]
+  liveGuideSessions LiveGuideSession[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -106,4 +110,42 @@ model TripChatMessage {
   createdAt DateTime @default(now())
 
   @@index([tripId, createdAt])
+}
+
+model UserDevice {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fcmToken  String   @unique
+  platform  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model LiveGuideSession {
+  id              String    @id @default(uuid())
+  tripId          String
+  trip            SavedTrip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isActive        Boolean   @default(true)
+  activatedAt     DateTime
+  deactivatedAt   DateTime?
+  currentDay      Int
+  activityStatus  Json
+  lastLocation    Json?
+  lastBriefingAt  DateTime?
+  lastBreakfastAt DateTime?
+  lastLunchAt     DateTime?
+  lastDinnerAt    DateTime?
+  replanCount     Json?
+  lastSuggestAt   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([tripId])
+  @@index([userId])
+  @@index([isActive])
 }
