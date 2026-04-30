@@ -10,7 +10,46 @@ Implement the Live Sarthi Mode feature in the sarthi-app mobile client: real-tim
 
 **Entry point:** The Trip Detail screen detects if today falls within the trip's date range and replaces the large Itinerary tile with a Live Guide tile. Tapping it requests location permission then navigates to the Live Guide screen.
 
-**Tech stack:** `socket.io-client` for WebSocket, `@react-native-firebase/messaging` for FCM, `expo-location` for GPS, Zustand + TanStack React Query (existing patterns), Expo Router for navigation.
+**Tech stack:** `socket.io-client` (install: `npm i socket.io-client`) for WebSocket, `@react-native-firebase/messaging` for FCM, `expo-location` for GPS, Zustand + TanStack React Query (existing patterns), Expo Router for navigation.
+
+---
+
+## Type Definitions
+
+```typescript
+// Activity — shape from backend todayPlan array
+interface Activity {
+  time: string           // e.g. "9:00 AM"
+  activity: string       // display name
+  cost: number
+  healthNote?: string
+  mapQuery?: string
+  dropped?: boolean
+  status?: 'pending' | 'done' | 'skipped'  // client-side tracked in store
+}
+
+// Suggestion — shape from backend location_suggestion WS event
+// Note: pushSummary is NOT included in the WS event (only used for FCM internally)
+interface Suggestion {
+  suggestion: string     // AI text
+  placeName: string
+  mapQuery: string
+}
+
+// GuideActivatedPayload — shape of guide_activated event from backend
+interface GuideActivatedPayload {
+  sessionId: string
+  status: 'before' | 'during' | 'after'
+  briefing: string | null        // null if AI call failed
+  pushSummary: string | null
+  // todayPlan is { dayIndex } with NO activities field when trip has no itinerary
+  // Check !todayPlan?.activities?.length for the empty state — do NOT null-check
+  todayPlan: {
+    dayIndex: number             // 0-based index into trip itinerary days
+    activities?: Activity[]      // absent when no itinerary exists for this day
+  } | null
+}
+```
 
 ---
 
@@ -24,71 +63,114 @@ Implement the Live Sarthi Mode feature in the sarthi-app mobile client: real-tim
 | `stores/live-guide.store.ts` | Zustand store — sessionId, isActive, briefing, todayPlan, nearbySuggestion, connectionState |
 | `hooks/useLiveGuide.ts` | Reads store, exposes: activate, markDone, skipActivity, requestReplan, deactivate |
 | `app/trip/[id]/live-guide.tsx` | Live Guide screen — briefing card + scrollable activity list |
-| `services/notifications.service.ts` | FCM token registration, notification tap → navigate to live guide |
+| `services/notifications.service.ts` | FCM token registration + storage, notification tap → navigate to live guide |
 
 ### Modified Files
 
 | File | Change |
 |------|--------|
 | `app/trip/[id]/index.tsx` | Show Live Guide tile when today is within trip dates |
-| `app/(tabs)/profile/index.tsx` | Add notification preference toggles under Notifications section |
-| `app/_layout.tsx` | Register FCM token on app start, set up notification tap listener |
+| `app/(tabs)/profile/index.tsx` | Replace existing local-state Notifications toggle with real API-wired Morning Briefing + Meal Nudges toggles |
+| `app/_layout.tsx` | Call `notificationsService.registerDevice()` on auth, set up notification tap listener |
+
+---
+
+## Socket Events Reference
+
+### Client → Server (emit)
+
+| Event | Payload | Notes |
+|-------|---------|-------|
+| `activate_guide` | `{ tripId: string, fcmToken?: string }` | Initiates session |
+| `location_update` | `{ lat: number, lng: number, timestamp?: number }` | Sent every ~60s from GPS watcher |
+| `mark_done` | `{ dayIndex: number, activityIndex: number }` | No sessionId — server reads from socket context |
+| `skip_activity` | `{ dayIndex: number, activityIndex: number, reason?: string }` | No sessionId |
+| `request_replan` | `{ dayIndex: number }` | No sessionId — dayIndex is required |
+| `deactivate_guide` | _(no payload)_ | Ends session |
+
+### Server → Client (listen)
+
+| Event | Payload | Action |
+|-------|---------|--------|
+| `guide_activated` | `GuideActivatedPayload` | Store session + plan + briefing |
+| `activity_marked` | `{ dayIndex: number, activityIndex: number, status: string }` | `store.patchActivity(payload.dayIndex, payload.activityIndex, payload.status)` |
+| `replan_result` | `{ activities: Activity[] }` | `store.setTodayPlan(payload.activities)` |
+| `location_suggestion` | `Suggestion` | Set nearbySuggestion in store |
+| `morning_briefing` | `{ briefing: string, todayPlan: any }` | Update `briefing` in store only — ignore `todayPlan` field |
+| `meal_nudge` | `{ meal: string, suggestion: string }` | Show in-app toast/card |
+| `guide_deactivated` | _(any)_ | Reset store |
+| `error` | `{ message: string }` | Show toast |
 
 ---
 
 ## Screen Designs
 
-### Trip Detail (`/trip/[id]/index.tsx`)
+### Trip Detail (`app/trip/[id]/index.tsx`)
 
 **Active trip day (today within trip dates):**
-- Large Live Guide tile (saffron-light `#FEF0E6` background, `#E8601C` border, pulsing green dot, "Day N · Active now") replaces the Itinerary tile
+- Large Live Guide tile (`#FEF0E6` background, `#E8601C` border, pulsing green dot, "Day N · Active now") replaces the Itinerary tile
 - Itinerary + Food Guide become smaller equal-width secondary tiles beside it
-- Tapping Live Guide tile → request `expo-location` foreground permission → on grant, navigate to `/trip/[id]/live-guide` → on deny, show inline prompt with "Open Settings" link (guide still activates, nearby suggestions disabled)
+- Tapping Live Guide tile → request `expo-location` `requestForegroundPermissionsAsync()` → on grant, navigate to `/trip/[id]/live-guide` → on deny, show inline prompt with "Open Settings" link and still navigate (guide activates, nearby suggestions disabled)
 
 **Non-active days:**
 - Normal layout: large Itinerary tile + Food Guide tile (no Live Guide tile)
 
-### Live Guide Screen (`/trip/[id]/live-guide.tsx`)
+**Date check logic:**
+```typescript
+// trip.dates shape is TripDates: { from: string, to: string } — NOT trip.startDate/endDate
+const today = new Date().toISOString().split('T')[0]
+const isActiveDay = trip.dates.from <= today && today <= trip.dates.to
+```
+
+### Live Guide Screen (`app/trip/[id]/live-guide.tsx`)
 
 **On mount:**
-1. `useLiveGuide.activate(tripId, fcmToken)` emits `activate_guide` over WebSocket
-2. Backend returns `{ todayPlan, briefing, sessionId, status }`
-3. Store updates, screen renders
+1. Read `fcmToken` from `notificationsService.getCachedToken()`
+2. Call `useLiveGuide.activate(tripId, fcmToken)` → emits `activate_guide`
+3. Backend responds with `guide_activated` → store updates
+4. If `!todayPlan?.activities?.length` → show empty state: "No itinerary for today. Generate one from the trip detail screen."
+   Note: `todayPlan` is never truly null — when no itinerary exists the backend returns `{ dayIndex }` with no `activities` field. Always check `activities?.length`, not `todayPlan === null`.
+5. Start `expo-location` `watchPositionAsync` with `accuracy: Location.Accuracy.Balanced`, interval 60 000ms → each update emits `location_update`
+
+**On unmount / back:**
+- Stop location watcher (`subscription.remove()`)
+- Emit `deactivate_guide`
+- Socket disconnects
 
 **Layout (top → bottom, scrollable):**
-1. **Header** — back button ("← TripName"), screen title "Live Guide", green pulsing "Live" badge, "Day N of M · Date" subtitle
-2. **Morning Briefing card** — dark (`#1B3A2D`) rounded card, "☀️ MORNING BRIEFING" overline, AI-generated briefing text, "Generated by Sarthi AI" caption
+1. **Header** — back button ("← TripName"), "Live Guide" title, green pulsing "Live" badge, "Day N of M · Date" subtitle
+2. **Morning Briefing card** — dark (`#1B3A2D`) rounded card, "☀️ MORNING BRIEFING" overline, briefing text, "Generated by Sarthi AI" caption. Hidden if `briefing` is null.
 3. **"Today's Plan" section label**
 4. **Activity list:**
-   - Past activities: dimmed (opacity 0.45), "✓ Done" green tag, time in tertiary color
-   - Current activity: saffron border (`#E8601C`), normal opacity, time shows "NOW · HH:MM AM", Done + Skip + Replan Day buttons
+   - Past activities (`status === 'done' | 'skipped'`): dimmed (opacity 0.45), "✓ Done" or "Skipped" tag
+   - Current activity (first `status === 'pending'`): saffron border, "NOW · HH:MM", Done + Skip + Replan Day buttons
    - Upcoming activities: normal opacity, no action buttons
+5. **Nearby suggestion card** (saffron-light `#FEF0E6`) — appears below current activity when `nearbySuggestion` is set. Shows `placeName` + `suggestion` text.
 
 **Activity actions:**
-- **Done** → emit `mark_done` → optimistic update to `done` state → rollback + toast on error
-- **Skip** → emit `skip_activity` → optimistic update to `skipped` → store receives updated plan
-- **Replan Day** → emit `request_replan` → show loading state → store replaces `todayPlan` → on 429 show toast "You've used all replans for today"
+- **Done** → optimistic patch activity to `done` → emit `mark_done { dayIndex, activityIndex }` → rollback + toast on `error` event
+- **Skip** → optimistic patch to `skipped` → emit `skip_activity { dayIndex, activityIndex }` → rollback on error
+- **Replan Day** → emit `request_replan { dayIndex }` → show loading spinner on button → on `replan_result`, replace activities → on `error` with rate-limit message show toast "You've used all replans for today"
 
-**Incoming socket events:**
-- `activity_marked` → patch activity status in store
-- `replan_result` → replace `todayPlan` in store
-- `suggestion` → set `nearbySuggestion` in store → show saffron-light suggestion card below current activity
+**Foreground socket events:**
+- `morning_briefing` → update `briefing` in store
+- `meal_nudge` → show toast with meal suggestion text
+- `location_suggestion` → set `nearbySuggestion` in store
 
 **Connection state:**
-- `reconnecting` → subtle top banner "Reconnecting…" in amber
-- `connected` → green Live badge in header
-- On reconnect → call `GET /live-guide/:tripId/status` to restore session
+- `reconnecting` → subtle amber banner "Reconnecting…" at top of screen
+- On reconnect → re-emit `activate_guide` (same `tripId` + `fcmToken`) to restore full session state. Do not use REST `/status` (it does not return `todayPlan`).
 
-**Back / deactivate:**
-- Back button emits `deactivate_guide`, socket disconnects, navigate back
+### Profile Screen (`app/(tabs)/profile/index.tsx`)
 
-### Profile Screen (`/trip/[id]/../(tabs)/profile/index.tsx`)
+**Replace** the existing local-state-only `Notifications` toggle (currently `const [notifs, setNotifs] = useState(true)`, not wired to any API) with two real API-backed toggles in a `NOTIFICATIONS` section:
 
-Under the existing **Notifications** section, add toggles:
-- **Morning Briefing** — "Daily AI briefing at 7 AM during your trip" — calls `PATCH /users/me/notification-prefs { morningBriefing: bool }`
-- **Meal Nudges** — "Breakfast, lunch & dinner reminders" — calls `PATCH /users/me/notification-prefs { mealNudges: bool }`
+- **Morning Briefing** — "Daily AI briefing at 7 AM during your trip"
+  - `PATCH /users/me/notification-prefs { morningBriefing: bool }`
+- **Meal Nudges** — "Breakfast, lunch & dinner reminders"
+  - `PATCH /users/me/notification-prefs { mealNudges: bool }`
 
-Each toggle updates optimistically and rolls back on API error.
+On mount: fetch current prefs via `GET /users/me` (existing endpoint, `notificationPrefs` field). Each toggle updates optimistically and rolls back on API error.
 
 ---
 
@@ -97,27 +179,43 @@ Each toggle updates optimistically and rolls back on API error.
 ### `socket.service.ts`
 
 ```typescript
-// Singleton Socket.io client
-connect(token: string): void        // init socket with auth: { token }
-disconnect(): void                   // close socket, clear listeners
-emit(event: string, data: any): void // emit event
-on(event: string, cb: Function): void // register listener
-off(event: string): void             // remove listener
-isConnected(): boolean
-```
+class SocketService {
+  private socket: Socket | null = null
 
-- Uses `socket.io-client` connecting to the backend WS URL from `config/api.ts`
-- Injects Firebase ID token in handshake `auth.token`
-- Auto-reconnects with exponential backoff (Socket.io default)
+  connect(token: string): void
+    // init with io(WS_URL, { auth: { token }, transports: ['websocket'] })
+    // WS_URL from config/api.ts
+
+  disconnect(): void          // socket.disconnect(), clear all listeners
+  emit(event: string, data?: any): void
+  on(event: string, cb: (data: any) => void): void
+  off(event: string): void
+  isConnected(): boolean
+}
+
+export const socketService = new SocketService()  // singleton
+```
 
 ### `notifications.service.ts`
 
 ```typescript
-registerDevice(): Promise<void>    // get FCM token → POST /devices
-setupTapHandler(): void            // on notification open → router.push('/trip/[tripId]/live-guide')
-```
+class NotificationsService {
+  private cachedToken: string | null = null
 
-Called from `_layout.tsx` on app start after Firebase auth resolves.
+  async registerDevice(): Promise<void>
+    // messaging().getToken() → store in this.cachedToken
+    // → POST /devices { fcmToken, platform: 'android' | 'ios' }
+
+  getCachedToken(): string | null  // read by useLiveGuide.activate
+
+  setupTapHandler(): void
+    // messaging().onNotificationOpenedApp → parse tripId from notification.data
+    // → router.push(`/trip/${tripId}/live-guide`)
+    // Also check messaging().getInitialNotification() for cold-start taps
+}
+
+export const notificationsService = new NotificationsService()
+```
 
 ### `live-guide.store.ts` (Zustand)
 
@@ -127,38 +225,66 @@ interface LiveGuideState {
   isActive: boolean
   connectionState: 'idle' | 'connecting' | 'connected' | 'reconnecting'
   briefing: string | null
-  todayPlan: Activity[]
+  dayIndex: number | null
+  todayPlan: Activity[] | null    // null = no itinerary for today
   nearbySuggestion: Suggestion | null
 }
-```
 
-Actions: `setSession`, `setBriefing`, `setTodayPlan`, `patchActivity`, `setSuggestion`, `setConnectionState`, `reset`
+// Actions: setSession, setBriefing, setTodayPlan, patchActivity,
+//          setSuggestion, setConnectionState, reset
+```
 
 ---
 
 ## Data Flow
 
 ```
-User taps Live Guide tile
-  → expo-location permission request
+App start (_layout.tsx)
+  → notificationsService.registerDevice()   // store FCM token
+  → notificationsService.setupTapHandler()  // handle background tap
+
+User taps Live Guide tile (trip/[id]/index.tsx)
+  → requestForegroundPermissionsAsync()
   → navigate to /trip/[id]/live-guide
-  → useLiveGuide.activate(tripId, fcmToken)
-    → socketService.connect(token)
-    → socket.emit('activate_guide', { tripId, fcmToken })
-    → backend responds with guide_activated event
-    → store.setSession + store.setBriefing + store.setTodayPlan
-    → screen renders
 
-User taps Done
-  → store.patchActivity(id, 'done') [optimistic]
-  → socket.emit('mark_done', { sessionId, dayIndex, activityIndex })
-  → backend emits activity_marked
-  → store.patchActivity confirms
+Live Guide screen mounts
+  → fcmToken = notificationsService.getCachedToken()
+  → firebaseIdToken = await authService.getToken()  // from services/auth.service.ts
+  //   returns null in Expo Go dev mode — socket will be rejected; show error + navigate back
+  → socketService.connect(firebaseIdToken)
+  → socket.emit('activate_guide', { tripId, fcmToken })
+  → receive 'guide_activated' → store.setSession + setBriefing + setTodayPlan
+  → start Location.watchPositionAsync → each tick: emit 'location_update'
 
-FCM notification tap (app background)
-  → notifications.setupTapHandler fires
+User taps Done on activity
+  → store.patchActivity(idx, 'done')  [optimistic]
+  → socket.emit('mark_done', { dayIndex, activityIndex })
+  → receive 'activity_marked' → confirms state
+  → receive 'error' → rollback + toast
+
+User taps Replan Day
+  → socket.emit('request_replan', { dayIndex })
+  → receive 'replan_result' → store.setTodayPlan(newActivities)
+
+Backend pushes location_suggestion
+  → store.setSuggestion(suggestion)
+  → UI shows suggestion card below current activity
+
+FCM notification tap (app in background/killed)
+  → notificationsService tap handler fires
   → router.push('/trip/[tripId]/live-guide')
   → screen activates guide as normal
+
+Socket disconnects
+  → store.setConnectionState('reconnecting')
+  → socket.io auto-reconnects
+  → on reconnect: re-emit 'activate_guide' to restore full session
+
+Back button pressed
+  → stop location watcher
+  → socket.emit('deactivate_guide')
+  → socketService.disconnect()
+  → store.reset()
 ```
 
 ---
@@ -167,12 +293,14 @@ FCM notification tap (app background)
 
 | Scenario | Behaviour |
 |----------|-----------|
-| Socket disconnects mid-session | `connectionState = 'reconnecting'`, amber banner shown, auto-reconnect, restore via REST on reconnect |
-| Location permission denied | Guide activates without location, nearby suggestions disabled, inline "Open Settings" prompt shown |
-| FCM token unavailable | Skip device registration silently, WS still works |
+| Socket disconnects mid-session | `connectionState = 'reconnecting'`, amber banner, auto-reconnect, re-emit `activate_guide` on reconnect |
+| Location permission denied | Navigate to live guide anyway, skip starting location watcher, show inline "Enable location for nearby suggestions" prompt |
+| FCM token unavailable | Skip device registration silently, WS still works, activate guide with no `fcmToken` |
 | Action fails (mark done / skip) | Rollback optimistic update, toast "Couldn't update, try again" |
-| Replan rate limited (429) | Toast "You've used all replans for today" |
-| Activate guide fails | Toast error, navigate back to Trip Detail |
+| Replan rate limited (error message contains "limit") | Toast "You've used all replans for today" |
+| `todayPlan.activities` empty or absent after activation | Show empty state: "No itinerary for today. Generate one from the trip detail screen." — check `!todayPlan?.activities?.length`, not `todayPlan === null` |
+| `firebaseIdToken` is null (Expo Go dev mode) | Show toast "Live Guide unavailable in Expo Go", navigate back |
+| Cold-start from notification when not logged in | Auth check in `_layout.tsx` redirects to login first; after login, deep link resumes |
 
 ---
 
@@ -180,10 +308,12 @@ FCM notification tap (app background)
 
 | Test | Type | What it verifies |
 |------|------|-----------------|
-| `live-guide.store` state transitions | Unit | Each action produces correct state |
-| `socket.service` event emission | Unit | Correct events emitted with correct payloads (mock socket.io-client) |
-| `useLiveGuide` hook | Unit | Actions call socket service, store updates correctly |
+| `live-guide.store` state transitions | Unit | `setTodayPlan`, `patchActivity`, `setSuggestion`, `reset` produce correct state |
+| `socket.service` event emission | Unit | Correct events emitted with correct payloads (mock `socket.io-client`) |
+| `useLiveGuide` hook — activate | Unit | Calls `socketService.connect`, emits `activate_guide`, updates store |
+| `useLiveGuide` hook — markDone optimistic + rollback | Unit | Patches store immediately, rolls back on error event |
 | Trip Detail — active day | Integration | Live Guide tile visible when today in trip date range |
-| Trip Detail — non-active day | Integration | Live Guide tile absent, normal layout shown |
-| Notification tap handler | Integration | Correct route pushed on notification tap with tripId |
-| Optimistic rollback | Integration | Failed action restores previous activity state |
+| Trip Detail — non-active day | Integration | Live Guide tile absent, normal Itinerary + Food layout shown |
+| Notification tap handler — foreground | Integration | `setupTapHandler` pushes correct route |
+| Notification tap handler — cold start | Integration | `getInitialNotification` navigates correctly after auth |
+| Profile prefs fetch + toggle | Integration | Prefs fetched on mount, toggle calls PATCH, rolls back on error |
