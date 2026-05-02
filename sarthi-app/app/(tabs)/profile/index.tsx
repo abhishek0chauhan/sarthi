@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet, Alert, ScrollView, Switch } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '@/stores/auth.store';
@@ -8,6 +8,7 @@ import { useThemeStore } from '@/stores/theme.store';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
+import { apiRequest } from '@/services/api';
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -20,11 +21,13 @@ interface SwitchMenuItemProps {
   thumbColor: string;
   styles: ReturnType<typeof makeStyles>;
   colors: Colors;
+  testID?: string;
+  isFirst?: boolean;
 }
 
-function SwitchMenuItem({ icon, label, value, onValueChange, trackColor, thumbColor, styles }: SwitchMenuItemProps) {
+function SwitchMenuItem({ icon, label, value, onValueChange, trackColor, thumbColor, styles, testID, isFirst }: SwitchMenuItemProps) {
   return (
-    <View style={styles.menuRow}>
+    <View style={[styles.menuRow, isFirst && styles.menuRowFirst]}>
       <Text style={styles.menuIcon}>{icon}</Text>
       <Text style={styles.menuLabel}>{label}</Text>
       <Switch
@@ -32,6 +35,7 @@ function SwitchMenuItem({ icon, label, value, onValueChange, trackColor, thumbCo
         onValueChange={onValueChange}
         trackColor={trackColor}
         thumbColor={thumbColor}
+        testID={testID}
       />
     </View>
   );
@@ -66,9 +70,43 @@ export default function ProfileScreen() {
   const colors = useColors();
   const styles = makeStyles(colors);
 
-  const [notifs, setNotifs] = useState(true);
+  // OLD: const [notifs, setNotifs] = useState(true);
+  // NEW: Separate toggles for morning briefing and meal nudges
+  const [morningBriefing, setMorningBriefing] = useState(true);
+  const [mealNudges, setMealNudges] = useState(true);
+  const [prefsLoading, setPrefsLoading] = useState(true);
 
   const initial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase();
+
+  // Fetch notification prefs on mount
+  useEffect(() => {
+    apiRequest<{ notificationPrefs: { morningBriefing: boolean; mealNudges: boolean } }>('/users/me/notification-prefs')
+      .then(({ notificationPrefs }) => {
+        setMorningBriefing(notificationPrefs.morningBriefing);
+        setMealNudges(notificationPrefs.mealNudges);
+      })
+      .catch((err) => console.warn('[Profile] Failed to fetch notification prefs:', err))
+      .finally(() => setPrefsLoading(false));
+  }, []);
+
+  // Update preference with optimistic update + rollback
+  const updatePref = async (key: 'morningBriefing' | 'mealNudges', value: boolean) => {
+    // Optimistic update
+    if (key === 'morningBriefing') setMorningBriefing(value);
+    else setMealNudges(value);
+
+    try {
+      await apiRequest('/users/me/notification-prefs', {
+        method: 'PATCH',
+        body: JSON.stringify({ [key]: value }),
+      });
+    } catch (err) {
+      console.warn('[Profile] Failed to update notification pref:', err);
+      // Rollback on error
+      if (key === 'morningBriefing') setMorningBriefing(!value);
+      else setMealNudges(!value);
+    }
+  };
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -128,17 +166,6 @@ export default function ProfileScreen() {
             colors={colors}
           />
 
-          <SwitchMenuItem
-            icon="🔔"
-            label="Notifications"
-            value={notifs}
-            onValueChange={setNotifs}
-            trackColor={{ true: colors.primary500, false: colors.border }}
-            thumbColor={colors.bgCard}
-            styles={styles}
-            colors={colors}
-          />
-
           <ChevronMenuItem
             icon="🌐"
             label="Language"
@@ -146,6 +173,34 @@ export default function ProfileScreen() {
             onPress={() => {}}
             styles={styles}
             colors={colors}
+          />
+        </View>
+
+        {/* ── NOTIFICATIONS section ── */}
+        <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
+        <View style={styles.menuSection}>
+          <SwitchMenuItem
+            icon="☀️"
+            label="Morning Briefing"
+            value={morningBriefing}
+            onValueChange={(v) => updatePref('morningBriefing', v)}
+            trackColor={{ true: colors.primary500, false: colors.border }}
+            thumbColor={colors.bgCard}
+            styles={styles}
+            colors={colors}
+            testID="toggle-morningBriefing"
+            isFirst={true}
+          />
+          <SwitchMenuItem
+            icon="🍽️"
+            label="Meal Nudges"
+            value={mealNudges}
+            onValueChange={(v) => updatePref('mealNudges', v)}
+            trackColor={{ true: colors.primary500, false: colors.border }}
+            thumbColor={colors.bgCard}
+            styles={styles}
+            colors={colors}
+            testID="toggle-mealNudges"
           />
         </View>
 
@@ -304,9 +359,18 @@ function makeStyles(colors: Colors) {
     sectionLabel: {
       ...type.overline,
       color: colors.textTertiary,
-      paddingHorizontal: 16,
-      paddingTop: 12,
-      paddingBottom: 4,
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 8,
+    },
+    menuSection: {
+      marginHorizontal: 24,
+      marginBottom: 24,
+      backgroundColor: colors.bgCard,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
     },
 
     // Menu items
