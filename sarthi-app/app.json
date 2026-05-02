@@ -21,7 +21,13 @@
     "plugins": [
       "expo-router",
       "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/auth",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Sarthi to track your location during your trip for nearby suggestions."
+        }
+      ]
     ]
   }
 }
