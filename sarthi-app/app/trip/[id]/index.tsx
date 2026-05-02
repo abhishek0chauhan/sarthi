@@ -2,6 +2,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Location from 'expo-location';
 import { useTrip } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -21,6 +22,22 @@ export default function TripDetailScreen() {
 
   if (isLoading) return <LoadingSpinner />;
   if (error || !trip) return <EmptyState title="Trip not found" />;
+
+  // Check if today is within trip dates
+  const today = new Date().toISOString().split('T')[0];
+  const isActiveDay = trip.dates.from <= today && today <= trip.dates.to;
+
+  // Calculate day number (1-based)
+  const dayNumber = Math.floor(
+    (new Date(today).getTime() - new Date(trip.dates.from).getTime()) / 86400000
+  ) + 1;
+
+  // Handler for Live Guide tile
+  const handleLiveGuidePress = async () => {
+    const { granted } = await Location.requestForegroundPermissionsAsync();
+    // Navigate regardless of permission (suggestion disabled if denied)
+    router.push(`/trip/${id}/live-guide` as any);
+  };
 
   const gradientColors = destinationGradient(trip.destination) as [string, string, string];
   const readiness = trip.itineraryData?.tripReadiness ?? 75;
@@ -59,32 +76,71 @@ export default function TripDetailScreen() {
           </View>
 
           {/* 3. Quick nav tiles */}
-          <View style={styles.navGrid}>
-            <Pressable
-              style={[styles.navTile, styles.navTilePrimary]}
-              onPress={() => trip.itineraryData && router.push(`/trip/${id}/itinerary` as any)}
-            >
-              <Text style={styles.navTileIcon}>📅</Text>
-              <Text style={[styles.navTileLabel, { color: colors.textInverse }]}>Itinerary</Text>
-              <Text style={[styles.navTileDetail, { color: 'rgba(255,255,255,0.7)' }]}>
-                {trip.itineraryData ? `${trip.itineraryData.itinerary?.length ?? 0} days` : 'Not generated'}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.navTile, styles.navTileSecondary]}
-              onPress={() =>
-                trip.foodGuideData
-                  ? router.push(`/trip/${id}/food-guide` as any)
-                  : router.push(`/trip/${id}/generate-food-guide` as any)
-              }
-            >
-              <Text style={styles.navTileIcon}>🍽️</Text>
-              <Text style={[styles.navTileLabel, { color: colors.textPrimary }]}>Food Guide</Text>
-              <Text style={[styles.navTileDetail, { color: colors.textTertiary }]}>
-                {trip.foodGuideData ? `${foodDishCount} dishes` : 'Tap to generate'}
-              </Text>
-            </Pressable>
-          </View>
+          {isActiveDay ? (
+            <View style={styles.tilesGrid}>
+              {/* Live Guide — large primary tile */}
+              <Pressable
+                style={[styles.navTile, styles.navTileLive]}
+                onPress={handleLiveGuidePress}
+              >
+                <View style={styles.liveIndicator}>
+                  <View style={styles.liveDot} />
+                  <Text style={styles.liveDotLabel}>LIVE</Text>
+                </View>
+                <Text style={styles.navTileIcon}>🗺️</Text>
+                <Text style={[styles.navTileLabel, { color: colors.success }]}>Live Guide</Text>
+                <Text style={styles.navTileSub}>Day {dayNumber} · Active now</Text>
+              </Pressable>
+              {/* Secondary tiles column */}
+              <View style={styles.tilesSecondary}>
+                <Pressable
+                  style={[styles.navTile, styles.navTileSecondary]}
+                  onPress={() => trip.itineraryData && router.push(`/trip/${id}/itinerary` as any)}
+                >
+                  <Text style={styles.navTileIconSm}>📅</Text>
+                  <Text style={styles.navTileLabelSm}>Itinerary</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.navTile, styles.navTileSecondary]}
+                  onPress={() =>
+                    trip.foodGuideData
+                      ? router.push(`/trip/${id}/food-guide` as any)
+                      : router.push(`/trip/${id}/generate-food-guide` as any)
+                  }
+                >
+                  <Text style={styles.navTileIconSm}>🍽️</Text>
+                  <Text style={styles.navTileLabelSm}>Food Guide</Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.navGrid}>
+              <Pressable
+                style={[styles.navTile, styles.navTilePrimary]}
+                onPress={() => trip.itineraryData && router.push(`/trip/${id}/itinerary` as any)}
+              >
+                <Text style={styles.navTileIcon}>📅</Text>
+                <Text style={[styles.navTileLabel, { color: colors.textInverse }]}>Itinerary</Text>
+                <Text style={[styles.navTileDetail, { color: 'rgba(255,255,255,0.7)' }]}>
+                  {trip.itineraryData ? `${trip.itineraryData.itinerary?.length ?? 0} days` : 'Not generated'}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.navTile, styles.navTileSecondary]}
+                onPress={() =>
+                  trip.foodGuideData
+                    ? router.push(`/trip/${id}/food-guide` as any)
+                    : router.push(`/trip/${id}/generate-food-guide` as any)
+                }
+              >
+                <Text style={styles.navTileIcon}>🍽️</Text>
+                <Text style={[styles.navTileLabel, { color: colors.textPrimary }]}>Food Guide</Text>
+                <Text style={[styles.navTileDetail, { color: colors.textTertiary }]}>
+                  {trip.foodGuideData ? `${foodDishCount} dishes` : 'Tap to generate'}
+                </Text>
+              </Pressable>
+            </View>
+          )}
 
           {/* 4. Highlights card */}
           <View style={styles.card}>
@@ -171,15 +227,46 @@ function makeStyles(colors: Colors) {
 
     // Nav grid
     navGrid: { flexDirection: 'row', gap: 12 },
-    navTile: { flex: 1, borderRadius: 16, padding: 16, gap: 6 },
-    navTilePrimary: { backgroundColor: colors.primary500 },
+    tilesGrid: { flexDirection: 'row', gap: 12 },
+    tilesSecondary: { flex: 1, gap: 12 },
+    navTile: { borderRadius: 16, padding: 16, gap: 6 },
+    navTilePrimary: { flex: 1, backgroundColor: colors.primary500 },
     navTileSecondary: {
+      flex: 1,
       backgroundColor: colors.bgCard,
       borderWidth: 1,
       borderColor: colors.border,
     },
+    navTileLive: {
+      flex: 0,
+      width: '45%',
+      backgroundColor: '#FEF0E6',
+      borderWidth: 2,
+      borderColor: '#E8601C',
+    },
+    liveIndicator: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginBottom: 4,
+    },
+    liveDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#10B981',
+    },
+    liveDotLabel: {
+      fontSize: 10,
+      fontFamily: 'Inter_600SemiBold',
+      color: '#10B981',
+      letterSpacing: 1,
+    },
     navTileIcon: { fontSize: 24 },
+    navTileIconSm: { fontSize: 20 },
     navTileLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 14 },
+    navTileLabelSm: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: colors.textPrimary },
+    navTileSub: { fontSize: 11, color: colors.textTertiary, marginTop: 2 },
     navTileDetail: { fontSize: 12 },
 
     // Highlights
