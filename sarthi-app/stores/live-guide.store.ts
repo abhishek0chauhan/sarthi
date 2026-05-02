@@ -41,6 +41,7 @@ export const useLiveGuideStore = create<LiveGuideState>((set) => ({
 
   setTodayPlan: (activities) => set({ todayPlan: activities }),
 
+  // patchActivity includes dayIndex for hook consistency; store only tracks todayPlan (one day)
   patchActivity: (_, activityIndex, status) =>
     set((state) => {
       if (!state.todayPlan) return state;
