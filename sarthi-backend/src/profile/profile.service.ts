@@ -106,4 +106,15 @@ export class ProfileService {
       select: { notificationPrefs: true },
     });
   }
+
+  async getNotificationPrefs(firebaseUid: string): Promise<{ notificationPrefs: { morningBriefing: boolean; mealNudges: boolean } }> {
+    const user = await this.prisma.user.findUnique({ where: { firebaseUid } });
+    const prefs = ((user?.notificationPrefs ?? {}) as Record<string, boolean>);
+    return {
+      notificationPrefs: {
+        morningBriefing: prefs.morningBriefing ?? true,
+        mealNudges: prefs.mealNudges ?? true,
+      },
+    };
+  }
 }
