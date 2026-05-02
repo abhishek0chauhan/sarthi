@@ -8,6 +8,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '\\.(css|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
   collectCoverageFrom: [
     'components/**/*.tsx',

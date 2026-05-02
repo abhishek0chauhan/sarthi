@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/auth.store';
 import { authService } from '@/services/auth.service';
+import { notificationsService } from '@/services/notifications.service';
 import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -32,6 +33,11 @@ export default function RootLayout() {
     return () => {
       try { unsubscribe?.(); } catch {}
     };
+  }, []);
+
+  useEffect(() => {
+    notificationsService.registerDevice().catch(console.warn);
+    notificationsService.setupTapHandler();
   }, []);
 
   useEffect(() => {
