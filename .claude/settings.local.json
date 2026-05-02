@@ -7,7 +7,8 @@
       "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\('@nestjs/throttler:', p.dependencies['@nestjs/throttler'], '| @nestjs/core:', p.dependencies['@nestjs/core']\\)\")",
       "Bash(/c/Users/Abhishek/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/brainstorming/scripts/start-server.sh *)",
       "Bash(npm test *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
