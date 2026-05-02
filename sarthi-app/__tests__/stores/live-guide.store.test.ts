@@ -57,6 +57,18 @@ describe('live-guide store', () => {
     expect(useLiveGuideStore.getState().nearbySuggestion).toEqual(suggestion);
   });
 
+  it('setMealNudge stores nudge', () => {
+    const nudge = { meal: 'Lunch', suggestion: 'Try dal baati nearby' };
+    useLiveGuideStore.getState().setMealNudge(nudge);
+    expect(useLiveGuideStore.getState().mealNudge).toEqual(nudge);
+  });
+
+  it('setMealNudge can clear nudge with null', () => {
+    useLiveGuideStore.getState().setMealNudge({ meal: 'Breakfast', suggestion: 'Try paratha' });
+    useLiveGuideStore.getState().setMealNudge(null);
+    expect(useLiveGuideStore.getState().mealNudge).toBeNull();
+  });
+
   it('setConnectionState updates connectionState', () => {
     useLiveGuideStore.getState().setConnectionState('reconnecting');
     expect(useLiveGuideStore.getState().connectionState).toBe('reconnecting');
