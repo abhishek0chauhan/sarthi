@@ -3,6 +3,7 @@ import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
 import { TripChatService } from './trip-chat.service';
+import { EnrichmentService } from './enrichment.service';
 import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
@@ -15,6 +16,7 @@ export class SavedTripsController {
     private readonly service: SavedTripsService,
     private readonly phrasebookService: PhrasebookService,
     private readonly chatService: TripChatService,
+    private readonly enrichmentService: EnrichmentService,
   ) {}
 
   @Post()
@@ -52,6 +54,21 @@ export class SavedTripsController {
   @HttpCode(204)
   async unshare(@Param('id') id: string, @Req() req: any) {
     await this.service.disableSharing(id, req.user);
+  }
+
+  @Post(':id/enrich')
+  @HttpCode(200)
+  async enrichTrip(@Param('id') id: string, @Req() req: any) {
+    const trip = await this.service.getById(id, req.user);
+    if (!trip.itineraryData) {
+      throw new Error('Trip has no itinerary to enrich');
+    }
+    const enrichedItinerary = await this.enrichmentService.enrichTrip(
+      trip.itineraryData as any,
+      trip.destination,
+      trip.state,
+    );
+    return this.service.update(id, { itineraryData: enrichedItinerary }, req.user);
   }
 
   @Post(':id/phrasebook')
