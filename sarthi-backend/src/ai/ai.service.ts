@@ -37,7 +37,7 @@ import { buildReplanPrompt } from './prompts/live-replan.prompt';
 import type { ReplanParams } from './prompts/live-replan.prompt';
 import { buildLocationSuggestionPrompt } from './prompts/live-suggestion.prompt';
 import type { LocationSuggestionParams } from './prompts/live-suggestion.prompt';
-import { enrichmentContextArraySchema } from './schemas/enrichment.schema';
+import { enrichmentWrapperSchema, enrichmentContextSchema } from './schemas/enrichment.schema';
 import type { EnrichmentContext } from './schemas/enrichment.schema';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
@@ -249,13 +249,13 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     return result.result;
   }
 
-  async enrichActivities(prompt: string): Promise<EnrichmentContext> {
+  async enrichActivities(prompt: string): Promise<EnrichmentContext[]> {
     const result = await generateJson({
       model: this.model,
-      schema: enrichmentContextArraySchema,
+      schema: enrichmentWrapperSchema,
       system: 'You are a travel expert enriching trip activities with detailed context.',
       prompt,
     });
-    return result;
+    return result.contexts ?? [];
   }
 }

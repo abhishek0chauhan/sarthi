@@ -27,16 +27,18 @@ For EACH activity, generate a JSON object with:
 - whatToCarry: Array of 2-3 essential items for this activity
 - nearbyAlternative: Optional - a nearby alternative if this is crowded
 
-Format your response as a valid JSON array with objects in the same order as the activities above:
-[
-  {
-    "whySpecial": "...",
-    "bestTimeToVisit": "...",
-    "suggestedDuration": "...",
-    "insiderTips": ["...", "..."],
-    "whatToCarry": ["...", "..."],
-    "nearbyAlternative": "..."
-  },
-  ...
-]`;
+Format your response as a valid JSON object with a "contexts" array containing objects in the same order as the activities above:
+{
+  "contexts": [
+    {
+      "whySpecial": "...",
+      "bestTimeToVisit": "...",
+      "suggestedDuration": "...",
+      "insiderTips": ["...", "..."],
+      "whatToCarry": ["...", "..."],
+      "nearbyAlternative": "..."
+    },
+    ...
+  ]
+}`;
 }
