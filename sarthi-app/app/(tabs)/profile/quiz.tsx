@@ -422,7 +422,8 @@ function makeStyles(colors: Colors) {
       borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      padding: 18,
+      paddingHorizontal: 16,
+      paddingVertical: 20,
       gap: 14,
     },
     questionText: {
@@ -432,19 +433,21 @@ function makeStyles(colors: Colors) {
       lineHeight: 22,
     },
     optionsContainer: {
-      gap: 10,
+      gap: 12,
       flexDirection: 'row',
       flexWrap: 'wrap',
+      justifyContent: 'center',
+      paddingVertical: 4,
     },
 
     // Chip
     chip: {
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 24,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 22,
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: 44,
+      minHeight: 40,
       borderWidth: 2,
     },
     chipSelected: {
@@ -463,8 +466,9 @@ function makeStyles(colors: Colors) {
     chipText: {
       ...type.caption,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: '600',
+      lineHeight: 18,
     },
     chipTextSelected: {
       color: colors.textInverse,
