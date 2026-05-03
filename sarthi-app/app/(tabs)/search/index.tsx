@@ -30,7 +30,6 @@ export default function SearchScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
-        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <SearchForm onSubmit={handleSearch} loading={searchMutation.isPending} />

@@ -51,7 +51,7 @@ const getProfileScreen = () => require('@/app/(tabs)/profile/index').default;
 describe('Profile Screen - Notification Preferences', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAuthStore as jest.Mock).mockReturnValue(mockUser);
+    (useAuthStore as unknown as jest.Mock).mockReturnValue(mockUser);
   });
 
   it('fetches notification prefs on mount', async () => {

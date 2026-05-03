@@ -48,10 +48,10 @@ export default function SharedTripScreen() {
         {itinerary && (
           <View>
             <Text style={styles.section}>Itinerary</Text>
-            {itinerary.days.map((day) => (
+            {itinerary.itinerary.map((day) => (
               <View key={day.day} style={styles.dayBlock}>
                 <Text style={styles.dayTitle}>Day {day.day}: {day.title}</Text>
-                {day.activities.map((activity, i) => (
+                {day.activities.map((activity: typeof day.activities[0], i: number) => (
                   <ActivityCard
                     key={i}
                     activity={activity}
