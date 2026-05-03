@@ -26,11 +26,11 @@ export function useSubmitStory(story: string) {
   });
 }
 
-export function useSubmitQuiz(dto: QuizDto) {
+export function useSubmitQuiz() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => profileService.submitQuiz(dto),
+    mutationFn: (dto: QuizDto) => profileService.submitQuiz(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
     },

@@ -240,7 +240,7 @@ export default function QuizScreen() {
   }, [prefillData]);
 
   // Submit quiz mutation
-  const submitQuizMutation = useSubmitQuiz(answers as QuizDto);
+  const submitQuizMutation = useSubmitQuiz();
 
   const handleSelectAnswer = (dimension: string, value: string | string[]) => {
     setAnswers(prev => ({
@@ -267,7 +267,7 @@ export default function QuizScreen() {
       return;
     }
 
-    submitQuizMutation.mutate(undefined, {
+    submitQuizMutation.mutate(answers as QuizDto, {
       onSuccess: () => {
         Alert.alert('Success', 'Your personality profile has been saved!', [
           {
