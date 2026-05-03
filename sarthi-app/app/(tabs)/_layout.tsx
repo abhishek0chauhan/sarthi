@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
+import { useProfile } from '@/hooks/useProfile';
 
 // Old floating pill nav kept for reference:
 // const TABS = [
@@ -25,6 +26,7 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const styles = makeStyles(colors);
+  const { data: profile } = useProfile();
 
   return (
     <Tabs
@@ -39,6 +41,9 @@ export default function TabLayout() {
             const route = state.routes[routeIndex];
             const focused = state.index === routeIndex;
 
+            // Show profile completeness indicator dot
+            const showProfileBadge = tab.name === 'profile' && profile?.completeness !== undefined && profile.completeness < 100;
+
             return (
               <Pressable
                 key={tab.name}
@@ -50,7 +55,10 @@ export default function TabLayout() {
               >
                 {focused && <View style={styles.indicator} />}
 
-                <Text style={[styles.icon, focused && styles.iconActive]}>{tab.icon}</Text>
+                <View style={styles.iconContainer}>
+                  <Text style={[styles.icon, focused && styles.iconActive]}>{tab.icon}</Text>
+                  {showProfileBadge && <View style={[styles.completenessIndicator, { backgroundColor: colors.warning }]} />}
+                </View>
                 <Text style={[styles.label, focused && styles.labelActive]}>{tab.label}</Text>
               </Pressable>
             );
@@ -82,6 +90,19 @@ function makeStyles(colors: Colors) {
       height: 3,
       borderRadius: 2,
       backgroundColor: colors.primary500,
+    },
+    iconContainer: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    completenessIndicator: {
+      position: 'absolute',
+      top: -2,
+      right: -6,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
     },
     label: {
       ...type.caption,
