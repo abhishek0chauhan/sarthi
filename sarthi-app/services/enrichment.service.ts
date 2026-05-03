@@ -18,7 +18,7 @@ export const enrichmentService = {
   sendChatMessage: (tripId: string, content: string) =>
     apiRequest<ChatMessage>(`/saved-trips/${tripId}/chat`, {
       method: 'POST',
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ message: content }),
     }),
 
   clearChat: (tripId: string) =>
