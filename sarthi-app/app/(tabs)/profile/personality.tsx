@@ -6,43 +6,7 @@ import { useColors } from '@/hooks/useColorScheme';
 import { useProfile, useResetProfile } from '@/hooks/useProfile';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const DIMENSION_LABELS = {
-  travelPace: {
-    label: 'Travel Pace',
-    values: { packed: 'Packed schedule', loose: 'Loose plan', no_plan: 'No plan' },
-  },
-  depthVsBreadth: {
-    label: 'Style',
-    values: { deep: 'Deep explorer', balanced: 'Balanced', cover: 'Cover as much as possible' },
-  },
-  comfortLevel: {
-    label: 'Stay Preference',
-    values: { hotel: 'Hotel', homestay: 'Homestay', rough: 'Rough it' },
-  },
-  crowdTolerance: {
-    label: 'Crowd Tolerance',
-    values: { worth_it: 'Worth the crowds', hidden: 'Prefer hidden gems', avoid: 'Avoid crowds' },
-  },
-  physicalReadiness: {
-    label: 'Physical Activity',
-    values: { yes: 'Loves a challenge', maybe: 'Moderate', no: 'Easy going' },
-  },
-  spendingStyle: {
-    label: 'Spending Style',
-    values: { experience: 'Spend on experiences', budget: 'Budget everything', comfort: 'Comfort matters' },
-  },
-  groundReality: {
-    label: 'Ground Reality',
-    values: { bring_it: 'Part of the adventure', tolerate: 'Can handle it', need_comfort: 'Need basics' },
-  },
-  languageComfort: {
-    label: 'Language',
-    values: { fine: 'Comfortable anywhere', hindi: 'Prefer Hindi regions', english: 'Need English' },
-  },
-};
+import { DIMENSION_LABELS } from '@/constants/profileDimensions';
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -108,6 +72,9 @@ function EmptyState({ colors, styles, onStoryPress, onQuizPress }: EmptyStatePro
 
         <View style={styles.buttonGroup}>
           <Pressable
+            accessible
+            accessibilityLabel="Share a story"
+            accessibilityHint="Tell us about your travel experiences"
             style={({ pressed }) => [
               styles.button,
               styles.buttonPrimary,
@@ -119,6 +86,9 @@ function EmptyState({ colors, styles, onStoryPress, onQuizPress }: EmptyStatePro
           </Pressable>
 
           <Pressable
+            accessible
+            accessibilityLabel="Take a quiz"
+            accessibilityHint="Answer questions about your travel preferences"
             style={({ pressed }) => [
               styles.button,
               styles.buttonSecondary,
@@ -221,12 +191,16 @@ export default function PersonalityScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* ── Header ── */}
-        <Pressable style={styles.header} onPress={() => router.back()}>
+        <Pressable
+          accessible
+          accessibilityLabel="Back to profile"
+          accessibilityHint="Returns to the main profile screen"
+          style={styles.header}
+          onPress={() => router.back()}
+        >
           <Text style={styles.headerText}>← Profile</Text>
         </Pressable>
 
-        {/* ── Title ── */}
         <Text style={styles.title}>Traveler Personality</Text>
 
         {/* ── Content ── */}
@@ -260,9 +234,11 @@ export default function PersonalityScreen() {
               ))}
             </View>
 
-            {/* Edit and Reset buttons */}
             <View style={styles.actionButtonsContainer}>
               <Pressable
+                accessible
+                accessibilityLabel="Edit via quiz"
+                accessibilityHint="Update your personality profile by taking a quiz"
                 style={({ pressed }) => [
                   styles.editButton,
                   { backgroundColor: colors.primary500, opacity: pressed ? 0.8 : 1 },
@@ -273,6 +249,9 @@ export default function PersonalityScreen() {
               </Pressable>
 
               <Pressable
+                accessible
+                accessibilityLabel="Reset profile"
+                accessibilityHint="Clear your personality profile. This action cannot be undone."
                 style={({ pressed }) => [
                   styles.resetButton,
                   { opacity: pressed ? 0.8 : 1 },

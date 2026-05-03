@@ -6,51 +6,30 @@ import { useColors } from '@/hooks/useColorScheme';
 import { useSubmitStory } from '@/hooks/useProfile';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
+import { DIMENSION_LABELS } from '@/constants/profileDimensions';
+import type { StoryResponse, TravelerProfile } from '@/types/profile.types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MIN_CHARACTERS = 50;
 const MAX_CHARACTERS = 1000;
 
-const DIMENSION_LABELS = {
-  travelPace: {
-    label: 'Travel Pace',
-    values: { packed: 'Packed schedule', loose: 'Loose plan', no_plan: 'No plan' },
-  },
-  depthVsBreadth: {
-    label: 'Style',
-    values: { deep: 'Deep explorer', balanced: 'Balanced', cover: 'Cover as much as possible' },
-  },
-  comfortLevel: {
-    label: 'Stay Preference',
-    values: { hotel: 'Hotel', homestay: 'Homestay', rough: 'Rough it' },
-  },
-  crowdTolerance: {
-    label: 'Crowd Tolerance',
-    values: { worth_it: 'Worth the crowds', hidden: 'Prefer hidden gems', avoid: 'Avoid crowds' },
-  },
-  physicalReadiness: {
-    label: 'Physical Activity',
-    values: { yes: 'Loves a challenge', maybe: 'Moderate', no: 'Easy going' },
-  },
-  spendingStyle: {
-    label: 'Spending Style',
-    values: { experience: 'Spend on experiences', budget: 'Budget everything', comfort: 'Comfort matters' },
-  },
-  groundReality: {
-    label: 'Ground Reality',
-    values: { bring_it: 'Part of the adventure', tolerate: 'Can handle it', need_comfort: 'Need basics' },
-  },
-  languageComfort: {
-    label: 'Language',
-    values: { fine: 'Comfortable anywhere', hindi: 'Prefer Hindi regions', english: 'Need English' },
-  },
-};
+// ─── Helper Functions ───────────────────────────────────────────────────────
+
+function extractDimensions(profile: TravelerProfile) {
+  return Object.entries(DIMENSION_LABELS).map(([key, config]) => ({
+    key,
+    label: config.label,
+    value: profile[key as keyof TravelerProfile]
+      ? config.values[profile[key as keyof TravelerProfile] as keyof typeof config.values]
+      : null,
+  }));
+}
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 interface SuccessStateProps {
-  profile: any;
+  profile: TravelerProfile;
   colors: Colors;
   styles: ReturnType<typeof makeStyles>;
   onContinue: () => void;
@@ -58,69 +37,11 @@ interface SuccessStateProps {
 }
 
 function SuccessState({ profile, colors, styles, onContinue, onDone }: SuccessStateProps) {
-  const dimensions = [
-    {
-      key: 'travelPace',
-      label: DIMENSION_LABELS.travelPace.label,
-      value: profile?.travelPace
-        ? DIMENSION_LABELS.travelPace.values[profile.travelPace as keyof typeof DIMENSION_LABELS.travelPace.values]
-        : null,
-    },
-    {
-      key: 'depthVsBreadth',
-      label: DIMENSION_LABELS.depthVsBreadth.label,
-      value: profile?.depthVsBreadth
-        ? DIMENSION_LABELS.depthVsBreadth.values[profile.depthVsBreadth as keyof typeof DIMENSION_LABELS.depthVsBreadth.values]
-        : null,
-    },
-    {
-      key: 'comfortLevel',
-      label: DIMENSION_LABELS.comfortLevel.label,
-      value: profile?.comfortLevel
-        ? DIMENSION_LABELS.comfortLevel.values[profile.comfortLevel as keyof typeof DIMENSION_LABELS.comfortLevel.values]
-        : null,
-    },
-    {
-      key: 'crowdTolerance',
-      label: DIMENSION_LABELS.crowdTolerance.label,
-      value: profile?.crowdTolerance
-        ? DIMENSION_LABELS.crowdTolerance.values[profile.crowdTolerance as keyof typeof DIMENSION_LABELS.crowdTolerance.values]
-        : null,
-    },
-    {
-      key: 'physicalReadiness',
-      label: DIMENSION_LABELS.physicalReadiness.label,
-      value: profile?.physicalReadiness
-        ? DIMENSION_LABELS.physicalReadiness.values[profile.physicalReadiness as keyof typeof DIMENSION_LABELS.physicalReadiness.values]
-        : null,
-    },
-    {
-      key: 'spendingStyle',
-      label: DIMENSION_LABELS.spendingStyle.label,
-      value: profile?.spendingStyle
-        ? DIMENSION_LABELS.spendingStyle.values[profile.spendingStyle as keyof typeof DIMENSION_LABELS.spendingStyle.values]
-        : null,
-    },
-    {
-      key: 'groundReality',
-      label: DIMENSION_LABELS.groundReality.label,
-      value: profile?.groundReality
-        ? DIMENSION_LABELS.groundReality.values[profile.groundReality as keyof typeof DIMENSION_LABELS.groundReality.values]
-        : null,
-    },
-    {
-      key: 'languageComfort',
-      label: DIMENSION_LABELS.languageComfort.label,
-      value: profile?.languageComfort
-        ? DIMENSION_LABELS.languageComfort.values[profile.languageComfort as keyof typeof DIMENSION_LABELS.languageComfort.values]
-        : null,
-    },
-  ];
+  const dimensions = extractDimensions(profile);
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.successContainer}>
-        {/* Extracted dimensions card */}
         <View style={[styles.dimensionsSection, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
           <Text style={styles.successTitle}>Extracted Personality</Text>
           {dimensions.map((dimension, index) => (
@@ -139,9 +60,11 @@ function SuccessState({ profile, colors, styles, onContinue, onDone }: SuccessSt
           ))}
         </View>
 
-        {/* Action buttons */}
         <View style={styles.actionButtonsContainer}>
           <Pressable
+            accessible
+            accessibilityLabel="Looks good, continue to quiz"
+            accessibilityHint="Proceeds to the personality quiz based on your story"
             style={({ pressed }) => [
               styles.button,
               styles.buttonPrimary,
@@ -153,6 +76,9 @@ function SuccessState({ profile, colors, styles, onContinue, onDone }: SuccessSt
           </Pressable>
 
           <Pressable
+            accessible
+            accessibilityLabel="Done"
+            accessibilityHint="Closes the story submission screen"
             style={({ pressed }) => [
               styles.button,
               styles.buttonSecondary,
@@ -175,7 +101,7 @@ export default function StoryScreen() {
   const colors = useColors();
   const styles = makeStyles(colors);
   const [text, setText] = useState('');
-  const [successData, setSuccessData] = useState<any>(null);
+  const [successData, setSuccessData] = useState<StoryResponse | null>(null);
 
   const submitStoryMutation = useSubmitStory(text);
 
@@ -189,10 +115,13 @@ export default function StoryScreen() {
       onSuccess: (data) => {
         setSuccessData(data);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error as Record<string, unknown>)?.response?.data?.message || 'Please try again later.';
         Alert.alert(
           'Failed to analyse story',
-          error?.response?.data?.message || 'Please try again later.'
+          String(errorMessage)
         );
       },
     });
@@ -246,20 +175,22 @@ export default function StoryScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* ── Header ── */}
-        <Pressable style={styles.header} onPress={() => router.back()}>
+        <Pressable
+          accessible
+          accessibilityLabel="Back to profile"
+          accessibilityHint="Returns to the main personality screen"
+          style={styles.header}
+          onPress={() => router.back()}
+        >
           <Text style={styles.headerText}>← Traveler Personality</Text>
         </Pressable>
 
-        {/* ── Overline ── */}
         <Text style={styles.overline}>TELL US YOUR STORY</Text>
 
-        {/* ── Prompt text ── */}
         <Text style={styles.prompt}>
           Tell us about a trip you loved — what made it great? And a trip (or moment) that didn't work — what went wrong?
         </Text>
 
-        {/* ── Text Input ── */}
         <TextInput
           style={[styles.textInput, { backgroundColor: colors.bgCard, borderColor: colors.border }]}
           placeholder="Share your travel story..."
@@ -269,20 +200,25 @@ export default function StoryScreen() {
           value={text}
           onChangeText={setText}
           maxLength={MAX_CHARACTERS}
+          accessible
+          accessibilityLabel="Travel story input"
+          accessibilityHint={`Enter your travel story. Character count: ${text.length} out of ${MAX_CHARACTERS}`}
         />
 
-        {/* ── Character counter ── */}
         <View style={styles.counterContainer}>
           <Text style={styles.counter}>
             {text.length} / {MAX_CHARACTERS}
           </Text>
         </View>
 
-        {/* ── Analyse Story button ── */}
         <Pressable
+          accessible
+          accessibilityLabel="Analyse story"
+          accessibilityHint={text.length < MIN_CHARACTERS ? `Enter at least ${MIN_CHARACTERS} characters to analyse` : 'Analyses your travel story to extract personality'}
+          accessibilityRole="button"
           style={({ pressed }) => [
             styles.button,
-            { backgroundColor: colors.primary500, opacity: pressed && text.length >= MIN_CHARACTERS ? 0.8 : 1 },
+            { backgroundColor: colors.primary500, opacity: pressed && text.length >= MIN_CHARACTERS ? 0.8 : 0.6 },
           ]}
           onPress={handleAnalyseStory}
           disabled={text.length < MIN_CHARACTERS}
