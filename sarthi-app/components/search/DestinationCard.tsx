@@ -48,6 +48,18 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
 
       {/* Card body content */}
       <View style={styles.cardBody}>
+        {/* Personal match signal badge */}
+        {destination.personalMatch && (
+          <View style={styles.matchSignalContainer}>
+            <View style={getMatchBadgeStyle(destination.personalMatch.level, styles, colors)}>
+              <Text style={getMatchBadgeTextStyle(destination.personalMatch.level, styles, colors)}>
+                {getMatchBadgeLabel(destination.personalMatch.level)}
+              </Text>
+            </View>
+            <Text style={styles.matchReasonText}>{destination.personalMatch.reason}</Text>
+          </View>
+        )}
+
         <Text style={styles.why}>{destination.whyItMatches}</Text>
 
         <View style={styles.statsRow}>
@@ -78,6 +90,48 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
   );
 }
 
+// Helper function to get match badge label with icon
+function getMatchBadgeLabel(level: 'great_match' | 'good_match' | 'heads_up' | 'not_your_style'): string {
+  switch (level) {
+    case 'great_match':
+      return '✦ Great match';
+    case 'good_match':
+      return '✓ Good match';
+    case 'heads_up':
+      return '⚠ Heads up';
+    case 'not_your_style':
+      return 'Not your style';
+  }
+}
+
+// Helper function to get badge container style based on match level
+function getMatchBadgeStyle(level: 'great_match' | 'good_match' | 'heads_up' | 'not_your_style', styles: any, colors: Colors): any {
+  switch (level) {
+    case 'great_match':
+      return { ...styles.matchBadgeGood, backgroundColor: `${colors.success}15` };
+    case 'good_match':
+      return { ...styles.matchBadgeGood, backgroundColor: `${colors.primary500}15` };
+    case 'heads_up':
+      return { ...styles.matchBadgeGood, backgroundColor: `${colors.warning}15` };
+    case 'not_your_style':
+      return { ...styles.matchBadgeNeutral, borderColor: colors.textTertiary };
+  }
+}
+
+// Helper function to get badge text style based on match level
+function getMatchBadgeTextStyle(level: 'great_match' | 'good_match' | 'heads_up' | 'not_your_style', styles: any, colors: Colors): any {
+  switch (level) {
+    case 'great_match':
+      return { ...styles.matchBadgeText, color: colors.success };
+    case 'good_match':
+      return { ...styles.matchBadgeText, color: colors.primary500 };
+    case 'heads_up':
+      return { ...styles.matchBadgeText, color: colors.warning };
+    case 'not_your_style':
+      return { ...styles.matchBadgeText, color: colors.textTertiary };
+  }
+}
+
 function makeStyles(colors: Colors) {
   return StyleSheet.create({
     card: {
@@ -99,6 +153,11 @@ function makeStyles(colors: Colors) {
     saveBtn: { position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 10, width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
     saveBtnIcon: { fontSize: 18 },
     cardBody: { padding: 16, gap: 12 },
+    matchSignalContainer: { gap: 4 },
+    matchBadgeGood: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignSelf: 'flex-start' },
+    matchBadgeNeutral: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, alignSelf: 'flex-start', borderWidth: 1 },
+    matchBadgeText: { ...type.caption, fontFamily: 'Inter_600SemiBold' },
+    matchReasonText: { ...type.caption, color: colors.textTertiary, marginLeft: 0 },
     why: { ...type.body, color: colors.textSecondary },
     statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     statChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgBase, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, gap: 4 },

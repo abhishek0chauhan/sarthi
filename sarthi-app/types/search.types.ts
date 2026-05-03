@@ -91,6 +91,11 @@ export interface SearchResultDestination {
   // Slim fields for free-tier models; expand when using paid model:
   suitability: string;
   readinessScore: number;
+  // Personal match signal showing personality alignment
+  personalMatch?: {
+    level: 'great_match' | 'good_match' | 'heads_up' | 'not_your_style';
+    reason: string;
+  };
   // healthAdvisory?: HealthAdvisory;
   // costBreakdown?: CostBreakdown;
   // permits?: Permits;
