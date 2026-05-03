@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
@@ -74,7 +74,12 @@ export class SavedTripsController {
   @Post(':id/phrasebook')
   @HttpCode(200)
   async generatePhrasebook(@Param('id') id: string, @Req() req: any) {
-    return this.phrasebookService.generateAndStore(id, req.user);
+    try {
+      return await this.phrasebookService.generateAndStore(id, req.user);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new InternalServerErrorException(`Phrasebook generation failed: ${message}`);
+    }
   }
 
   @Get(':id/phrasebook')
