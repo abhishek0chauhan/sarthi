@@ -50,34 +50,7 @@ export default function PhrasebookScreen() {
       </View>
       <Text style={styles.title}>Phrasebook</Text>
 
-      {error && !phrasebook && (
-        <View style={styles.empty}>
-          <Text style={styles.errorText}>⚠️ Failed to load phrasebook</Text>
-          <Text style={styles.emptyText}>Try generating a new one or try again in a moment.</Text>
-          <Pressable
-            style={[styles.generateBtn, isGenerating && styles.generateBtnDisabled]}
-            onPress={() => generate()}
-            disabled={isGenerating}
-          >
-            <Text style={styles.generateBtnText}>{isGenerating ? 'Generating…' : '✨ Generate Phrasebook'}</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {!phrasebook && !isLoading && !error && (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>No phrasebook yet for this trip.</Text>
-          <Pressable
-            style={[styles.generateBtn, isGenerating && styles.generateBtnDisabled]}
-            onPress={() => generate()}
-            disabled={isGenerating}
-          >
-            <Text style={styles.generateBtnText}>{isGenerating ? 'Generating…' : '✨ Generate Phrasebook'}</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {phrasebook && (
+      {phrasebook && phrasebook.language ? (
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.langBadge}>
             <Text style={styles.langText}>{phrasebook.language}</Text>
@@ -108,6 +81,20 @@ export default function PhrasebookScreen() {
             </View>
           )}
         </ScrollView>
+      ) : (
+        <View style={styles.empty}>
+          {error && <Text style={styles.errorText}>⚠️ Failed to load phrasebook</Text>}
+          <Text style={styles.emptyText}>
+            {error ? 'Try generating a new one or try again in a moment.' : 'No phrasebook yet for this trip.'}
+          </Text>
+          <Pressable
+            style={[styles.generateBtn, isGenerating && styles.generateBtnDisabled]}
+            onPress={() => generate()}
+            disabled={isGenerating}
+          >
+            <Text style={styles.generateBtnText}>{isGenerating ? 'Generating…' : '✨ Generate Phrasebook'}</Text>
+          </Pressable>
+        </View>
       )}
     </SafeAreaView>
   );
