@@ -11,7 +11,9 @@ export class SessionService {
     status: 'before' | 'during' | 'after';
     totalDays: number;
   } {
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Use IST (UTC+5:30) for date calculation — avoids wrong day before 5:30 AM IST
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const todayStr = new Date(Date.now() + istOffset).toISOString().split('T')[0];
     const today = new Date(todayStr);
     const from = new Date(dates.from);
     const to = new Date(dates.to);

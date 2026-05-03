@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import * as Location from 'expo-location';
@@ -30,8 +30,9 @@ export default function LiveGuideScreen() {
     });
 
     Location.watchPositionAsync(
-      { accuracy: Location.Accuracy.Balanced, timeInterval: 60000 },
+      { accuracy: Location.Accuracy.Balanced, timeInterval: 60000, distanceInterval: 0 },
       (loc) => {
+        console.log('[LiveGuide] location_update', loc.coords.latitude, loc.coords.longitude);
         socketService.emit('location_update', {
           lat: loc.coords.latitude,
           lng: loc.coords.longitude,
@@ -45,6 +46,15 @@ export default function LiveGuideScreen() {
       deactivate();
     };
   }, [id]);
+
+  const [isReplanning, setIsReplanning] = useState(false);
+
+  const handleReplan = () => {
+    console.log('[LiveGuide] requestReplan dayIndex=', dayIndex);
+    setIsReplanning(true);
+    requestReplan(() => setIsReplanning(false));
+    setTimeout(() => setIsReplanning(false), 15000);
+  };
 
   const currentIndex = todayPlan?.findIndex((a) => a.status === 'pending') ?? -1;
 
@@ -127,7 +137,10 @@ export default function LiveGuideScreen() {
                     {activity.status === 'skipped' && <Text style={styles.skippedTag}>Skipped</Text>}
                   </View>
                   <Text style={styles.activityName}>{activity.activity}</Text>
-                  <Text style={styles.activityMeta}>₹{activity.cost}{activity.healthNote ? ` · ${activity.healthNote}` : ''}</Text>
+                  <Text style={styles.activityMeta}>
+                    {String(activity.cost).includes('₹') ? activity.cost : `₹${activity.cost}`}
+                    {activity.healthNote ? ` · ${activity.healthNote}` : ''}
+                  </Text>
 
                   {isCurrent && (
                     <View style={styles.btnRow}>
@@ -137,8 +150,10 @@ export default function LiveGuideScreen() {
                       <Pressable style={styles.btnSkip} onPress={() => skipActivity(dayIndex ?? 0, idx)}>
                         <Text style={styles.btnSkipText}>Skip</Text>
                       </Pressable>
-                      <Pressable style={styles.btnReplan} onPress={requestReplan}>
-                        <Text style={styles.btnReplanText}>⟳ Replan Day</Text>
+                      <Pressable style={styles.btnReplan} onPress={handleReplan} disabled={isReplanning}>
+                        {isReplanning
+                          ? <ActivityIndicator size="small" color={colors.primary500} />
+                          : <Text style={styles.btnReplanText}>⟳ Replan Day</Text>}
                       </Pressable>
                     </View>
                   )}

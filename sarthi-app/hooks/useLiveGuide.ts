@@ -81,8 +81,12 @@ export function useLiveGuide() {
     socketService.emit('skip_activity', { dayIndex, activityIndex, ...(reason ? { reason } : {}) });
   };
 
-  const requestReplan = () => {
+  const requestReplan = (onResult?: () => void) => {
     const dayIndex = useLiveGuideStore.getState().dayIndex ?? 0;
+    console.log('[useLiveGuide] emit request_replan dayIndex=', dayIndex);
+    if (onResult) {
+      socketService.on('replan_result', () => { onResult(); socketService.off('replan_result'); });
+    }
     socketService.emit('request_replan', { dayIndex });
   };
 

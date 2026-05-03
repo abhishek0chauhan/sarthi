@@ -63,16 +63,22 @@ export class EnrichmentService {
 
     this.logger.log(`Enriching ${activitiesToEnrich.length} activities for ${destination}, ${state}`);
 
-    const response = await this.aiService.enrichActivities(prompt);
+    try {
+      const response = await this.aiService.enrichActivities(prompt);
+      this.logger.log(`Received enrichment response with ${response.length} contexts`);
 
-    // Apply enriched context back to itinerary
-    let contextIndex = 0;
-    activitiesToEnrich.forEach(({ dayIndex, activityIndex }) => {
-      if (contextIndex < response.length) {
-        itineraryData.itinerary[dayIndex].activities[activityIndex].placeContext = response[contextIndex];
-        contextIndex++;
-      }
-    });
+      // Apply enriched context back to itinerary
+      let contextIndex = 0;
+      activitiesToEnrich.forEach(({ dayIndex, activityIndex }) => {
+        if (contextIndex < response.length) {
+          itineraryData.itinerary[dayIndex].activities[activityIndex].placeContext = response[contextIndex];
+          contextIndex++;
+        }
+      });
+    } catch (err) {
+      this.logger.error('Failed to enrich activities', err);
+      throw err;
+    }
 
     return itineraryData;
   }

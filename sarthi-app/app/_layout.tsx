@@ -24,6 +24,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    // Safety fallback: if Firebase auth doesn't resolve within 5s, unblock the UI
+    const timeout = setTimeout(() => {
+      if (useAuthStore.getState().isLoading) {
+        console.warn('[RootLayout] Auth timeout — forcing loading false');
+        useAuthStore.getState().setLoading(false);
+      }
+    }, 5000);
     try {
       unsubscribe = authService.init();
     } catch (err) {
@@ -31,6 +38,7 @@ export default function RootLayout() {
       useAuthStore.getState().setLoading(false);
     }
     return () => {
+      clearTimeout(timeout);
       try { unsubscribe?.(); } catch {}
     };
   }, []);

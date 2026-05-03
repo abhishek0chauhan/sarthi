@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
@@ -61,7 +61,7 @@ export class SavedTripsController {
   async enrichTrip(@Param('id') id: string, @Req() req: any) {
     const trip = await this.service.getById(id, req.user);
     if (!trip.itineraryData) {
-      throw new Error('Trip has no itinerary to enrich');
+      throw new BadRequestException('Trip has no itinerary to enrich');
     }
     const enrichedItinerary = await this.enrichmentService.enrichTrip(
       trip.itineraryData as any,
