@@ -124,14 +124,6 @@ interface ChipProps {
 }
 
 function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
-  const chipStyle = selected
-    ? styles.chipSelected
-    : styles.chipUnselected;
-
-  const textStyle = selected
-    ? styles.chipTextSelected
-    : styles.chipTextUnselected;
-
   return (
     <Pressable
       accessible
@@ -140,14 +132,30 @@ function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
       accessibilityState={{ selected }}
       style={({ pressed }) => [
         styles.chip,
-        chipStyle,
-        pressed && styles.chipPressed,
+        selected && {
+          backgroundColor: colors.primary500,
+          borderColor: colors.primary500,
+        },
+        !selected && {
+          backgroundColor: colors.bgCard,
+          borderColor: colors.textSecondary,
+        },
+        pressed && { opacity: 0.8 },
       ]}
       onPress={onPress}
     >
-      <Text style={[styles.chipText, textStyle]}>
-        {label}
-      </Text>
+      <View style={styles.chipContent}>
+        {selected && <Text style={styles.chipCheckmark}>✓</Text>}
+        <Text
+          style={[
+            styles.chipText,
+            selected && { color: colors.textInverse },
+            !selected && { color: colors.textPrimary },
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -449,16 +457,17 @@ function makeStyles(colors: Colors) {
       justifyContent: 'center',
       minHeight: 40,
       borderWidth: 2,
+      elevation: 2,
     },
-    chipSelected: {
-      backgroundColor: colors.primary500,
-      borderColor: colors.primary500,
-      elevation: 4,
+    chipContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
     },
-    chipUnselected: {
-      backgroundColor: colors.bgCard,
-      borderColor: colors.primary500,
-      elevation: 0,
+    chipCheckmark: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: 'white',
     },
     chipPressed: {
       opacity: 0.75,
@@ -469,12 +478,6 @@ function makeStyles(colors: Colors) {
       fontSize: 13,
       fontWeight: '600',
       lineHeight: 18,
-    },
-    chipTextSelected: {
-      color: colors.textInverse,
-    },
-    chipTextUnselected: {
-      color: colors.textPrimary,
     },
 
     // Loading state
