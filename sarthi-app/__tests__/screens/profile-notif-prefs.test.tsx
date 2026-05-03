@@ -1,9 +1,18 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as apiModule from '@/services/api';
 import { useAuthStore } from '@/stores/auth.store';
 
 // Mock dependencies
+jest.mock('expo-router', () => ({
+  useRouter: jest.fn(() => ({
+    back: jest.fn(),
+    push: jest.fn(),
+    replace: jest.fn(),
+  })),
+}));
+
 jest.mock('@/stores/auth.store');
 jest.mock('@/stores/theme.store', () => ({
   useThemeStore: jest.fn(() => ({
@@ -49,10 +58,22 @@ const mockUser = {
 const getProfileScreen = () => require('@/app/(tabs)/profile/index').default;
 
 describe('Profile Screen - Notification Preferences', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     jest.clearAllMocks();
     (useAuthStore as unknown as jest.Mock).mockReturnValue(mockUser);
+
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
   });
+
+  const renderWithQuery = (component: React.ReactElement) =>
+    render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
 
   it('fetches notification prefs on mount', async () => {
     const mockApiRequest = jest.fn().mockResolvedValue({
@@ -64,7 +85,7 @@ describe('Profile Screen - Notification Preferences', () => {
     jest.spyOn(apiModule, 'apiRequest').mockImplementation(mockApiRequest);
 
     const ProfileScreen = getProfileScreen();
-    render(<ProfileScreen />);
+    renderWithQuery(<ProfileScreen />);
 
     await waitFor(() => {
       expect(mockApiRequest).toHaveBeenCalledWith('/users/me/notification-prefs');
@@ -81,7 +102,7 @@ describe('Profile Screen - Notification Preferences', () => {
     jest.spyOn(apiModule, 'apiRequest').mockImplementation(mockApiRequest);
 
     const ProfileScreen = getProfileScreen();
-    const { getByText, getByTestId } = render(<ProfileScreen />);
+    const { getByText, getByTestId } = renderWithQuery(<ProfileScreen />);
 
     await waitFor(() => {
       expect(getByText('Morning Briefing')).toBeTruthy();
@@ -99,7 +120,7 @@ describe('Profile Screen - Notification Preferences', () => {
     jest.spyOn(apiModule, 'apiRequest').mockImplementation(mockApiRequest);
 
     const ProfileScreen = getProfileScreen();
-    const { getByText, getByTestId } = render(<ProfileScreen />);
+    const { getByText, getByTestId } = renderWithQuery(<ProfileScreen />);
 
     await waitFor(() => {
       expect(getByText('Meal Nudges')).toBeTruthy();
@@ -120,7 +141,7 @@ describe('Profile Screen - Notification Preferences', () => {
     jest.spyOn(apiModule, 'apiRequest').mockImplementation(mockApiRequest);
 
     const ProfileScreen = getProfileScreen();
-    const { getByTestId } = render(<ProfileScreen />);
+    const { getByTestId } = renderWithQuery(<ProfileScreen />);
 
     await waitFor(() => {
       expect(mockApiRequest).toHaveBeenCalledWith('/users/me/notification-prefs');
