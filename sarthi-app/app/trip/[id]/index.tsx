@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { useTrip } from '@/hooks/useTrips';
+import { useEnrichTrip } from '@/hooks/useEnrichment';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { CostBreakdown } from '@/components/trip/CostBreakdown';
@@ -19,6 +20,7 @@ export default function TripDetailScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const styles = makeStyles(colors);
+  const { mutate: enrichTrip, isPending: isEnriching } = useEnrichTrip(id ?? '');
 
   if (isLoading) return <LoadingSpinner />;
   if (error || !trip) return <EmptyState title="Trip not found" />;
@@ -26,6 +28,11 @@ export default function TripDetailScreen() {
   // Check if today is within trip dates
   const today = new Date().toISOString().split('T')[0];
   const isActiveDay = trip.dates.from <= today && today <= trip.dates.to;
+
+  // Check if trip has place context in any activity
+  const hasPlaceContext = (trip.itineraryData?.itinerary ?? []).some((d: any) =>
+    d.activities?.some((a: any) => a.placeContext)
+  );
 
   // Calculate day number (1-based)
   const dayNumber = Math.floor(
@@ -77,6 +84,7 @@ export default function TripDetailScreen() {
 
           {/* 3. Quick nav tiles */}
           {isActiveDay ? (
+            <>
             <View style={styles.tilesGrid}>
               {/* Live Guide — large primary tile */}
               <Pressable
@@ -113,7 +121,25 @@ export default function TripDetailScreen() {
                 </Pressable>
               </View>
             </View>
+            <View style={styles.navGrid}>
+              <Pressable
+                style={[styles.navTile, styles.navTileSecondary]}
+                onPress={() => router.push(`/trip/${id}/phrasebook` as any)}
+              >
+                <Text style={styles.navTileIconSm}>🗣️</Text>
+                <Text style={styles.navTileLabelSm}>Phrasebook</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.navTile, styles.navTileSecondary]}
+                onPress={() => router.push(`/trip/${id}/chat` as any)}
+              >
+                <Text style={styles.navTileIconSm}>💬</Text>
+                <Text style={styles.navTileLabelSm}>Trip Chat</Text>
+              </Pressable>
+            </View>
+            </>
           ) : (
+            <>
             <View style={styles.navGrid}>
               <Pressable
                 style={[styles.navTile, styles.navTilePrimary]}
@@ -140,6 +166,40 @@ export default function TripDetailScreen() {
                 </Text>
               </Pressable>
             </View>
+            <View style={styles.navGrid}>
+              <Pressable
+                style={[styles.navTile, styles.navTileSecondary]}
+                onPress={() => router.push(`/trip/${id}/phrasebook` as any)}
+              >
+                <Text style={styles.navTileIcon}>🗣️</Text>
+                <Text style={[styles.navTileLabel, { color: colors.textPrimary }]}>Phrasebook</Text>
+                <Text style={[styles.navTileDetail, { color: colors.textTertiary }]}>
+                  {trip.phrasebookData ? 'Ready' : 'Tap to generate'}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.navTile, styles.navTileSecondary]}
+                onPress={() => router.push(`/trip/${id}/chat` as any)}
+              >
+                <Text style={styles.navTileIcon}>💬</Text>
+                <Text style={[styles.navTileLabel, { color: colors.textPrimary }]}>Trip Chat</Text>
+                <Text style={[styles.navTileDetail, { color: colors.textTertiary }]}>Ask Sarthi AI</Text>
+              </Pressable>
+            </View>
+            </>
+          )}
+
+          {/* Enrich Trip — shown when itinerary exists but has no place context yet */}
+          {trip.itineraryData && !hasPlaceContext && (
+            <Pressable
+              style={[styles.enrichBtn, isEnriching && styles.enrichBtnDisabled]}
+              onPress={() => enrichTrip()}
+              disabled={isEnriching}
+            >
+              <Text style={styles.enrichBtnText}>
+                {isEnriching ? '✨ Enriching…' : '✨ Enrich Trip — Add Place Context & Map Links'}
+              </Text>
+            </Pressable>
           )}
 
           {/* 4. Highlights card */}
@@ -294,5 +354,17 @@ function makeStyles(colors: Colors) {
       borderRadius: 10,
     },
     shareBtnText: { ...type.caption, color: colors.textInverse, fontFamily: 'Inter_600SemiBold' },
+
+    // Enrich button
+    enrichBtn: {
+      backgroundColor: (colors as any).primary50,
+      borderRadius: 12,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: (colors as any).primary200,
+    },
+    enrichBtnDisabled: { opacity: 0.5 },
+    enrichBtnText: { fontSize: 13, fontFamily: 'Inter_600SemiBold', color: colors.primary500 },
   });
 }

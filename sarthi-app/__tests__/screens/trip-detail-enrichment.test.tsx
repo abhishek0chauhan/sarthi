@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import TripDetailScreen from '@/app/trip/[id]/index';
 
 const mockPush = jest.fn();
 const mockBack = jest.fn();
-const mockLocationPermission = jest.fn().mockResolvedValue({ granted: true });
+const mockEnrichTrip = jest.fn();
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, back: mockBack }),
-  useLocalSearchParams: () => ({ id: 'trip-123' })
+  useLocalSearchParams: () => ({ id: 'trip-1' })
 }));
 
 jest.mock('@/hooks/useTrips', () => ({
@@ -16,12 +16,12 @@ jest.mock('@/hooks/useTrips', () => ({
 }));
 
 jest.mock('@/hooks/useEnrichment', () => ({
-  useEnrichTrip: () => ({ mutate: jest.fn(), isPending: false })
+  useEnrichTrip: () => ({ mutate: mockEnrichTrip, isPending: false })
 }));
 
 jest.mock('expo-location', () => ({
   __esModule: true,
-  requestForegroundPermissionsAsync: mockLocationPermission,
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ granted: false }),
   watchPositionAsync: jest.fn(),
   Accuracy: { Balanced: 5 }
 }));
@@ -39,6 +39,8 @@ jest.mock('@/hooks/useColorScheme', () => ({
     textSecondary: '#666666',
     textTertiary: '#999999',
     primary500: '#2563EB',
+    primary50: '#F0F9FF',
+    primary200: '#BFDBFE',
     border: '#E5E5E5',
     success: '#10B981'
   })
@@ -55,33 +57,31 @@ jest.mock('expo-linear-gradient', () => ({
 import { useTrip } from '@/hooks/useTrips';
 
 const baseTrip = {
-  id: 'trip-123',
-  name: 'Paris Trip',
-  destination: 'Paris',
-  state: 'France',
+  id: 'trip-1',
+  name: 'Meghalaya Trip',
+  destination: 'Shillong',
+  state: 'Meghalaya',
   dates: {
-    from: '2026-05-01',
-    to: '2026-05-10'
+    from: '2026-06-01',
+    to: '2026-06-05'
   },
   itineraryData: {
-    tripReadiness: 75,
-    highlights: ['Eiffel Tower', 'Louvre', 'Versailles'],
+    tripReadiness: 80,
+    highlights: [],
     itinerary: [{ day: 1, activities: [] }]
   },
-  foodGuideData: {
-    mustTryDishes: [{ name: 'Croissant' }]
-  }
+  foodGuideData: null
 };
 
-describe('TripDetailScreen - Live Guide Tile', () => {
+describe('TripDetail enrichment tiles', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows Live Guide tile on active day', () => {
-    // Mock today as 2026-05-05 (within trip dates 2026-05-01 to 2026-05-10)
+  it('renders Phrasebook tile', () => {
+    // Mock today as before trip start (inactive day)
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2026-05-05'));
+    jest.setSystemTime(new Date('2026-05-20'));
 
     (useTrip as jest.Mock).mockReturnValue({
       data: baseTrip,
@@ -90,36 +90,15 @@ describe('TripDetailScreen - Live Guide Tile', () => {
     });
 
     const { getByText } = render(<TripDetailScreen />);
-
-    expect(getByText('Live Guide')).toBeTruthy();
-    expect(getByText('Day 5 · Active now')).toBeTruthy();
+    expect(getByText('Phrasebook')).toBeTruthy();
 
     jest.useRealTimers();
   });
 
-  it('hides Live Guide tile on non-active day', () => {
-    // Mock today as 2026-04-20 (before trip start 2026-05-01)
+  it('renders Trip Chat tile', () => {
+    // Mock today as before trip start (inactive day)
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2026-04-20'));
-
-    (useTrip as jest.Mock).mockReturnValue({
-      data: baseTrip,
-      isLoading: false,
-      error: null
-    });
-
-    const { queryByText } = render(<TripDetailScreen />);
-
-    expect(queryByText('Live Guide')).toBeFalsy();
-    expect(queryByText('Day 5 · Active now')).toBeFalsy();
-
-    jest.useRealTimers();
-  });
-
-  it('renders Live Guide tile with correct day number', () => {
-    // Mock today as 2026-05-06 (day 6 of trip: 2026-05-01 to 2026-05-10)
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2026-05-06'));
+    jest.setSystemTime(new Date('2026-05-20'));
 
     (useTrip as jest.Mock).mockReturnValue({
       data: baseTrip,
@@ -128,9 +107,43 @@ describe('TripDetailScreen - Live Guide Tile', () => {
     });
 
     const { getByText } = render(<TripDetailScreen />);
+    expect(getByText('Trip Chat')).toBeTruthy();
 
-    expect(getByText('Live Guide')).toBeTruthy();
-    expect(getByText('Day 6 · Active now')).toBeTruthy();
+    jest.useRealTimers();
+  });
+
+  it('navigates to phrasebook on tile press', () => {
+    // Mock today as before trip start (inactive day)
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-05-20'));
+
+    (useTrip as jest.Mock).mockReturnValue({
+      data: baseTrip,
+      isLoading: false,
+      error: null
+    });
+
+    const { getByText } = render(<TripDetailScreen />);
+    fireEvent.press(getByText('Phrasebook'));
+    expect(mockPush).toHaveBeenCalledWith('/trip/trip-1/phrasebook');
+
+    jest.useRealTimers();
+  });
+
+  it('navigates to chat on tile press', () => {
+    // Mock today as before trip start (inactive day)
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-05-20'));
+
+    (useTrip as jest.Mock).mockReturnValue({
+      data: baseTrip,
+      isLoading: false,
+      error: null
+    });
+
+    const { getByText } = render(<TripDetailScreen />);
+    fireEvent.press(getByText('Trip Chat'));
+    expect(mockPush).toHaveBeenCalledWith('/trip/trip-1/chat');
 
     jest.useRealTimers();
   });
