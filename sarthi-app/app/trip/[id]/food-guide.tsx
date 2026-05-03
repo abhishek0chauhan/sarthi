@@ -5,6 +5,7 @@ import { useTrip } from '@/hooks/useTrips';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DishCard } from '@/components/food/DishCard';
+import { MapLinkButton } from '@/components/trip/MapLinkButton';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
@@ -43,6 +44,7 @@ export default function TripFoodGuideScreen() {
                 <Text style={styles.streetName}>{item.name}</Text>
                 <Text style={styles.streetMeta}>📍 {item.where} · {item.price}</Text>
                 {item.healthNote && <Text style={styles.streetSafety}>{item.healthNote}</Text>}
+                {item.mapQuery && <MapLinkButton mapQuery={item.mapQuery} />}
               </View>
             ))}
           </View>
