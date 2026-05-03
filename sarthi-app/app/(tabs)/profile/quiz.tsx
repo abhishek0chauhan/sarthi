@@ -124,45 +124,28 @@ interface ChipProps {
 }
 
 function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
+  const chipStyle = selected
+    ? styles.chipSelected
+    : styles.chipUnselected;
+
+  const textStyle = selected
+    ? styles.chipTextSelected
+    : styles.chipTextUnselected;
+
   return (
     <Pressable
       accessible
       accessibilityLabel={label}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      style={({ pressed }) => {
-        const baseStyle = [styles.chip];
-
-        if (selected) {
-          baseStyle.push({
-            backgroundColor: colors.primary500,
-            borderColor: colors.primary500,
-            borderWidth: 2,
-            elevation: 3,
-          });
-        } else {
-          baseStyle.push({
-            backgroundColor: colors.bgCard,
-            borderColor: colors.primary500,
-            borderWidth: 1.5,
-            elevation: 0,
-          });
-        }
-
-        if (pressed) {
-          baseStyle.push(styles.chipPressed);
-        }
-
-        return baseStyle;
-      }}
+      style={({ pressed }) => [
+        styles.chip,
+        chipStyle,
+        pressed && styles.chipPressed,
+      ]}
       onPress={onPress}
     >
-      <Text
-        style={[
-          styles.chipText,
-          selected ? { color: colors.textInverse } : { color: colors.textPrimary },
-        ]}
-      >
+      <Text style={[styles.chipText, textStyle]}>
         {label}
       </Text>
     </Pressable>
@@ -462,6 +445,17 @@ function makeStyles(colors: Colors) {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: 44,
+      borderWidth: 2,
+    },
+    chipSelected: {
+      backgroundColor: colors.primary500,
+      borderColor: colors.primary500,
+      elevation: 4,
+    },
+    chipUnselected: {
+      backgroundColor: colors.bgCard,
+      borderColor: colors.primary500,
+      elevation: 0,
     },
     chipPressed: {
       opacity: 0.75,
@@ -471,6 +465,12 @@ function makeStyles(colors: Colors) {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
       fontWeight: '600',
+    },
+    chipTextSelected: {
+      color: colors.textInverse,
+    },
+    chipTextUnselected: {
+      color: colors.textPrimary,
     },
 
     // Loading state
