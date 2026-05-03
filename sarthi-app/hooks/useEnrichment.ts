@@ -86,5 +86,6 @@ export function useSwapActivity(tripId: string) {
 export function useLogCorrection() {
   return useMutation({
     mutationFn: (dto: Correction) => enrichmentService.logCorrection(dto),
+    onError: (error) => console.warn('Failed to log correction:', error),
   });
 }

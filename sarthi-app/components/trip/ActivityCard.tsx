@@ -58,7 +58,7 @@ export function ActivityCard({ activity, isLast, tripId, dayIndex, activityIndex
               <Pressable
                 accessible={true}
                 accessibilityLabel="Like activity"
-                accessibilityHint={`Like ${activity.activity}`}
+                accessibilityHint={`Help us improve by rating this ${activity.activity}`}
                 style={styles.thumbBtn}
                 onPress={() => handleThumbPress('up')}
               >
@@ -69,7 +69,7 @@ export function ActivityCard({ activity, isLast, tripId, dayIndex, activityIndex
               <Pressable
                 accessible={true}
                 accessibilityLabel="Dislike activity"
-                accessibilityHint={`Dislike ${activity.activity}`}
+                accessibilityHint={`Help us improve by rating this ${activity.activity}`}
                 style={styles.thumbBtn}
                 onPress={() => handleThumbPress('down')}
               >
