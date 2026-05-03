@@ -83,8 +83,10 @@ export class SavedTripsController {
   }
 
   @Get(':id/phrasebook')
+  @HttpCode(200)
   async getPhrasebook(@Param('id') id: string, @Req() req: any) {
-    return this.phrasebookService.getPhrasebook(id, req.user);
+    const phrasebook = await this.phrasebookService.getPhrasebook(id, req.user);
+    return phrasebook ?? { language: null };
   }
 
   @Post(':id/itinerary/day/:day/activity')
