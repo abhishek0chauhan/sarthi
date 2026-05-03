@@ -6,8 +6,10 @@ export const enrichmentService = {
   enrichTrip: (tripId: string) =>
     apiRequest<SavedTrip>(`/saved-trips/${tripId}/enrich`, { method: 'POST' }),
 
-  getPhrasebook: (tripId: string) =>
-    apiRequest<PhrasebookData>(`/saved-trips/${tripId}/phrasebook`),
+  getPhrasebook: async (tripId: string) => {
+    const response = await apiRequest<{ data: PhrasebookData | null }>(`/saved-trips/${tripId}/phrasebook`);
+    return response.data;
+  },
 
   generatePhrasebook: (tripId: string) =>
     apiRequest<PhrasebookData>(`/saved-trips/${tripId}/phrasebook`, { method: 'POST' }),
