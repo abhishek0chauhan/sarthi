@@ -130,20 +130,31 @@ function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
       accessibilityLabel={label}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      style={({ pressed }) => [
-        styles.chip,
-        selected ? {
-          backgroundColor: colors.primary500,
-          borderColor: colors.primary500,
-          // Subtle shadow for selected state on Android
-          elevation: 2,
-        } : {
-          borderColor: colors.border,
-          backgroundColor: 'transparent',
-          elevation: 0,
-        },
-        pressed && styles.chipPressed,
-      ]}
+      style={({ pressed }) => {
+        const baseStyle = [styles.chip];
+
+        if (selected) {
+          baseStyle.push({
+            backgroundColor: colors.primary500,
+            borderColor: colors.primary500,
+            borderWidth: 2,
+            elevation: 3,
+          });
+        } else {
+          baseStyle.push({
+            backgroundColor: colors.bgCard,
+            borderColor: colors.primary500,
+            borderWidth: 1.5,
+            elevation: 0,
+          });
+        }
+
+        if (pressed) {
+          baseStyle.push(styles.chipPressed);
+        }
+
+        return baseStyle;
+      }}
       onPress={onPress}
     >
       <Text
@@ -448,18 +459,18 @@ function makeStyles(colors: Colors) {
       paddingVertical: 12,
       paddingHorizontal: 16,
       borderRadius: 24,
-      borderWidth: 1.5,
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: 44,
     },
     chipPressed: {
-      opacity: 0.7,
+      opacity: 0.75,
     },
     chipText: {
       ...type.caption,
       fontFamily: 'Inter_600SemiBold',
       fontSize: 14,
+      fontWeight: '600',
     },
 
     // Loading state
