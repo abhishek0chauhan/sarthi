@@ -1,6 +1,6 @@
 import { apiRequest } from './api';
 import type { SavedTrip, ItineraryActivity } from '@/types/trip.types';
-import type { PhrasebookData, ChatMessage, AddActivityDto, SwapActivityDto } from '@/types/enrichment.types';
+import type { PhrasebookData, ChatMessage, AddActivityDto, SwapActivityDto, Correction } from '@/types/enrichment.types';
 
 export const enrichmentService = {
   enrichTrip: (tripId: string) =>
@@ -42,4 +42,7 @@ export const enrichmentService = {
       method: 'PUT',
       body: JSON.stringify(dto),
     }),
+
+  logCorrection: (dto: Correction) =>
+    apiRequest<void>('/corrections', { method: 'POST', body: JSON.stringify(dto) }),
 };

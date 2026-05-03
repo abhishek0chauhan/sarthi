@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { enrichmentService } from '@/services/enrichment.service';
-import type { AddActivityDto, SwapActivityDto } from '@/types/enrichment.types';
+import type { AddActivityDto, SwapActivityDto, Correction } from '@/types/enrichment.types';
 
 export function usePhrasebook(tripId: string) {
   return useQuery({
@@ -80,5 +80,11 @@ export function useSwapActivity(tripId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
     },
+  });
+}
+
+export function useLogCorrection() {
+  return useMutation({
+    mutationFn: (dto: Correction) => enrichmentService.logCorrection(dto),
   });
 }

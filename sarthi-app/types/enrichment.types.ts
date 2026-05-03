@@ -49,3 +49,9 @@ export interface SwapActivityDto {
   cost?: string;
   healthNote?: string;
 }
+
+export interface Correction {
+  tripId: string;
+  type: 'thumbs_up' | 'thumbs_down' | 'removed_place' | 'added_place' | 'swapped_place';
+  context: Record<string, unknown>;
+}

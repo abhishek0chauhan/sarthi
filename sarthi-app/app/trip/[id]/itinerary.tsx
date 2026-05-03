@@ -74,7 +74,13 @@ export default function TripItineraryScreen() {
             {currentDay.activities.map((activity, i) => (
               <View key={i} style={styles.activityRow}>
                 <View style={styles.activityCardWrapper}>
-                  <ActivityCard activity={activity} isLast={i === currentDay.activities.length - 1} />
+                  <ActivityCard
+                    activity={activity}
+                    isLast={i === currentDay.activities.length - 1}
+                    tripId={trip?.id}
+                    dayIndex={currentDay.day}
+                    activityIndex={i}
+                  />
                 </View>
                 <Pressable
                   testID={`delete-activity-${i}`}
