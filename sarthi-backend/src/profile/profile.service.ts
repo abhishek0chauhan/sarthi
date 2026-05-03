@@ -33,7 +33,22 @@ export class ProfileService {
 
   async getProfile(firebaseUid: string) {
     const user = await this.findOrCreateUser(firebaseUid);
-    return this.prisma.travelerProfile.findUnique({ where: { userId: user.id } });
+    const profile = await this.prisma.travelerProfile.findUnique({ where: { userId: user.id } });
+    // Return empty profile if none exists (instead of null) to avoid empty response body
+    return profile ?? {
+      userId: user.id,
+      story: null,
+      travelPace: null,
+      depthVsBreadth: null,
+      comfortLevel: null,
+      crowdTolerance: null,
+      travelMotivations: [],
+      physicalReadiness: null,
+      spendingStyle: null,
+      groundReality: null,
+      languageComfort: null,
+      completeness: 0,
+    };
   }
 
   async submitStory(firebaseUid: string, story: string) {
