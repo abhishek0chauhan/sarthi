@@ -10,6 +10,8 @@ export interface Dish {
   allergens?: string[];
   allergyAlert?: string;
   tasteProfile?: TasteProfile;
+  mapQuery?: string;
+  placeContext?: import('./enrichment.types').DishContext;
 }
 
 export interface HealthConsciousDish {
@@ -29,6 +31,7 @@ export interface StreetFoodItem {
   allergens?: string[];
   allergyAlert?: string;
   tasteProfile?: TasteProfile;
+  mapQuery?: string;
 }
 
 export interface MealSuggestion { suggestion: string; cost: string; healthNote?: string }

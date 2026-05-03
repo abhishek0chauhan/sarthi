@@ -7,6 +7,8 @@ export interface ItineraryActivity {
   activity: string;
   cost: string;
   healthNote?: string;
+  mapQuery?: string;
+  placeContext?: import('./enrichment.types').PlaceContext;
 }
 
 export interface ItineraryMeals {
@@ -45,6 +47,7 @@ export interface SavedTrip {
   destinationData: Record<string, unknown>;
   itineraryData?: ItineraryData;
   foodGuideData?: Record<string, unknown>;
+  phrasebookData?: import('./enrichment.types').PhrasebookData;
   shareToken?: string;
   createdAt: string;
   updatedAt: string;
