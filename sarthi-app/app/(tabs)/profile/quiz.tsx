@@ -9,7 +9,6 @@ import { profileService } from '@/services/profile.service';
 import type { Colors } from '@/constants/colors';
 import type { QuizDto } from '@/types/profile.types';
 import { type } from '@/constants/typography';
-import { DIMENSION_LABELS } from '@/constants/profileDimensions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -323,7 +322,7 @@ export default function QuizScreen() {
         </Pressable>
 
         <Text style={styles.title}>Quick Questions</Text>
-        <Text style={styles.subtitle}>8 questions · ~2 min</Text>
+        <Text style={styles.subtitle}>{QUIZ_QUESTIONS.length} questions · ~2 min</Text>
 
         {/* Questions */}
         <View style={styles.questionsContainer}>
