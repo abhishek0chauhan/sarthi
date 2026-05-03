@@ -3,6 +3,7 @@ import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { Dish } from '@/types/food.types';
+import { MapLinkButton } from '@/components/trip/MapLinkButton';
 
 export function DishCard({ dish }: { dish: Dish }) {
   const colors = useColors();
@@ -18,6 +19,16 @@ export function DishCard({ dish }: { dish: Dish }) {
       <Text style={styles.meta}>📍 {dish.where} · 🌶️ {dish.spiceLevel}</Text>
       {dish.allergyAlert && (
         <Text style={styles.warning}>⚠️ {dish.allergyAlert}</Text>
+      )}
+      {dish.mapQuery && <MapLinkButton mapQuery={dish.mapQuery} />}
+      {dish.placeContext && (
+        <View style={styles.contextBlock}>
+          <Text style={styles.contextLabel}>Best time</Text>
+          <Text style={styles.contextValue}>{dish.placeContext.bestTimeToVisit}</Text>
+          {dish.placeContext.insiderTips.map((tip, i) => (
+            <Text key={i} style={styles.contextTip}>• {tip}</Text>
+          ))}
+        </View>
       )}
     </View>
   );
@@ -40,5 +51,9 @@ function makeStyles(colors: Colors) {
     description: { ...type.caption, color: colors.textSecondary },
     meta: { ...type.caption, color: colors.textTertiary },
     warning: { ...type.caption, color: colors.warning },
+    contextBlock: { marginTop: 4, gap: 2 },
+    contextLabel: { fontSize: 10, fontFamily: 'Inter_700Bold', color: colors.textTertiary, textTransform: 'uppercase', letterSpacing: 0.5 },
+    contextValue: { fontSize: 11, color: colors.textSecondary },
+    contextTip: { fontSize: 11, color: colors.textSecondary },
   });
 }

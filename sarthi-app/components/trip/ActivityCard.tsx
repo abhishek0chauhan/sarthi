@@ -3,6 +3,8 @@ import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import type { ItineraryActivity } from '@/types/trip.types';
+import { PlaceContextCard } from './PlaceContextCard';
+import { MapLinkButton } from './MapLinkButton';
 
 interface ActivityCardProps {
   activity: ItineraryActivity;
@@ -25,6 +27,8 @@ export function ActivityCard({ activity, isLast }: ActivityCardProps) {
           <Text style={styles.activity}>{activity.activity}</Text>
           {activity.cost && <Text style={styles.meta}>💰 {activity.cost}</Text>}
           {activity.healthNote && <Text style={styles.healthNote}>💪 {activity.healthNote}</Text>}
+          {activity.mapQuery && <MapLinkButton mapQuery={activity.mapQuery} />}
+          {activity.placeContext && <PlaceContextCard context={activity.placeContext} />}
         </View>
       </View>
     </View>
