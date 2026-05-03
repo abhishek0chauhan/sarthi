@@ -132,8 +132,16 @@ function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
       accessibilityState={{ selected }}
       style={({ pressed }) => [
         styles.chip,
-        selected && { backgroundColor: colors.primary500 },
-        !selected && { borderColor: colors.border, backgroundColor: colors.bgCard },
+        selected ? {
+          backgroundColor: colors.primary500,
+          borderColor: colors.primary500,
+          // Subtle shadow for selected state on Android
+          elevation: 2,
+        } : {
+          borderColor: colors.border,
+          backgroundColor: 'transparent',
+          elevation: 0,
+        },
         pressed && styles.chipPressed,
       ]}
       onPress={onPress}
@@ -141,8 +149,7 @@ function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
       <Text
         style={[
           styles.chipText,
-          selected && { color: colors.textInverse },
-          !selected && { color: colors.textPrimary },
+          selected ? { color: colors.textInverse } : { color: colors.textPrimary },
         ]}
       >
         {label}
@@ -411,7 +418,7 @@ function makeStyles(colors: Colors) {
     // Questions container
     questionsContainer: {
       paddingHorizontal: 24,
-      gap: 20,
+      gap: 24,
       marginBottom: 24,
     },
 
@@ -421,36 +428,38 @@ function makeStyles(colors: Colors) {
       borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      padding: 16,
-      gap: 12,
+      padding: 18,
+      gap: 14,
     },
     questionText: {
       ...type.body,
       color: colors.textPrimary,
       fontFamily: 'Inter_600SemiBold',
+      lineHeight: 22,
     },
     optionsContainer: {
-      gap: 8,
+      gap: 10,
       flexDirection: 'row',
       flexWrap: 'wrap',
     },
 
     // Chip
     chip: {
-      paddingVertical: 10,
-      paddingHorizontal: 12,
-      borderRadius: 20,
-      borderWidth: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 24,
+      borderWidth: 1.5,
       alignItems: 'center',
       justifyContent: 'center',
+      minHeight: 44,
     },
     chipPressed: {
-      opacity: 0.8,
+      opacity: 0.7,
     },
     chipText: {
       ...type.caption,
       fontFamily: 'Inter_600SemiBold',
-      fontSize: 13,
+      fontSize: 14,
     },
 
     // Loading state
