@@ -2,10 +2,12 @@ import { View, Text, Pressable, StyleSheet, Alert, ScrollView, Switch } from 're
 import { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/auth.store';
 import { authService } from '@/services/auth.service';
 import { useThemeStore } from '@/stores/theme.store';
 import { useColors } from '@/hooks/useColorScheme';
+import { useProfile } from '@/hooks/useProfile';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import { apiRequest } from '@/services/api';
@@ -69,6 +71,8 @@ export default function ProfileScreen() {
   const { override, setOverride } = useThemeStore();
   const colors = useColors();
   const styles = makeStyles(colors);
+  const router = useRouter();
+  const { data: profile } = useProfile();
 
   // OLD: const [notifs, setNotifs] = useState(true);
   // NEW: Separate toggles for morning briefing and meal nudges
@@ -171,6 +175,21 @@ export default function ProfileScreen() {
             label="Language"
             value="English"
             onPress={() => {}}
+            styles={styles}
+            colors={colors}
+          />
+
+          <ChevronMenuItem
+            icon="🧭"
+            label="Traveler Personality"
+            value={
+              profile?.completeness === 0 || !profile
+                ? 'Not set up'
+                : profile.completeness === 100
+                  ? 'Complete'
+                  : `${profile.completeness}% complete`
+            }
+            onPress={() => router.push('/(tabs)/profile/personality')}
             styles={styles}
             colors={colors}
           />
