@@ -1,8 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { AiService } from '../ai/ai.service';
 import { buildEnrichmentPrompt } from '../ai/prompts/enrichment.prompt';
-import { activityPlaceContextSchema } from '../ai/schemas/destination.schema';
-import { z } from 'zod';
 
 export interface ItineraryActivity {
   time?: string;
@@ -65,7 +63,7 @@ export class EnrichmentService {
 
     this.logger.log(`Enriching ${activitiesToEnrich.length} activities for ${destination}, ${state}`);
 
-    const response = await this.aiService.generateJson(prompt, z.array(activityPlaceContextSchema));
+    const response = await this.aiService.enrichActivities(prompt);
 
     // Apply enriched context back to itinerary
     let contextIndex = 0;
