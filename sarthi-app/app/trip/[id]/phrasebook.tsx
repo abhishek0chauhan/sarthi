@@ -50,7 +50,21 @@ export default function PhrasebookScreen() {
       </View>
       <Text style={styles.title}>Phrasebook</Text>
 
-      {!phrasebook && !isLoading && (
+      {error && !phrasebook && (
+        <View style={styles.empty}>
+          <Text style={styles.errorText}>⚠️ Failed to load phrasebook</Text>
+          <Text style={styles.emptyText}>Try generating a new one or try again in a moment.</Text>
+          <Pressable
+            style={[styles.generateBtn, isGenerating && styles.generateBtnDisabled]}
+            onPress={() => generate()}
+            disabled={isGenerating}
+          >
+            <Text style={styles.generateBtnText}>{isGenerating ? 'Generating…' : '✨ Generate Phrasebook'}</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {!phrasebook && !isLoading && !error && (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>No phrasebook yet for this trip.</Text>
           <Pressable
@@ -107,6 +121,7 @@ function makeStyles(colors: Colors) {
     title: { fontSize: 22, fontFamily: 'Inter_800ExtraBold', color: colors.textPrimary, paddingHorizontal: 16, marginBottom: 8, letterSpacing: -0.5 },
     empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 },
     emptyText: { fontSize: 14, color: colors.textSecondary, textAlign: 'center' },
+    errorText: { fontSize: 16, fontFamily: 'Inter_700Bold', color: colors.textPrimary, textAlign: 'center' },
     generateBtn: { backgroundColor: colors.primary500, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 24 },
     generateBtnDisabled: { opacity: 0.5 },
     generateBtnText: { color: '#fff', fontFamily: 'Inter_700Bold', fontSize: 14 },
