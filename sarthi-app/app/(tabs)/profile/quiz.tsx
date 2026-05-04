@@ -131,6 +131,7 @@ function OptionRow({ label, selected, onPress, isMultiSelect }: OptionRowProps) 
       accessibilityState={{ selected }}
       onPress={onPress}
       style={({ pressed }) => ({
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -139,7 +140,6 @@ function OptionRow({ label, selected, onPress, isMultiSelect }: OptionRowProps) 
         borderRadius: 12,
         borderWidth: 2,
         minHeight: 52,
-        marginBottom: 0,
         backgroundColor: selected ? '#E8601C' : '#F5EFE6',
         borderColor: selected ? '#E8601C' : '#EDE5D8',
         opacity: pressed ? 0.75 : 1,
@@ -202,7 +202,7 @@ function QuestionCard({
   return (
     <View style={styles.questionCard}>
       <Text style={styles.questionText}>{question.question}</Text>
-      <View style={styles.optionsContainer}>
+      <View style={{ gap: 10, flexDirection: 'column' }}>
         {question.options.map((option) => {
           const isSelected = isMultiSelect
             ? Array.isArray(selectedValue) && selectedValue.includes(option.key)
