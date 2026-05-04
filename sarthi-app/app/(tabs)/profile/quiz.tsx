@@ -357,7 +357,7 @@ export default function QuizScreen() {
         </View>
 
         {/* Save button */}
-        <View style={{ paddingHorizontal: 24, marginBottom: 24, marginTop: 24 }}>
+        <View style={{ paddingHorizontal: 24, marginBottom: 12, marginTop: 12 }}>
           <Pressable
             accessible
             accessibilityLabel="Save profile"
