@@ -115,46 +115,48 @@ const QUIZ_QUESTIONS: Question[] = [
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-interface ChipProps {
+interface OptionRowProps {
   label: string;
   selected: boolean;
   onPress: () => void;
   colors: Colors;
   styles: ReturnType<typeof makeStyles>;
+  isMultiSelect: boolean;
 }
 
-function Chip({ label, selected, onPress, colors, styles }: ChipProps) {
+function OptionRow({ label, selected, onPress, colors, styles, isMultiSelect }: OptionRowProps) {
   return (
     <Pressable
       accessible
       accessibilityLabel={label}
-      accessibilityRole="radio"
+      accessibilityRole={isMultiSelect ? 'checkbox' : 'radio'}
       accessibilityState={{ selected }}
       style={({ pressed }) => [
-        styles.chip,
-        selected && {
-          backgroundColor: colors.primary500,
-          borderColor: colors.primary500,
-        },
-        !selected && {
-          backgroundColor: colors.bgCard,
-          borderColor: colors.textSecondary,
-        },
-        pressed && { opacity: 0.8 },
+        styles.optionRow,
+        selected
+          ? { backgroundColor: colors.primary500, borderColor: colors.primary500 }
+          : { backgroundColor: colors.bgSurface, borderColor: colors.border },
+        pressed && { opacity: 0.75 },
       ]}
       onPress={onPress}
     >
-      <View style={styles.chipContent}>
-        {selected && <Text style={styles.chipCheckmark}>✓</Text>}
-        <Text
-          style={[
-            styles.chipText,
-            selected && { color: colors.textInverse },
-            !selected && { color: colors.textPrimary },
-          ]}
-        >
-          {label}
-        </Text>
+      <Text
+        style={[
+          styles.optionLabel,
+          { color: selected ? '#FFFFFF' : colors.textPrimary },
+        ]}
+      >
+        {label}
+      </Text>
+      <View
+        style={[
+          styles.optionIndicator,
+          selected
+            ? { backgroundColor: 'rgba(255,255,255,0.3)', borderColor: 'rgba(255,255,255,0.6)' }
+            : { backgroundColor: 'transparent', borderColor: colors.textTertiary },
+        ]}
+      >
+        {selected && <Text style={styles.optionCheckmark}>✓</Text>}
       </View>
     </Pressable>
   );
@@ -177,7 +179,7 @@ function QuestionCard({
   styles,
   isMultiSelect,
 }: QuestionCardProps) {
-  const handleChipPress = (optionKey: string) => {
+  const handleOptionPress = (optionKey: string) => {
     if (isMultiSelect) {
       const currentArray = Array.isArray(selectedValue) ? selectedValue : [];
       const newArray = currentArray.includes(optionKey)
@@ -190,7 +192,7 @@ function QuestionCard({
   };
 
   return (
-    <View style={[styles.questionCard, { backgroundColor: colors.bgCard, borderColor: colors.border }]}>
+    <View style={styles.questionCard}>
       <Text style={styles.questionText}>{question.question}</Text>
       <View style={styles.optionsContainer}>
         {question.options.map((option) => {
@@ -199,13 +201,14 @@ function QuestionCard({
             : selectedValue === option.key;
 
           return (
-            <Chip
+            <OptionRow
               key={option.key}
               label={option.label}
               selected={isSelected}
-              onPress={() => handleChipPress(option.key)}
+              onPress={() => handleOptionPress(option.key)}
               colors={colors}
               styles={styles}
+              isMultiSelect={isMultiSelect}
             />
           );
         })}
@@ -427,57 +430,56 @@ function makeStyles(colors: Colors) {
     // Question card
     questionCard: {
       backgroundColor: colors.bgCard,
-      borderRadius: 12,
+      borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.border,
       paddingHorizontal: 16,
-      paddingVertical: 20,
-      gap: 14,
+      paddingTop: 18,
+      paddingBottom: 16,
+      gap: 10,
     },
     questionText: {
       ...type.body,
       color: colors.textPrimary,
       fontFamily: 'Inter_600SemiBold',
       lineHeight: 22,
+      marginBottom: 4,
     },
     optionsContainer: {
-      gap: 12,
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      paddingVertical: 4,
+      gap: 8,
     },
 
-    // Chip
-    chip: {
-      paddingVertical: 10,
-      paddingHorizontal: 14,
-      borderRadius: 22,
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: 40,
-      borderWidth: 2,
-      elevation: 2,
-    },
-    chipContent: {
+    // Option rows
+    optionRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      justifyContent: 'space-between',
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      minHeight: 52,
     },
-    chipCheckmark: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: 'white',
+    optionLabel: {
+      ...type.body,
+      fontFamily: 'Inter_500Medium',
+      fontSize: 15,
+      flex: 1,
     },
-    chipPressed: {
-      opacity: 0.75,
+    optionIndicator: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 12,
     },
-    chipText: {
-      ...type.caption,
-      fontFamily: 'Inter_600SemiBold',
+    optionCheckmark: {
       fontSize: 13,
-      fontWeight: '600',
-      lineHeight: 18,
+      fontWeight: '700',
+      color: '#FFFFFF',
+      lineHeight: 16,
     },
 
     // Loading state
