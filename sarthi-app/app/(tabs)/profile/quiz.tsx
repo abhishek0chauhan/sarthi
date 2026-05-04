@@ -357,26 +357,32 @@ export default function QuizScreen() {
         </View>
 
         {/* Save button */}
-        <View style={styles.buttonContainer}>
+        <View style={{ paddingHorizontal: 24, marginBottom: 24, marginTop: 16 }}>
           <Pressable
             accessible
             accessibilityLabel="Save profile"
             accessibilityHint="Saves your personality profile with current answers"
             accessibilityRole="button"
-            style={({ pressed }) => [
-              styles.saveButton,
-              { backgroundColor: colors.primary500, opacity: submitQuizMutation.isPending ? 0.6 : pressed ? 0.8 : 1 },
-            ]}
+            style={({ pressed }) => ({
+              backgroundColor: '#E8601C',
+              paddingVertical: 16,
+              paddingHorizontal: 16,
+              borderRadius: 14,
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 54,
+              opacity: submitQuizMutation.isPending ? 0.6 : pressed ? 0.8 : 1,
+            })}
             onPress={handleSaveProfile}
             disabled={submitQuizMutation.isPending}
           >
             {submitQuizMutation.isPending ? (
-              <View style={styles.buttonContent}>
-                <ActivityIndicator size="small" color={colors.textInverse} />
-                <Text style={styles.saveButtonText}>Saving...</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ActivityIndicator size="small" color="#FFFFFF" />
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Saving...</Text>
               </View>
             ) : (
-              <Text style={styles.saveButtonText}>Save Profile</Text>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Save Profile</Text>
             )}
           </Pressable>
         </View>
