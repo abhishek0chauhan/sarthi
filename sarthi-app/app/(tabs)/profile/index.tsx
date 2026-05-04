@@ -85,10 +85,25 @@ export default function ProfileScreen() {
   // Calculate trip stats
   const tripCount = trips.length;
   const daysPlanned = trips.reduce((sum, trip) => {
-    const itinerary = (trip.itineraryData as any)?.itinerary ?? [];
+    // Try itineraryData first (enriched trips)
+    const itineraryData = (trip.itineraryData as any);
+    const itinerary = itineraryData?.itinerary ?? [];
+
+    // Fallback: check trip dates for rough day count
+    if (itinerary.length === 0 && trip.dates) {
+      try {
+        const from = new Date(trip.dates.from);
+        const to = new Date(trip.dates.to);
+        const dayCount = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        return sum + (dayCount > 0 ? dayCount : 0);
+      } catch {
+        return sum;
+      }
+    }
+
     return sum + itinerary.length;
   }, 0);
-  const sharedCount = trips.filter((trip) => trip.isShared).length;
+  const sharedCount = trips.filter((trip) => (trip as any).isShared).length;
 
   const initial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase();
 
