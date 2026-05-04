@@ -8,6 +8,7 @@ import { authService } from '@/services/auth.service';
 import { useThemeStore } from '@/stores/theme.store';
 import { useColors } from '@/hooks/useColorScheme';
 import { useProfile } from '@/hooks/useProfile';
+import { useTrips } from '@/hooks/useTrips';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import { apiRequest } from '@/services/api';
@@ -73,12 +74,21 @@ export default function ProfileScreen() {
   const styles = makeStyles(colors);
   const router = useRouter();
   const { data: profile } = useProfile();
+  const { data: trips = [] } = useTrips();
 
   // OLD: const [notifs, setNotifs] = useState(true);
   // NEW: Separate toggles for morning briefing and meal nudges
   const [morningBriefing, setMorningBriefing] = useState(true);
   const [mealNudges, setMealNudges] = useState(true);
   const [prefsLoading, setPrefsLoading] = useState(true);
+
+  // Calculate trip stats
+  const tripCount = trips.length;
+  const daysPlanned = trips.reduce((sum, trip) => {
+    const itinerary = (trip.itineraryData as any)?.itinerary ?? [];
+    return sum + itinerary.length;
+  }, 0);
+  const sharedCount = trips.filter((trip) => trip.isShared).length;
 
   const initial = (user?.displayName?.[0] ?? user?.email?.[0] ?? '?').toUpperCase();
 
@@ -140,17 +150,17 @@ export default function ProfileScreen() {
         {/* ── Stats row ── */}
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{tripCount}</Text>
             <Text style={styles.statLabel}>Trips</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{daysPlanned}</Text>
             <Text style={styles.statLabel}>Days Planned</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{sharedCount}</Text>
             <Text style={styles.statLabel}>Shared</Text>
           </View>
         </View>
