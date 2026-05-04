@@ -83,14 +83,15 @@ export default function TripChatScreen() {
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={88}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView
           ref={scrollRef}
           style={styles.messageList}
           contentContainerStyle={styles.messageContent}
           onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+          scrollEnabled={true}
         >
           {!messages?.length && (
             <View style={styles.emptyChat}>
@@ -124,6 +125,7 @@ export default function TripChatScreen() {
             multiline
             returnKeyType="send"
             onSubmitEditing={handleSend}
+            onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100)}
           />
           <Pressable
             style={[styles.sendBtn, isSending && styles.sendBtnDisabled]}
