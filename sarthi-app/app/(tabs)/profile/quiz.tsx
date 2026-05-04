@@ -119,32 +119,52 @@ interface OptionRowProps {
   label: string;
   selected: boolean;
   onPress: () => void;
-  colors: Colors;
-  styles: ReturnType<typeof makeStyles>;
   isMultiSelect: boolean;
 }
 
-function OptionRow({ label, selected, onPress, colors, styles, isMultiSelect }: OptionRowProps) {
+function OptionRow({ label, selected, onPress, isMultiSelect }: OptionRowProps) {
   return (
     <Pressable
       accessible
       accessibilityLabel={label}
       accessibilityRole={isMultiSelect ? 'checkbox' : 'radio'}
       accessibilityState={{ selected }}
-      style={({ pressed }) => [
-        styles.optionRow,
-        selected
-          ? styles.optionRowSelected
-          : styles.optionRowUnselected,
-        pressed && styles.optionRowPressed,
-      ]}
       onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        borderWidth: 2,
+        minHeight: 52,
+        marginBottom: 0,
+        backgroundColor: selected ? '#E8601C' : '#F5EFE6',
+        borderColor: selected ? '#E8601C' : '#EDE5D8',
+        opacity: pressed ? 0.75 : 1,
+      })}
     >
-      <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>
+      <Text style={{
+        fontSize: 15,
+        fontWeight: '600',
+        color: selected ? '#FFFFFF' : '#1A1208',
+        flex: 1,
+      }}>
         {label}
       </Text>
-      <View style={[styles.optionIndicator, selected && styles.optionIndicatorSelected]}>
-        {selected && <Text style={styles.optionCheckmark}>✓</Text>}
+      <View style={{
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: selected ? 'rgba(255,255,255,0.7)' : '#C4B5A5',
+        backgroundColor: selected ? 'rgba(255,255,255,0.25)' : 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 12,
+      }}>
+        {selected && <Text style={{ fontSize: 13, fontWeight: '800', color: '#FFFFFF' }}>✓</Text>}
       </View>
     </Pressable>
   );
@@ -194,8 +214,6 @@ function QuestionCard({
               label={option.label}
               selected={isSelected}
               onPress={() => handleOptionPress(option.key)}
-              colors={colors}
-              styles={styles}
               isMultiSelect={isMultiSelect}
             />
           );
