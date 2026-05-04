@@ -222,30 +222,70 @@ interface TravelerProfileSnapshot {
 
 ## Implementation Details
 
-### Session Profile Caching
+### Session Management & Persistence
 
-When `activate_guide` is received:
-1. Fetch user profile from `ProfileService`
-2. Store in `LiveGuideSession` entity or memory cache
-3. TTL: Duration of live guide session
-4. Avoids repeated profile fetches; improves performance
+**Profile Caching:**
+1. On `activate_guide` event: fetch user profile → cache in `LiveGuideSession`
+2. TTL: Duration of live guide session
+3. Avoids repeated profile fetches; improves performance
+
+**Scheduled Activities Persistence:**
+1. On guide activation: calculate all activities for today → store in `ActivitySchedule` table
+   ```sql
+   CREATE TABLE activity_schedules (
+     id UUID PRIMARY KEY,
+     sessionId UUID FOREIGN KEY,
+     tripId UUID,
+     userId UUID,
+     dayIndex INT,
+     activityIndex INT,
+     scheduledTime TIMESTAMP,
+     distance INT,
+     estimatedTravelTime INT,
+     notificationSent BOOLEAN DEFAULT FALSE,
+     createdAt TIMESTAMP
+   );
+   ```
+2. When notification is sent: set `notificationSent = TRUE` + store idempotency key
+3. On reconnect: query `ActivitySchedule` for this trip → compare with sent times → only resend unsent
+4. Cleanup: delete schedules older than 24 hours (old trips)
 
 ### Travel Time Calculation
 
+**Primary method:** Use Google Maps Distance Matrix API (accounts for actual roads, traffic, transit)
+
+**Fallback method** (if API unavailable):
 ```typescript
-function calculateTravelTime(distanceMeters: number, userPace: string): number {
-  const avgWalkingSpeed = 1.4; // m/s (5 km/h)
-  const baseTravelTime = (distanceMeters / avgWalkingSpeed) / 60; // minutes
+function calculateTravelTime(
+  distanceMeters: number, 
+  userPace: string, 
+  transportMode?: 'car' | 'taxi' | 'public_transit' | 'walking'
+): number {
+  // Speed estimates (meters/second)
+  const speeds = {
+    'walking': 1.4,           // 5 km/h
+    'public_transit': 8.3,    // 30 km/h (including waits)
+    'taxi': 8.3,              // 30 km/h (typical Mumbai traffic)
+    'car': 11.1               // 40 km/h (typical city driving)
+  };
+  
+  const speed = speeds[transportMode || 'walking'];
+  const baseTravelTime = (distanceMeters / speed) / 60; // minutes
   
   const bufferMultipliers = {
-    'packed': 1.2,
-    'loose': 1.1,
-    'no_plan': 1.0
+    'packed': 1.2,    // +20% buffer for preparation time
+    'loose': 1.1,     // +10% buffer
+    'no_plan': 1.0    // No buffer
   };
   
   return Math.ceil(baseTravelTime * (bufferMultipliers[userPace] || 1.0));
 }
 ```
+
+**Transport mode selection:**
+- Use `trip.travelMode` if available (from trip creation)
+- Default to `public_transit` for Indian cities
+- Can be overridden by user preference in profile (future enhancement)
 
 ### AI Prompt for Location Suggestions
 
@@ -268,11 +308,28 @@ Example: *"For a traveler who loves culture & history, moderate budget, and has 
 | No places found | Don't send suggestion (avoid empty state) |
 | Profile fetch fails | Use empty profile (no personalization, but still suggest) |
 
-### Rate Limiting
+### Rate Limiting & Deduplication
 
-- **Activity notifications:** 1 per activity (no duplicates)
-- **Location suggestions:** Max 1 per hour per session
-- **Profile fetches:** Once per session (cached)
+**Activity Notifications:**
+- 1 per activity (no duplicates)
+- Use idempotency key: `{tripId}:{dayIndex}:{activityIndex}:{scheduledTime}`
+- Store sent notifications in `ActivitySchedule.notificationSent` flag
+- On reconnect: only resend if `notificationSent = FALSE` AND scheduled time has passed
+
+**Location Suggestions:**
+- Max 1 per hour per session (or when user moves >500m from last suggestion point)
+- Track in session: `lastSuggestionTime` + `lastSuggestionLocation`
+- Only generate if: `now - lastSuggestionTime >= 3600000ms` OR `distance > 500m`
+- Use deduplication: don't suggest same place twice in same session
+
+**Profile Fetches:**
+- Once per session (cached)
+- TTL: Duration of guide session
+
+**AI Cost Optimization:**
+- For location suggestions: queue up to 3 suggestions, display 1 per hour
+- Batch AI calls instead of calling for every location update
+- Expected cost: ~$0.05-0.10 per active session (10+ suggestion batches × $0.005-0.010 per call)
 
 ---
 
