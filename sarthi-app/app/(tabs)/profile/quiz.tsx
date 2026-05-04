@@ -134,28 +134,16 @@ function OptionRow({ label, selected, onPress, colors, styles, isMultiSelect }: 
       style={({ pressed }) => [
         styles.optionRow,
         selected
-          ? { backgroundColor: colors.primary500, borderColor: colors.primary500 }
-          : { backgroundColor: colors.bgSurface, borderColor: colors.border },
-        pressed && { opacity: 0.75 },
+          ? styles.optionRowSelected
+          : styles.optionRowUnselected,
+        pressed && styles.optionRowPressed,
       ]}
       onPress={onPress}
     >
-      <Text
-        style={[
-          styles.optionLabel,
-          { color: selected ? '#FFFFFF' : colors.textPrimary },
-        ]}
-      >
+      <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>
         {label}
       </Text>
-      <View
-        style={[
-          styles.optionIndicator,
-          selected
-            ? { backgroundColor: 'rgba(255,255,255,0.3)', borderColor: 'rgba(255,255,255,0.6)' }
-            : { backgroundColor: 'transparent', borderColor: colors.textTertiary },
-        ]}
-      >
+      <View style={[styles.optionIndicator, selected && styles.optionIndicatorSelected]}>
         {selected && <Text style={styles.optionCheckmark}>✓</Text>}
       </View>
     </Pressable>
@@ -443,13 +431,13 @@ function makeStyles(colors: Colors) {
       color: colors.textPrimary,
       fontFamily: 'Inter_600SemiBold',
       lineHeight: 22,
-      marginBottom: 4,
+      marginBottom: 2,
     },
     optionsContainer: {
       gap: 8,
     },
 
-    // Option rows
+    // Option row — base
     optionRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -460,26 +448,52 @@ function makeStyles(colors: Colors) {
       borderWidth: 1.5,
       minHeight: 52,
     },
+    optionRowUnselected: {
+      backgroundColor: colors.bgSurface,
+      borderColor: colors.border,
+    },
+    optionRowSelected: {
+      backgroundColor: colors.primary500,
+      borderColor: colors.primary500,
+    },
+    optionRowPressed: {
+      opacity: 0.75,
+    },
+
+    // Option label
     optionLabel: {
       ...type.body,
       fontFamily: 'Inter_500Medium',
       fontSize: 15,
+      color: colors.textPrimary,
       flex: 1,
     },
+    optionLabelSelected: {
+      color: '#FFFFFF',
+      fontFamily: 'Inter_600SemiBold',
+    },
+
+    // Circle indicator
     optionIndicator: {
       width: 24,
       height: 24,
       borderRadius: 12,
       borderWidth: 2,
+      borderColor: colors.textTertiary,
+      backgroundColor: 'transparent',
       alignItems: 'center',
       justifyContent: 'center',
       marginLeft: 12,
     },
+    optionIndicatorSelected: {
+      borderColor: 'rgba(255,255,255,0.7)',
+      backgroundColor: 'rgba(255,255,255,0.25)',
+    },
     optionCheckmark: {
       fontSize: 13,
-      fontWeight: '700',
+      fontWeight: '800',
       color: '#FFFFFF',
-      lineHeight: 16,
+      lineHeight: 15,
     },
 
     // Loading state
@@ -500,12 +514,12 @@ function makeStyles(colors: Colors) {
       marginBottom: 8,
     },
     saveButton: {
-      paddingVertical: 14,
+      paddingVertical: 16,
       paddingHorizontal: 16,
-      borderRadius: 12,
+      borderRadius: 14,
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: 48,
+      minHeight: 54,
     },
     buttonContent: {
       flexDirection: 'row',
@@ -514,8 +528,9 @@ function makeStyles(colors: Colors) {
     },
     saveButtonText: {
       ...type.body,
-      color: colors.textInverse,
-      fontFamily: 'Inter_600SemiBold',
+      color: '#FFFFFF',
+      fontFamily: 'Inter_700Bold',
+      fontSize: 16,
     },
   });
 }

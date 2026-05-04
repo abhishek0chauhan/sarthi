@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sarthi Quiz Screen — Design Options</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Inter', sans-serif;
+    background: #1A1208;
+    display: flex;
+    gap: 32px;
+    padding: 32px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    flex-wrap: wrap;
+  }
+
+  /* ── Phone frame ── */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .label { color: #F5E6D3; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .chosen { color: #E8601C; }
+  .phone {
+    width: 375px;
+    height: 780px;
+    background: #FDF8F0;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .phone-inner::-webkit-scrollbar { display: none; }
+
+  /* ── Common header ── */
+  .back { padding: 16px 24px 4px; }
+  .back a { color: #E8601C; font-size: 15px; font-weight: 600; text-decoration: none; }
+  .screen-title { padding: 8px 24px 4px; font-size: 28px; font-weight: 800; color: #1A1208; }
+  .screen-sub { padding: 0 24px 20px; font-size: 14px; color: #A0856E; }
+  .questions { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Question card ── */
+  .q-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #EDE5D8;
+    padding: 18px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .q-text { font-size: 15px; font-weight: 700; color: #1A1208; line-height: 1.4; }
+  .save-wrap { padding: 20px 20px 8px; }
+  .save-btn {
+    background: #E8601C;
+    border-radius: 14px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* ══════════════════════════════════════
+     DESIGN A — Pill chips (wrap layout)
+     ══════════════════════════════════════ */
+  .a-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .a-chip {
+    padding: 10px 16px;
+    border-radius: 100px;
+    border: 1.5px solid #EDE5D8;
+    background: #F5EFE6;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1A1208;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .a-chip.sel {
+    background: #E8601C;
+    border-color: #E8601C;
+    color: #FFFFFF;
+  }
+
+  /* ══════════════════════════════════════
+     DESIGN B — Full-width rows with radio
+     ══════════════════════════════════════ */
+  .b-options { display: flex; flex-direction: column; gap: 8px; }
+  .b-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #EDE5D8;
+    background: #F5EFE6;
+    cursor: pointer;
+    min-height: 50px;
+  }
+  .b-row.sel {
+    background: #E8601C;
+    border-color: #E8601C;
+  }
+  .b-label { font-size: 15px; font-weight: 600; color: #1A1208; }
+  .b-row.sel .b-label { color: #FFFFFF; }
+  .b-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #C4B5A5;
+    background: transparent;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .b-row.sel .b-dot {
+    border-color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.25);
+    color: #FFFFFF;
+    font-weight: 800;
+  }
+
+  /* ══════════════════════════════════════
+     DESIGN C — Card grid (2 columns)
+     ══════════════════════════════════════ */
+  .c-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .c-card {
+    background: #F5EFE6;
+    border: 1.5px solid #EDE5D8;
+    border-radius: 12px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    min-height: 60px;
+    position: relative;
+  }
+  .c-card.sel {
+    background: #FEF0E6;
+    border-color: #E8601C;
+    border-width: 2px;
+  }
+  .c-icon { font-size: 20px; }
+  .c-label { font-size: 13px; font-weight: 600; color: #1A1208; line-height: 1.3; }
+  .c-card.sel .c-label { color: #E8601C; }
+  .c-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #E8601C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #FFFFFF;
+    font-weight: 800;
+  }
+
+  /* ══════════════════════════════════════
+     DESIGN D — Left icon + check toggle
+     ══════════════════════════════════════ */
+  .d-options { display: flex; flex-direction: column; gap: 0; border-radius: 12px; overflow: hidden; border: 1px solid #EDE5D8; }
+  .d-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #FFFFFF;
+    cursor: pointer;
+    border-bottom: 1px solid #EDE5D8;
+    min-height: 52px;
+  }
+  .d-row:last-child { border-bottom: none; }
+  .d-row.sel { background: #FEF0E6; }
+  .d-radio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #C4B5A5;
+    background: transparent;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .d-row.sel .d-radio {
+    border-color: #E8601C;
+    background: #E8601C;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .d-label { font-size: 15px; font-weight: 600; color: #1A1208; }
+  .d-row.sel .d-label { color: #E8601C; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ DESIGN A ═══ -->
+<div class="phone-wrap">
+  <div class="label">Design A — Pill Chips</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="back"><a>← Traveler Personality</a></div>
+      <div class="screen-title">Quick Questions</div>
+      <div class="screen-sub">9 questions · ~2 min</div>
+      <div class="questions">
+
+        <div class="q-card">
+          <div class="q-text">How do you prefer to structure your trips?</div>
+          <div class="a-options">
+            <div class="a-chip">Packed schedule</div>
+            <div class="a-chip sel">Loose plan ✓</div>
+            <div class="a-chip">No plan</div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What's your travel style?</div>
+          <div class="a-options">
+            <div class="a-chip">Deep explorer</div>
+            <div class="a-chip">Balanced</div>
+            <div class="a-chip">Cover as much as possible</div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">Where do you prefer to stay?</div>
+          <div class="a-options">
+            <div class="a-chip sel">Hotel ✓</div>
+            <div class="a-chip">Homestay</div>
+            <div class="a-chip">Rough it</div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What motivates you to travel? <span style="font-weight:400;color:#A0856E">(pick all that apply)</span></div>
+          <div class="a-options">
+            <div class="a-chip sel">Adventure ✓</div>
+            <div class="a-chip">Culture</div>
+            <div class="a-chip sel">Nature ✓</div>
+            <div class="a-chip">Food</div>
+            <div class="a-chip">Relaxation</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-wrap"><div class="save-btn">Save Profile</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DESIGN B ═══ -->
+<div class="phone-wrap">
+  <div class="label">Design B — Full-width Rows</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="back"><a>← Traveler Personality</a></div>
+      <div class="screen-title">Quick Questions</div>
+      <div class="screen-sub">9 questions · ~2 min</div>
+      <div class="questions">
+
+        <div class="q-card">
+          <div class="q-text">How do you prefer to structure your trips?</div>
+          <div class="b-options">
+            <div class="b-row"><span class="b-label">Packed schedule</span><div class="b-dot"></div></div>
+            <div class="b-row sel"><span class="b-label">Loose plan</span><div class="b-dot">✓</div></div>
+            <div class="b-row"><span class="b-label">No plan</span><div class="b-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What's your travel style?</div>
+          <div class="b-options">
+            <div class="b-row"><span class="b-label">Deep explorer</span><div class="b-dot"></div></div>
+            <div class="b-row"><span class="b-label">Balanced</span><div class="b-dot"></div></div>
+            <div class="b-row"><span class="b-label">Cover as much as possible</span><div class="b-dot"></div></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What motivates you? <span style="font-weight:400;color:#A0856E">(pick all)</span></div>
+          <div class="b-options">
+            <div class="b-row sel"><span class="b-label">Adventure & thrill</span><div class="b-dot">✓</div></div>
+            <div class="b-row"><span class="b-label">Culture & history</span><div class="b-dot"></div></div>
+            <div class="b-row sel"><span class="b-label">Nature & landscapes</span><div class="b-dot">✓</div></div>
+            <div class="b-row"><span class="b-label">Food & cuisine</span><div class="b-dot"></div></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-wrap"><div class="save-btn">Save Profile</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DESIGN C ═══ -->
+<div class="phone-wrap">
+  <div class="label">Design C — 2-Column Cards</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="back"><a>← Traveler Personality</a></div>
+      <div class="screen-title">Quick Questions</div>
+      <div class="screen-sub">9 questions · ~2 min</div>
+      <div class="questions">
+
+        <div class="q-card">
+          <div class="q-text">How do you prefer to structure your trips?</div>
+          <div class="c-options">
+            <div class="c-card"><div class="c-label">Packed schedule</div></div>
+            <div class="c-card sel"><div class="c-check">✓</div><div class="c-label">Loose plan</div></div>
+            <div class="c-card"><div class="c-label">No plan</div></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What's your travel style?</div>
+          <div class="c-options">
+            <div class="c-card"><div class="c-label">Deep explorer</div></div>
+            <div class="c-card sel"><div class="c-check">✓</div><div class="c-label">Balanced</div></div>
+            <div class="c-card"><div class="c-label">Cover as much as possible</div></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What motivates you? <span style="font-weight:400;color:#A0856E">(pick all)</span></div>
+          <div class="c-options">
+            <div class="c-card sel"><div class="c-check">✓</div><div class="c-label">Adventure & thrill</div></div>
+            <div class="c-card"><div class="c-label">Culture & history</div></div>
+            <div class="c-card sel"><div class="c-check">✓</div><div class="c-label">Nature & landscapes</div></div>
+            <div class="c-card"><div class="c-label">Food & cuisine</div></div>
+            <div class="c-card"><div class="c-label">Relaxation & escape</div></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-wrap"><div class="save-btn">Save Profile</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DESIGN D ═══ -->
+<div class="phone-wrap">
+  <div class="label">Design D — Grouped List</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="back"><a>← Traveler Personality</a></div>
+      <div class="screen-title">Quick Questions</div>
+      <div class="screen-sub">9 questions · ~2 min</div>
+      <div class="questions">
+
+        <div class="q-card">
+          <div class="q-text">How do you prefer to structure your trips?</div>
+          <div class="d-options">
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Packed schedule</span></div>
+            <div class="d-row sel"><div class="d-radio">✓</div><span class="d-label">Loose plan</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">No plan</span></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What's your travel style?</div>
+          <div class="d-options">
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Deep explorer</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Balanced</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Cover as much as possible</span></div>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-text">What motivates you? <span style="font-weight:400;color:#A0856E">(pick all)</span></div>
+          <div class="d-options">
+            <div class="d-row sel"><div class="d-radio">✓</div><span class="d-label">Adventure & thrill</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Culture & history</span></div>
+            <div class="d-row sel"><div class="d-radio">✓</div><span class="d-label">Nature & landscapes</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Food & cuisine</span></div>
+            <div class="d-row"><div class="d-radio"></div><span class="d-label">Relaxation</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="save-wrap"><div class="save-btn">Save Profile</div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
