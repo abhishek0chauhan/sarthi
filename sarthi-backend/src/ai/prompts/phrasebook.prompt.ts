@@ -1,11 +1,74 @@
 export function buildPhrasebookPrompt(destination: string, state: string): { system: string; user: string } {
   return {
-    system: 'You are a travel language assistant specializing in Indian regional languages and local travel culture.',
-    user: `Generate a practical travel phrasebook for ${destination}, ${state}.
+    system: `You are an expert travel language guide for India with deep knowledge of regional languages, local idioms, and authentic travel phrases.
+Your goal is to provide REAL, COMMONLY-USED phrases that travelers will actually hear and use - not direct word-for-word translations.
+Prioritize accuracy and authenticity over literal translation.`,
+    user: `Generate an authentic, practical travel phrasebook for ${destination}, ${state}.
 
-Include 3 phrases per category. Transliterate local language into Latin script for easy reading. Keep pronunciation guides simple (e.g. "khoo-blay" not IPA).
+**CRITICAL REQUIREMENTS:**
+1. Use ONLY authentic phrases that locals actually say - not direct English-to-language translations
+2. Include context for when/where each phrase is used
+3. For food: include actual local dish names, food stall phrases, and market haggling language
+4. For directions: use real phrases locals understand (not formal textbook language)
+5. For greetings: include formal, casual, and regional variations
+6. Provide phonetic guides that are EASY to pronounce (not IPA notation)
+7. Include 4 phrases per category (not 3)
 
-Respond ONLY with a JSON object in exactly this format (no extra text):
-{"result":{"language":"<local language name>","script":"<writing system if non-Latin, else omit>","greeting":[{"english":"<phrase>","local":"<transliterated>","pronunciation":"<phonetic guide>"}],"food":[{"english":"<phrase>","local":"<transliterated>","pronunciation":"<phonetic guide>"}],"directions":[{"english":"<phrase>","local":"<transliterated>","pronunciation":"<phonetic guide>"}],"emergency":[{"english":"<phrase>","local":"<transliterated>","pronunciation":"<phonetic guide>"}],"bargaining":[{"english":"<phrase>","local":"<transliterated>","pronunciation":"<phonetic guide>"}],"culturalNotes":["<important cultural note for visitors>"]}}`,
+**EXAMPLE OF GOOD PHRASE:**
+- BAD: "Hello" → "Namaste" (too formal, not how travelers speak)
+- GOOD: "Hello" → "Kya hal hai?" (actual greeting, with context: "casual, friendly way to greet shopkeepers")
+
+**Respond with ONLY a valid JSON object (no markdown, no extra text):**
+{
+  "result": {
+    "language": "<local language name e.g. Marathi, Hindi>",
+    "destination": "${destination}",
+    "greeting": [
+      {
+        "english": "<traveler phrase>",
+        "local": "<transliterated - easy to read>",
+        "pronunciation": "<phonetic guide>",
+        "context": "<when/where to use this>"
+      }
+    ],
+    "food": [
+      {
+        "english": "<food-related phrase or dish name>",
+        "local": "<transliterated>",
+        "pronunciation": "<phonetic guide>",
+        "context": "<e.g. 'used in food stalls or restaurants'>"
+      }
+    ],
+    "directions": [
+      {
+        "english": "<direction phrase>",
+        "local": "<transliterated>",
+        "pronunciation": "<phonetic guide>",
+        "context": "<how locals say this>"
+      }
+    ],
+    "emergency": [
+      {
+        "english": "<emergency phrase>",
+        "local": "<transliterated>",
+        "pronunciation": "<phonetic guide>",
+        "context": "<important context>"
+      }
+    ],
+    "bargaining": [
+      {
+        "english": "<haggling phrase>",
+        "local": "<transliterated>",
+        "pronunciation": "<phonetic guide>",
+        "context": "<used in markets, street vendors, etc.>"
+      }
+    ],
+    "culturalNotes": [
+      "<authentic cultural insight for ${destination}>",
+      "<regional custom or etiquette tip>",
+      "<practical advice for travelers>"
+    ]
+  }
+}`,
   };
 }

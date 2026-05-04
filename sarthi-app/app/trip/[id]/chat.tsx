@@ -42,8 +42,14 @@ export default function TripChatScreen() {
   const colors = useColors();
   const styles = makeStyles(colors);
 
-  // Merge actual messages with optimistic user messages
-  const displayMessages = [...messages, ...optimisticMessages];
+  // Merge actual messages with optimistic user messages, strip out system metadata
+  const displayMessages = [...messages, ...optimisticMessages]
+    .map(msg => ({
+      ...msg,
+      // Remove personalMatch JSON from content (system metadata, not for users)
+      content: msg.content?.replace(/[\n\s]*"?personalMatch"?\s*:\s*\{[\s\S]*?\}\s*$/, '').trim() || ''
+    }))
+    .filter(msg => msg.content);
 
   const handleSend = () => {
     const text = input.trim();

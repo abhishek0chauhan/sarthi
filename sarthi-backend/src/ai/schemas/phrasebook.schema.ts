@@ -4,10 +4,12 @@ const phraseSchema = z.object({
   english: z.string(),
   local: z.string(),
   pronunciation: z.string(),
+  context: z.string().optional(),
 });
 
 export const phrasebookSchema = z.object({
   language: z.string(),
+  destination: z.string().optional(),
   script: z.string().optional(),
   greeting: z.array(phraseSchema).default([]),
   food: z.array(phraseSchema).default([]),

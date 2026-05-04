@@ -26,7 +26,10 @@ export function ActivityCard({ activity, isLast, tripId, dayIndex, activityIndex
     const newSelection = selection === direction ? null : direction;
     setSelection(newSelection);
 
+    console.log('Thumbs pressed:', { tripId, dayIndex, activityIndex, newSelection });
+
     if (tripId && dayIndex !== undefined && activityIndex !== undefined && newSelection) {
+      console.log('Logging correction:', { tripId, type: newSelection === 'up' ? 'thumbs_up' : 'thumbs_down' });
       logCorrection({
         tripId,
         type: newSelection === 'up' ? 'thumbs_up' : 'thumbs_down',
@@ -36,6 +39,8 @@ export function ActivityCard({ activity, isLast, tripId, dayIndex, activityIndex
           placeId: activity.placeId,
         },
       });
+    } else {
+      console.warn('Correction not sent - missing required fields:', { tripId, dayIndex, activityIndex, newSelection });
     }
   };
 
