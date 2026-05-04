@@ -125,47 +125,17 @@ interface OptionRowProps {
 function OptionRow({ label, selected, onPress, isMultiSelect }: OptionRowProps) {
   return (
     <Pressable
-      accessible
-      accessibilityLabel={label}
-      accessibilityRole={isMultiSelect ? 'checkbox' : 'radio'}
-      accessibilityState={{ selected }}
       onPress={onPress}
-      style={({ pressed }) => ({
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        borderRadius: 12,
-        borderWidth: 2,
-        minHeight: 52,
-        backgroundColor: selected ? '#E8601C' : '#F5EFE6',
-        borderColor: selected ? '#E8601C' : '#EDE5D8',
-        opacity: pressed ? 0.75 : 1,
-      })}
+      style={{
+        backgroundColor: selected ? '#FF0000' : '#00FF00',
+        padding: 16,
+        marginBottom: 8,
+        borderRadius: 8,
+      }}
     >
-      <Text style={{
-        fontSize: 15,
-        fontWeight: '600',
-        color: selected ? '#FFFFFF' : '#1A1208',
-        flex: 1,
-      }}>
-        {label}
+      <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' }}>
+        {label} {selected ? '✓ SELECTED' : ''}
       </Text>
-      <View style={{
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: selected ? 'rgba(255,255,255,0.7)' : '#C4B5A5',
-        backgroundColor: selected ? 'rgba(255,255,255,0.25)' : 'transparent',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 12,
-      }}>
-        {selected && <Text style={{ fontSize: 13, fontWeight: '800', color: '#FFFFFF' }}>✓</Text>}
-      </View>
     </Pressable>
   );
 }
