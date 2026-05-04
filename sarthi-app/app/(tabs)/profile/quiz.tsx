@@ -357,13 +357,13 @@ export default function QuizScreen() {
         </View>
 
         {/* Save button */}
-        <View style={{ paddingHorizontal: 24, marginBottom: 24, marginTop: 16 }}>
+        <View style={{ paddingHorizontal: 24, marginBottom: 24, marginTop: 24 }}>
           <Pressable
             accessible
             accessibilityLabel="Save profile"
             accessibilityHint="Saves your personality profile with current answers"
             accessibilityRole="button"
-            style={({ pressed }) => ({
+            style={{
               backgroundColor: '#E8601C',
               paddingVertical: 16,
               paddingHorizontal: 16,
@@ -371,19 +371,11 @@ export default function QuizScreen() {
               alignItems: 'center',
               justifyContent: 'center',
               minHeight: 54,
-              opacity: submitQuizMutation.isPending ? 0.6 : pressed ? 0.8 : 1,
-            })}
+            }}
             onPress={handleSaveProfile}
             disabled={submitQuizMutation.isPending}
           >
-            {submitQuizMutation.isPending ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Saving...</Text>
-              </View>
-            ) : (
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Save Profile</Text>
-            )}
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>Save Profile</Text>
           </Pressable>
         </View>
       </ScrollView>
