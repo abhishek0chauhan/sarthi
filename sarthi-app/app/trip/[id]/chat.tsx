@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { View, Text, ScrollView, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, ScrollView, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTrip } from '@/hooks/useTrips';
@@ -9,22 +9,65 @@ import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import type { ChatMessage } from '@/types/enrichment.types';
 
+function AnimatedLoader() {
+  const opacity = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.4, duration: 500, useNativeDriver: true }),
+      ])
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [opacity]);
+
+  return (
+    <Animated.View style={{ opacity }}>
+      <Text style={{ fontSize: 20, lineHeight: 24 }}>●●●</Text>
+    </Animated.View>
+  );
+}
+
 export default function TripChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: trip } = useTrip(id ?? '');
-  const { data: messages, isLoading } = useChatHistory(id ?? '');
+  const { data: messages = [], isLoading } = useChatHistory(id ?? '');
   const { mutate: sendMessage, isPending: isSending } = useSendChatMessage(id ?? '');
   const [input, setInput] = useState('');
+  const [optimisticMessages, setOptimisticMessages] = useState<ChatMessage[]>([]);
   const scrollRef = useRef<ScrollView>(null);
   const colors = useColors();
   const styles = makeStyles(colors);
 
+  // Merge actual messages with optimistic user messages
+  const displayMessages = [...messages, ...optimisticMessages];
+
   const handleSend = () => {
     const text = input.trim();
     if (!text) return;
+
+    // Show user message immediately
+    setOptimisticMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text,
+      timestamp: new Date().toISOString(),
+    } as ChatMessage]);
+
     setInput('');
-    sendMessage(text, { onSuccess: () => scrollRef.current?.scrollToEnd({ animated: true }) });
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+
+    // Send to API
+    sendMessage(text, {
+      onSuccess: () => {
+        // Clear optimistic messages after response
+        setOptimisticMessages([]);
+        setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+      },
+    });
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -54,7 +97,7 @@ export default function TripChatScreen() {
               <Text style={styles.emptyChatText}>Ask anything about your trip — itinerary, food, logistics, packing.</Text>
             </View>
           )}
-          {messages?.map((msg: ChatMessage) => (
+          {displayMessages.map((msg: ChatMessage) => (
             <View
               key={msg.id}
               style={[styles.bubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}
@@ -66,7 +109,7 @@ export default function TripChatScreen() {
           ))}
           {isSending && (
             <View style={[styles.bubble, styles.bubbleAssistant]}>
-              <Text style={styles.bubbleAssistantText}>…</Text>
+              <AnimatedLoader />
             </View>
           )}
         </ScrollView>
