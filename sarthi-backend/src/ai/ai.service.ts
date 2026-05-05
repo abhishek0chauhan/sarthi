@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateJson } from './generate-json';
 import { generateText } from 'ai';
@@ -40,6 +40,9 @@ import type { LocationSuggestionParams } from './prompts/live-suggestion.prompt'
 import { enrichmentWrapperSchema, enrichmentContextSchema } from './schemas/enrichment.schema';
 import type { EnrichmentContext } from './schemas/enrichment.schema';
 import { buildPersonalizedLocationPrompt } from './prompts/personalized-location.prompt';
+import { personalizedSuggestionWrapperSchema } from './schemas/personalized-location.schema';
+import type { PersonalizedSuggestion } from './schemas/personalized-location.schema';
+import type { TravelerProfile, NearbyPlace } from './interfaces/personalized-location.interface';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -253,11 +256,31 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
   async generatePersonalizedLocationSuggestion(
     destination: string,
     state: string,
-    userProfile: any,
+    userProfile: TravelerProfile,
     availableMinutes: number,
-    nearbyPlaces: any[],
+    nearbyPlaces: NearbyPlace[],
     alreadyPlanned: string[]
-  ): Promise<{ placeName: string; reasoning: string; distance: number; estimatedTime: number; confidence: number }> {
+  ): Promise<PersonalizedSuggestion> {
+    // Input validation
+    if (!destination?.trim()) {
+      throw new BadRequestException('Destination is required');
+    }
+    if (!state?.trim()) {
+      throw new BadRequestException('State is required');
+    }
+    if (!userProfile) {
+      this.logger.warn('User profile not provided for personalized suggestion');
+    }
+    if (!nearbyPlaces || nearbyPlaces.length === 0) {
+      this.logger.warn('No nearby places provided for suggestion');
+    }
+    if (availableMinutes <= 0) {
+      throw new BadRequestException('Available minutes must be greater than 0');
+    }
+    if (!Array.isArray(alreadyPlanned)) {
+      throw new BadRequestException('Already planned must be an array');
+    }
+
     const prompt = buildPersonalizedLocationPrompt(
       destination,
       state,
@@ -267,14 +290,14 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
       alreadyPlanned
     );
 
-    const { text } = await generateText({
+    const result = await generateJson({
       model: this.model,
-      maxOutputTokens: 1024,
+      schema: personalizedSuggestionWrapperSchema,
       system: prompt.system,
       prompt: prompt.user,
     });
 
-    return JSON.parse(text);
+    return result.result;
   }
 
   async enrichActivities(prompt: string): Promise<EnrichmentContext[]> {

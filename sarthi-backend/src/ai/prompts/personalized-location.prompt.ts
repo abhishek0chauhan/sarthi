@@ -1,9 +1,11 @@
+import { TravelerProfile, NearbyPlace } from '../interfaces/personalized-location.interface';
+
 export function buildPersonalizedLocationPrompt(
   destination: string,
   state: string,
-  userProfile: any,
+  userProfile: TravelerProfile,
   availableMinutes: number,
-  nearbyPlaces: any[],
+  nearbyPlaces: NearbyPlace[],
   alreadyPlanned: string[]
 ): { system: string; user: string } {
   return {
@@ -24,7 +26,7 @@ export function buildPersonalizedLocationPrompt(
 - Already planned today: ${alreadyPlanned.join(', ') || 'nothing specific'}
 
 **Nearby places to consider:**
-${nearbyPlaces.map((p: any) => `- ${p.name} (${p.type}, ${p.distance}m away)`).join('\n')}
+${nearbyPlaces.map((p) => `- ${p.name} (${p.type}, ${p.distance}m away)`).join('\n')}
 
 **Generate:**
 1. Pick ONE place that matches their style
