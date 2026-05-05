@@ -144,8 +144,31 @@ model LiveGuideSession {
   lastSuggestAt   DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  activitySchedules ActivitySchedule[]
 
   @@index([tripId])
   @@index([userId])
   @@index([isActive])
+}
+
+model ActivitySchedule {
+  id                String    @id @default(cuid())
+  sessionId         String
+  liveGuideSession  LiveGuideSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  tripId            String
+  userId            String
+  dayIndex          Int
+  activityIndex     Int
+  activity          String
+  scheduledTime     DateTime
+  distance          Int       // meters
+  estimatedTravelTime Int     // minutes
+  notificationSent  Boolean   @default(false)
+  idempotencyKey    String    @unique
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([sessionId])
+  @@index([tripId, userId])
+  @@index([notificationSent, scheduledTime])
 }
