@@ -44,6 +44,7 @@ model User {
   notificationPrefs Json?
   devices           UserDevice[]
   liveGuideSessions LiveGuideSession[]
+  activitySchedules ActivitySchedule[]
 }
 
 model SavedTrip {
@@ -62,6 +63,7 @@ model SavedTrip {
   shareToken      String?     @unique
   chatMessages    TripChatMessage[]
   liveGuideSessions LiveGuideSession[]
+  activitySchedules ActivitySchedule[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -152,11 +154,13 @@ model LiveGuideSession {
 }
 
 model ActivitySchedule {
-  id                String    @id @default(cuid())
+  id                String    @id @default(uuid())
   sessionId         String
   liveGuideSession  LiveGuideSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   tripId            String
+  trip              SavedTrip @relation(fields: [tripId], references: [id], onDelete: Cascade)
   userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   dayIndex          Int
   activityIndex     Int
   activity          String
@@ -169,6 +173,7 @@ model ActivitySchedule {
   updatedAt         DateTime  @updatedAt
 
   @@index([sessionId])
+  @@index([sessionId, dayIndex])
   @@index([tripId, userId])
   @@index([notificationSent, scheduledTime])
 }
