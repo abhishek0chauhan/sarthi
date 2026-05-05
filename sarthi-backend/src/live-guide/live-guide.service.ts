@@ -6,7 +6,10 @@ import { AiService } from '../ai/ai.service';
 import { ProfileService } from '../profile/profile.service';
 import { CorrectionsService } from '../corrections/corrections.service';
 import { LiveGuideGateway } from './live-guide.gateway';
+import { ActivitySchedulerService } from './activity-scheduler.service';
 import type { LiveGuideSession } from '@prisma/client';
+import type { TravelerProfile } from '../ai/interfaces/personalized-location.interface';
+import type { PersonalizedSuggestion } from '../ai/interfaces/personalized-location.interface';
 
 interface FirebaseUser { uid: string; name?: string; email?: string; }
 
@@ -15,6 +18,9 @@ type ActivityStatus = Record<string, 'done' | 'skipped' | 'pending'>;
 @Injectable()
 export class LiveGuideService {
   private readonly logger = new Logger(LiveGuideService.name);
+
+  // Store profile cache per session (TTL = duration of session)
+  private profileCache = new Map<string, TravelerProfile | null>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -25,6 +31,7 @@ export class LiveGuideService {
     private readonly correctionsService: CorrectionsService,
     @Inject(forwardRef(() => LiveGuideGateway))
     private readonly gateway: LiveGuideGateway,
+    private readonly activityScheduler: ActivitySchedulerService,
   ) {}
 
   private async findOrCreateUser(firebaseUid: string) {
@@ -75,6 +82,14 @@ export class LiveGuideService {
       session = await this.sessionService.create(tripId, user.id, Math.max(dayIndex, 0));
     }
 
+    // NEW: Fetch and cache user profile
+    const profile = await this.profileService.getProfile(firebaseUid).catch(() => null);
+    if (session?.id && profile) {
+      // NOTE: Cast profile to TravelerProfile (null fields become undefined)
+      const profileData = profile as unknown as TravelerProfile;
+      this.profileCache.set(session.id, profileData);
+    }
+
     const todayPlan = this.getTodayPlan(trip.itineraryData, Math.max(dayIndex, 0));
     const activities = todayPlan?.activities ?? [];
 
@@ -83,7 +98,6 @@ export class LiveGuideService {
 
     if (status === 'during' && activities.length > 0) {
       try {
-        const profile = await this.profileService.getProfile(firebaseUid).catch(() => null);
         const result = await this.aiService.generateLiveBriefing({
           destination: trip.destination,
           state: trip.state,
@@ -96,9 +110,106 @@ export class LiveGuideService {
       } catch (err) {
         this.logger.warn(`Briefing generation failed: ${(err as Error).message}`);
       }
+
+      // NEW: Schedule activity notifications for today's activities
+      if (activities.length > 0 && profile?.travelPace) {
+        await this.scheduleActivityNotifications(
+          session.id,
+          tripId,
+          Math.max(dayIndex, 0),
+          activities,
+          profile.travelPace,
+          trip.travelMode || 'public_transit'
+        );
+      }
     }
 
     return { todayPlan: { ...todayPlan, dayIndex }, briefing, pushSummary, sessionId: session.id, status };
+  }
+
+  private async scheduleActivityNotifications(
+    sessionId: string,
+    tripId: string,
+    dayIndex: number,
+    activities: any[],
+    userPace: string,
+    transportMode: string
+  ): Promise<void> {
+    // Get the current session to access userId
+    const session = await this.prisma.liveGuideSession.findFirst({
+      where: { id: sessionId }
+    }).catch(() => null);
+    if (!session) {
+      this.logger.warn(`Session ${sessionId} not found, skipping activity scheduling`);
+      return;
+    }
+
+    const now = Date.now();
+
+    for (let i = 0; i < activities.length; i++) {
+      const activity = activities[i];
+
+      // Skip past activities (use the scheduler's isActivityTime method)
+      // NOTE: Commented out original logic — using scheduler's method instead
+      // if (activity.time && this.activityScheduler.isActivityTime(activity.time)) {
+      //   continue;
+      // }
+      if (this.activityScheduler.isActivityTime(activity.time)) {
+        continue;
+      }
+
+      // In real implementation, calculate distance using Google Maps
+      // For now, use rough estimate: 2km + 500m per activity index
+      const roughDistance = 2000 + (i * 500); // meters
+
+      // Calculate travel time with user's pace preference
+      const travelTime = this.activityScheduler.calculateTravelTime(
+        roughDistance,
+        userPace,
+        transportMode
+      );
+
+      // Parse activity time and calculate when to send notification
+      const activityMinutes = this.activityScheduler.parseActivityTime(activity.time);
+      const today = new Date();
+      const activityDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+      const scheduledMs = activityDate.getTime() + (activityMinutes - travelTime) * 60 * 1000;
+
+      // Generate idempotency key to prevent duplicate notifications
+      const idempotencyKey = this.activityScheduler.generateIdempotencyKey(
+        tripId,
+        dayIndex,
+        i,
+        scheduledMs
+      );
+
+      // Persist to database with upsert (no-op if already exists)
+      // NOTE: Original logic to persist activity schedule to database
+      await this.prisma.activitySchedule
+        .upsert({
+          where: { idempotencyKey },
+          update: {},
+          create: {
+            sessionId,
+            tripId,
+            userId: session.userId,
+            dayIndex,
+            activityIndex: i,
+            activity: activity.activity,
+            scheduledTime: new Date(scheduledMs),
+            distance: roughDistance,
+            estimatedTravelTime: travelTime,
+            idempotencyKey
+          }
+        })
+        .catch((err) => {
+          this.logger.warn(`Failed to schedule activity notification: ${(err as Error).message}`);
+        });
+    }
   }
 
   async markActivityDone(sessionId: string, session: LiveGuideSession, dayIndex: number, activityIndex: number) {
@@ -223,36 +334,120 @@ export class LiveGuideService {
   async handleLocationUpdate(sessionId: string, session: LiveGuideSession, lat: number, lng: number) {
     await this.sessionService.update(sessionId, { lastLocation: { lat, lng, timestamp: Date.now() } });
 
-    const oneHourAgo = Date.now() - 3_600_000;
-    const lastSuggest = session.lastSuggestAt ? new Date(session.lastSuggestAt).getTime() : 0;
-    if (lastSuggest > oneHourAgo) return;
+    // NEW: Check for pending activity notifications
+    const now = new Date();
+    const pendingActivities = await this.prisma.activitySchedule.findMany({
+      where: {
+        sessionId,
+        notificationSent: false,
+        scheduledTime: { lte: now }
+      }
+    }).catch(() => []);
 
-    const trip = await this.prisma.savedTrip.findFirst({ where: { id: session.tripId } });
-    if (!trip) return;
-
-    try {
-      const todayPlan = this.getTodayPlan(trip.itineraryData, session.currentDay);
-      const existing = (todayPlan?.activities ?? []).map((a: any) => a.activity);
-
-      const result = await this.aiService.generateLocationSuggestion({
-        destination: trip.destination,
-        state: trip.state,
-        lat,
-        lng,
-        existingActivities: existing,
-      });
-
+    for (const scheduled of pendingActivities) {
+      // Emit activity_approaching event
       this.dispatch(
         session.userId,
-        'location_suggestion',
-        { suggestion: result.suggestion, placeName: result.placeName, mapQuery: result.mapQuery },
-        'Nearby suggestion',
-        result.pushSummary,
+        'activity_approaching',
+        {
+          activityIndex: scheduled.activityIndex,
+          activity: scheduled.activity,
+          distance: scheduled.distance,
+          estimatedTravelTime: scheduled.estimatedTravelTime,
+          mapQuery: scheduled.activity
+        },
+        `Time for ${scheduled.activity}`,
+        `Leave now to arrive on time. ${scheduled.estimatedTravelTime} min away.`
       );
 
-      await this.sessionService.update(sessionId, { lastSuggestAt: new Date() });
-    } catch (err) {
-      this.logger.warn(`Location suggestion failed: ${(err as Error).message}`);
+      // Mark as sent
+      // NOTE: Commented out original logic to mark notification as sent
+      await this.prisma.activitySchedule
+        .update({
+          where: { id: scheduled.id },
+          data: { notificationSent: true }
+        })
+        .catch((err) => {
+          this.logger.warn(`Failed to mark notification as sent: ${(err as Error).message}`);
+        });
+    }
+
+    // NEW: Check for location-based suggestions (rate limited to 1 per hour)
+    const oneHourAgo = Date.now() - 3_600_000;
+    const lastSuggest = session.lastSuggestAt ? new Date(session.lastSuggestAt).getTime() : 0;
+
+    if (lastSuggest < oneHourAgo) {
+      // Try to generate personalized suggestion
+      const trip = await this.prisma.savedTrip.findFirst({
+        where: { id: session.tripId }
+      }).catch(() => null);
+
+      if (trip) {
+        try {
+          const profile = this.profileCache.get(sessionId);
+          const todayPlan = this.getTodayPlan(trip.itineraryData, session.currentDay);
+          const alreadyPlanned = (todayPlan?.activities ?? []).map((a: any) => a.activity);
+
+          // NEW: Pass profile to AI for personalization
+          const result = await this.aiService.generatePersonalizedLocationSuggestion(
+            trip.destination,
+            trip.state,
+            profile || {},
+            120, // In real code, calculate from next activity time
+            [], // In real code, fetch from Google Places API
+            alreadyPlanned
+          );
+
+          // Emit location_suggestion event with personalized data
+          this.dispatch(
+            session.userId,
+            'location_suggestion',
+            {
+              suggestion: result.reasoning,
+              placeName: result.placeName,
+              mapQuery: result.placeName,
+              distance: result.distance,
+              estimatedTravelTime: Math.ceil(result.estimatedTime / 60),
+              matchScore: result.confidence
+            },
+            'Nearby suggestion',
+            `${result.placeName} — ${result.reasoning}`
+          );
+
+          // Update last suggestion timestamp
+          await this.sessionService.update(sessionId, { lastSuggestAt: new Date() });
+        } catch (err) {
+          this.logger.warn(
+            `Personalized suggestion failed: ${(err as Error).message}`
+          );
+
+          // NOTE: Fallback to non-personalized location suggestion
+          try {
+            const todayPlan = this.getTodayPlan(trip.itineraryData, session.currentDay);
+            const existing = (todayPlan?.activities ?? []).map((a: any) => a.activity);
+
+            const result = await this.aiService.generateLocationSuggestion({
+              destination: trip.destination,
+              state: trip.state,
+              lat,
+              lng,
+              existingActivities: existing,
+            });
+
+            this.dispatch(
+              session.userId,
+              'location_suggestion',
+              { suggestion: result.suggestion, placeName: result.placeName, mapQuery: result.mapQuery },
+              'Nearby suggestion',
+              result.pushSummary,
+            );
+
+            await this.sessionService.update(sessionId, { lastSuggestAt: new Date() });
+          } catch (fallbackErr) {
+            this.logger.warn(`Fallback location suggestion also failed: ${(fallbackErr as Error).message}`);
+          }
+        }
+      }
     }
   }
 
