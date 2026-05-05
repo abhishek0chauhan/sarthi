@@ -39,6 +39,7 @@ import { buildLocationSuggestionPrompt } from './prompts/live-suggestion.prompt'
 import type { LocationSuggestionParams } from './prompts/live-suggestion.prompt';
 import { enrichmentWrapperSchema, enrichmentContextSchema } from './schemas/enrichment.schema';
 import type { EnrichmentContext } from './schemas/enrichment.schema';
+import { buildPersonalizedLocationPrompt } from './prompts/personalized-location.prompt';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -247,6 +248,33 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
       prompt: prompt.user,
     });
     return result.result;
+  }
+
+  async generatePersonalizedLocationSuggestion(
+    destination: string,
+    state: string,
+    userProfile: any,
+    availableMinutes: number,
+    nearbyPlaces: any[],
+    alreadyPlanned: string[]
+  ): Promise<{ placeName: string; reasoning: string; distance: number; estimatedTime: number; confidence: number }> {
+    const prompt = buildPersonalizedLocationPrompt(
+      destination,
+      state,
+      userProfile,
+      availableMinutes,
+      nearbyPlaces,
+      alreadyPlanned
+    );
+
+    const { text } = await generateText({
+      model: this.model,
+      maxOutputTokens: 1024,
+      system: prompt.system,
+      prompt: prompt.user,
+    });
+
+    return JSON.parse(text);
   }
 
   async enrichActivities(prompt: string): Promise<EnrichmentContext[]> {
