@@ -34,14 +34,24 @@ describe('ProfileService', () => {
   });
 
   describe('getProfile', () => {
-    it('returns null when no profile exists', async () => {
+    it('returns default profile when no profile exists', async () => {
       mockPrisma.travelerProfile.findUnique.mockResolvedValue(null);
       const result = await service.getProfile('fb-1');
-      expect(result).toBeNull();
+      expect(result).toEqual(expect.objectContaining({
+        userId: expect.any(String),
+        story: null,
+        travelPace: null,
+        completeness: 0,
+      }));
     });
 
     it('returns profile when it exists', async () => {
-      const profile = { id: 'p-1', userId: 'user-1', travelPace: 'loose', completeness: 20 };
+      const profile = {
+        id: 'p-1',
+        userId: 'user-1',
+        travelPace: 'loose',
+        completeness: 20,
+      };
       mockPrisma.travelerProfile.findUnique.mockResolvedValue(profile);
       const result = await service.getProfile('fb-1');
       expect(result).toEqual(profile);
@@ -58,7 +68,11 @@ describe('ProfileService', () => {
         confidence: 60,
       });
       mockPrisma.travelerProfile.upsert.mockResolvedValue({
-        id: 'p-1', userId: 'user-1', story: 'test story', travelPace: 'loose', completeness: 33,
+        id: 'p-1',
+        userId: 'user-1',
+        story: 'test story',
+        travelPace: 'loose',
+        completeness: 33,
       });
 
       const result = await service.submitStory('fb-1', 'test story');
@@ -71,10 +85,16 @@ describe('ProfileService', () => {
   describe('submitQuiz', () => {
     it('merges quiz answers into existing profile', async () => {
       mockPrisma.travelerProfile.upsert.mockResolvedValue({
-        id: 'p-1', userId: 'user-1', travelPace: 'packed', completeness: 55,
+        id: 'p-1',
+        userId: 'user-1',
+        travelPace: 'packed',
+        completeness: 55,
       });
 
-      const result = await service.submitQuiz('fb-1', { travelPace: 'packed', spendingStyle: 'budget' });
+      const result = await service.submitQuiz('fb-1', {
+        travelPace: 'packed',
+        spendingStyle: 'budget',
+      });
       expect(mockPrisma.travelerProfile.upsert).toHaveBeenCalled();
       expect(result).toHaveProperty('travelPace', 'packed');
     });
@@ -86,15 +106,28 @@ describe('ProfileService', () => {
     });
 
     it('returns 100 when all 9 dimensions are filled', () => {
-      expect(service.computeCompleteness({
-        travelPace: 'loose', depthVsBreadth: 'deep', comfortLevel: 'homestay',
-        crowdTolerance: 'avoid', travelMotivations: ['nature'], physicalReadiness: 'yes',
-        spendingStyle: 'budget', groundReality: 'bring_it', languageComfort: 'fine',
-      })).toBe(100);
+      expect(
+        service.computeCompleteness({
+          travelPace: 'loose',
+          depthVsBreadth: 'deep',
+          comfortLevel: 'homestay',
+          crowdTolerance: 'avoid',
+          travelMotivations: ['nature'],
+          physicalReadiness: 'yes',
+          spendingStyle: 'budget',
+          groundReality: 'bring_it',
+          languageComfort: 'fine',
+        }),
+      ).toBe(100);
     });
 
     it('counts each filled dimension correctly', () => {
-      expect(service.computeCompleteness({ travelPace: 'loose', comfortLevel: 'rough' })).toBe(22);
+      expect(
+        service.computeCompleteness({
+          travelPace: 'loose',
+          comfortLevel: 'rough',
+        }),
+      ).toBe(22);
     });
   });
 
