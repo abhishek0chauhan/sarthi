@@ -535,7 +535,7 @@ describe('dishSchema allergen + tasteProfile', () => {
     expect(result.allergyAlert).toBe(
       '⚠️ Contains fish — listed in your allergies',
     );
-    expect(result.tasteProfile.spicy).toBe(4);
+    expect(result.tasteProfile?.spicy).toBe(4);
   });
 
   it('applies defaults when allergens and tasteProfile are missing', () => {

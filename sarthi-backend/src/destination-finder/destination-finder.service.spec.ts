@@ -12,13 +12,14 @@ function makeDto(): SearchDestinationsDto {
     budget: { min: 5000, max: 15000 },
     experienceTypes: ['mountains'],
     departureCity: 'Mumbai',
-    group: { size: 4, type: 'friends' },
+    group: { type: 'friends' },
     freeText: 'offbeat trek',
+    mode: 'find',
   };
 }
 
 const mockAdvisory = {
-  suitability: 'moderate',
+  suitability: 'moderate' as const,
   altitude: '2000m',
   physicalDemand: 'Moderate walking',
   alerts: ['Stay hydrated'],
@@ -92,6 +93,8 @@ describe('DestinationFinderService', () => {
       isTrekkingIntent: jest.fn().mockReturnValue(false),
       filterForSearch: jest.fn(),
     } as any;
+    const profileService = {} as any;
+    const correctionsService = {} as any;
 
     service = new DestinationFinderService(
       queryService,
@@ -99,6 +102,8 @@ describe('DestinationFinderService', () => {
       cacheService,
       configService,
       trekService,
+      profileService,
+      correctionsService,
     );
   });
 
@@ -122,8 +127,9 @@ describe('DestinationFinderService', () => {
         budget: { min: 5000, max: 10000 },
         experienceTypes: ['nature'],
         departureCity: 'Ahmedabad',
-        group: { size: 2, type: 'couple' },
+        group: { type: 'couple' },
         freeText: 'offbeat trip',
+        mode: 'find',
       };
 
       cacheService.get.mockResolvedValue(null);
@@ -238,6 +244,8 @@ describe('DestinationFinderService', () => {
           travelTime: '12h bus',
           highlights: ['Key Monastery'],
           whyItMatches: 'Remote and beautiful',
+          suitability: 'moderate' as const,
+          readinessScore: 75,
         },
       ]);
 
@@ -307,6 +315,8 @@ describe('DestinationFinderService', () => {
           travelTime: '12h bus',
           highlights: ['Key Monastery'],
           whyItMatches: 'Remote',
+          suitability: 'moderate' as const,
+          readinessScore: 75,
         },
       ]);
 
@@ -323,7 +333,7 @@ describe('DestinationFinderService', () => {
       state: 'Goa',
       dates: { from: '2026-11-15', to: '2026-11-18' },
       budget: { min: 5000, max: 20000 },
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       departureCity: 'Mumbai',
       freeText: 'beach vacation',
     };
@@ -381,7 +391,7 @@ describe('DestinationFinderService', () => {
       destination: 'Jaipur',
       state: 'Rajasthan',
       dates: { from: '2026-11-15', to: '2026-11-18' },
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       departureCity: 'Mumbai',
       freeText: 'love spicy food',
       dietType: 'non-veg',
@@ -460,7 +470,7 @@ describe('DestinationFinderService', () => {
       budget: { min: 5000, max: 25000 },
       experienceTypes: ['trekking'],
       departureCity: 'Delhi',
-      group: { size: 2, type: 'friends' },
+      group: { type: 'friends' },
       freeText: 'challenging high altitude trek',
       age: 25,
     } as any;
@@ -471,7 +481,7 @@ describe('DestinationFinderService', () => {
       state: 'Himachal Pradesh',
       baseCamp: 'Jobra',
       peakAltitude: 4270,
-      difficulty: 'moderate',
+      difficulty: 'moderate' as const,
       durationDays: 5,
       bestMonths: [6, 7, 8, 9],
       terrain: ['snow', 'meadows'],
@@ -479,7 +489,7 @@ describe('DestinationFinderService', () => {
       nearestCity: 'Manali',
       permits: true,
       fitnessDemand: 'Walk 6-8 hours daily',
-    };
+    } as any;
 
     const mockTrekAiResult = {
       name: 'Hampta Pass',

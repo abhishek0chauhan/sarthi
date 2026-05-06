@@ -16,7 +16,7 @@ import {
 
 const baseParams = {
   freeText: 'want something offbeat',
-  group: { size: 4, type: 'friends' },
+  group: { type: 'friends' },
   budget: { min: 5000, max: 15000 },
   dates: { from: '2025-05-01', to: '2025-05-07' },
   departureCity: 'Mumbai',
@@ -151,7 +151,7 @@ describe('buildHybridPrompt', () => {
   it('includes the Context block with Rules', () => {
     const { user } = buildHybridPrompt({
       freeText: 'weekend escape',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       budget: { min: 5000, max: 10000 },
       dates: { from: '2026-04-17', to: '2026-04-19' },
       departureCity: 'Ahmedabad',
@@ -179,7 +179,7 @@ describe('buildHybridPrompt', () => {
   it('includes Hidden gems ONLY rule when hiddenGem is true', () => {
     const { user } = buildHybridPrompt({
       freeText: 'offbeat trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       budget: { min: 5000, max: 10000 },
       dates: { from: '2026-04-17', to: '2026-04-19' },
       departureCity: 'Ahmedabad',
@@ -263,7 +263,7 @@ describe('buildAiFullPrompt', () => {
   it('includes the Context block with Rules', () => {
     const { user } = buildAiFullPrompt({
       freeText: 'weekend escape',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       budget: { min: 5000, max: 10000 },
       dates: { from: '2026-04-17', to: '2026-04-19' },
       departureCity: 'Ahmedabad',
@@ -279,7 +279,7 @@ describe('buildAiFullPrompt', () => {
   it('includes Hidden gems ONLY rule when hiddenGem is true', () => {
     const { user } = buildAiFullPrompt({
       freeText: 'offbeat trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       budget: { min: 5000, max: 10000 },
       dates: { from: '2026-04-17', to: '2026-04-19' },
       departureCity: 'Ahmedabad',
@@ -296,7 +296,7 @@ describe('buildItineraryPrompt', () => {
     state: 'Goa',
     dates: { from: '2026-11-15', to: '2026-11-18' },
     budget: { min: 5000, max: 20000 },
-    group: { size: 2, type: 'couple' },
+    group: { type: 'couple' },
     departureCity: 'Mumbai',
     freeText: 'relaxing beach vacation',
   };
@@ -372,7 +372,7 @@ describe('buildFoodGuidePrompt', () => {
     destination: 'Jaipur',
     state: 'Rajasthan',
     dates: { from: '2026-11-15', to: '2026-11-18' },
-    group: { size: 2, type: 'couple' },
+    group: { type: 'couple' },
     departureCity: 'Mumbai',
     freeText: 'love spicy food',
     dietType: 'non-veg',
@@ -436,7 +436,7 @@ describe('buildFoodGuidePrompt', () => {
 describe('buildTrekPrompt', () => {
   const trekParams = {
     freeText: 'challenging high altitude trek with snow',
-    group: { size: 2, type: 'friends' },
+    group: { type: 'friends' },
     budget: { min: 5000, max: 25000 },
     dates: { from: '2026-06-01', to: '2026-06-08' },
     departureCity: 'Delhi',
@@ -559,7 +559,7 @@ describe('monthNameFromDate', () => {
 describe('buildSearchContext', () => {
   const baseParams = {
     dates: { from: '2026-04-17', to: '2026-04-19' },
-    group: { size: 4, type: 'friends' },
+    group: { type: 'friends' },
     budget: { min: 5000, max: 6000 },
     departureCity: 'Ahmedabad',
   };
@@ -590,7 +590,7 @@ describe('buildSearchContext', () => {
   it('uses couple hint for couple group type', () => {
     const ctx = buildSearchContext({
       ...baseParams,
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
     });
     expect(ctx).toContain('romantic, scenic stays');
   });
@@ -598,7 +598,7 @@ describe('buildSearchContext', () => {
   it('uses family hint for family group type', () => {
     const ctx = buildSearchContext({
       ...baseParams,
-      group: { size: 4, type: 'family' },
+      group: { type: 'family' },
     });
     expect(ctx).toContain('kid-friendly');
   });
@@ -606,7 +606,7 @@ describe('buildSearchContext', () => {
   it('uses solo hint for solo group type', () => {
     const ctx = buildSearchContext({
       ...baseParams,
-      group: { size: 1, type: 'solo' },
+      group: { type: 'solo' },
     });
     expect(ctx).toContain('safe, social destinations');
   });
@@ -614,7 +614,7 @@ describe('buildSearchContext', () => {
   it('falls back to generic hint for unknown group type', () => {
     const ctx = buildSearchContext({
       ...baseParams,
-      group: { size: 5, type: 'mystery' },
+      group: { type: 'mystery' },
     });
     expect(ctx).toContain("tailor to the group's vibe");
   });
@@ -687,7 +687,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
     });
@@ -699,7 +699,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       cuisinePreferences: ['Konkani', 'Goan'],
@@ -712,7 +712,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       cookingStyles: ['grilled', 'steamed'],
@@ -725,7 +725,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       flavorPreferences: ['tangy', 'spicy'],
@@ -738,7 +738,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       adventurousness: 'very_adventurous',
@@ -751,7 +751,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       favoriteDishes: 'fish curry, solkadhi',
@@ -764,7 +764,7 @@ describe('buildTasteProfileBlock', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       meatPreferences: ['fish', 'chicken'],
@@ -779,7 +779,7 @@ describe('buildFoodGuidePrompt — rules section', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
     });
@@ -793,7 +793,7 @@ describe('buildFoodGuidePrompt — rules section', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
     });
@@ -805,7 +805,7 @@ describe('buildFoodGuidePrompt — rules section', () => {
       destination: 'Goa',
       state: 'Goa',
       freeText: 'trip',
-      group: { size: 2, type: 'couple' },
+      group: { type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
       cuisinePreferences: ['Konkani'],
@@ -886,7 +886,7 @@ describe('buildItineraryPrompt — mapQuery', () => {
     destination: 'Cherrapunji',
     state: 'Meghalaya',
     freeText: 'want to see waterfalls',
-    group: { size: 2, type: 'couple' },
+    group: { type: 'couple' },
     budget: { min: 8000, max: 20000 },
     dates: { from: '2026-07-10', to: '2026-07-13' },
     departureCity: 'Kolkata',
@@ -903,7 +903,7 @@ describe('buildFoodGuidePrompt — mapQuery', () => {
     destination: 'Shillong',
     state: 'Meghalaya',
     freeText: 'love local food',
-    group: { size: 2, type: 'couple' },
+    group: { type: 'couple' },
     dates: { from: '2026-07-10', to: '2026-07-13' },
     departureCity: 'Kolkata',
   };

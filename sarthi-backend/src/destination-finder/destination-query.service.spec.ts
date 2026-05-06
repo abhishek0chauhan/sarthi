@@ -10,8 +10,9 @@ function makeDto(
     budget: { min: 5000, max: 15000 },
     experienceTypes: ['mountains', 'adventure'],
     departureCity: 'Mumbai',
-    group: { size: 4, type: 'friends' },
+    group: { type: 'friends' },
     freeText: 'offbeat trek',
+    mode: 'find',
     ...overrides,
   };
 }

@@ -10,6 +10,18 @@ const mockService = {
   disableSharing: jest.fn(),
 };
 
+const mockPhrasebookService = {
+  getPhrases: jest.fn(),
+};
+
+const mockChatService = {
+  sendMessage: jest.fn(),
+};
+
+const mockEnrichmentService = {
+  enrich: jest.fn(),
+};
+
 const mockRequest = {
   user: { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' },
 };
@@ -18,7 +30,12 @@ describe('SavedTripsController', () => {
   let controller: SavedTripsController;
 
   beforeEach(() => {
-    controller = new SavedTripsController(mockService as any);
+    controller = new SavedTripsController(
+      mockService as any,
+      mockPhrasebookService as any,
+      mockChatService as any,
+      mockEnrichmentService as any,
+    );
     Object.values(mockService).forEach((fn) => fn.mockReset());
   });
 
