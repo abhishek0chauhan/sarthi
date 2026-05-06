@@ -16,5 +16,5 @@ export const tripsService = {
   disableSharing: (id: string) =>
     apiRequest<void>(`/saved-trips/${id}/share`, { method: 'DELETE' }),
   getActivitySchedule: (tripId: string) =>
-    apiRequest<{ scheduledActivities: ActivityScheduleEntry[] }>(`/trips/${tripId}/activity-schedule`),
+    apiRequest<{ scheduledActivities: ActivityScheduleEntry[] }>(`/live-guide/${tripId}/activity-schedule`),
 };
