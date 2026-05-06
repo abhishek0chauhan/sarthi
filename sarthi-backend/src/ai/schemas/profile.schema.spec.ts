@@ -30,7 +30,9 @@ describe('profileExtractionSchema', () => {
   });
 
   it('rejects invalid travelPace values', () => {
-    expect(() => profileExtractionSchema.parse({ confidence: 50, travelPace: 'fast' })).toThrow();
+    expect(() =>
+      profileExtractionSchema.parse({ confidence: 50, travelPace: 'fast' }),
+    ).toThrow();
   });
 
   it('defaults travelMotivations to empty array', () => {

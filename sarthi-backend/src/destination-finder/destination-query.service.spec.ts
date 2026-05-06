@@ -2,7 +2,9 @@ import { DestinationQueryService } from './destination-query.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SearchDestinationsDto } from './dto/search-destinations.dto';
 
-function makeDto(overrides: Partial<SearchDestinationsDto> = {}): SearchDestinationsDto {
+function makeDto(
+  overrides: Partial<SearchDestinationsDto> = {},
+): SearchDestinationsDto {
   return {
     dates: { from: '2025-05-01', to: '2025-05-07' },
     budget: { min: 5000, max: 15000 },
@@ -20,7 +22,9 @@ describe('DestinationQueryService', () => {
 
   beforeEach(() => {
     prismaMock = { destination: { findMany: jest.fn() } };
-    service = new DestinationQueryService(prismaMock as unknown as PrismaService);
+    service = new DestinationQueryService(
+      prismaMock as unknown as PrismaService,
+    );
   });
 
   describe('findShortlist', () => {
@@ -53,7 +57,9 @@ describe('DestinationQueryService', () => {
 
     it('extracts month 5 for a May trip', async () => {
       prismaMock.destination.findMany.mockResolvedValue([]);
-      await service.findShortlist(makeDto({ dates: { from: '2025-05-01', to: '2025-05-07' } }));
+      await service.findShortlist(
+        makeDto({ dates: { from: '2025-05-01', to: '2025-05-07' } }),
+      );
 
       expect(prismaMock.destination.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -66,10 +72,14 @@ describe('DestinationQueryService', () => {
 
     it('extracts both months for a cross-month trip', async () => {
       prismaMock.destination.findMany.mockResolvedValue([]);
-      await service.findShortlist(makeDto({ dates: { from: '2025-04-28', to: '2025-05-03' } }));
+      await service.findShortlist(
+        makeDto({ dates: { from: '2025-04-28', to: '2025-05-03' } }),
+      );
 
       const call = prismaMock.destination.findMany.mock.calls[0][0];
-      expect(call.where.bestMonths.hasSome).toEqual(expect.arrayContaining([4, 5]));
+      expect(call.where.bestMonths.hasSome).toEqual(
+        expect.arrayContaining([4, 5]),
+      );
     });
 
     it('limits results to 15', async () => {

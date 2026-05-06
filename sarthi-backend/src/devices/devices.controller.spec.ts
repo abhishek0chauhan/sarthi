@@ -22,8 +22,14 @@ describe('DevicesController', () => {
 
   it('POST /devices calls service.register', async () => {
     mockService.register.mockResolvedValue({ fcmToken: 'tok' });
-    const result = await controller.register({ fcmToken: 'tok', platform: 'android' }, { user: { uid: 'fb-uid' } } as any);
-    expect(mockService.register).toHaveBeenCalledWith('fb-uid', { fcmToken: 'tok', platform: 'android' });
+    const result = await controller.register(
+      { fcmToken: 'tok', platform: 'android' },
+      { user: { uid: 'fb-uid' } } as any,
+    );
+    expect(mockService.register).toHaveBeenCalledWith('fb-uid', {
+      fcmToken: 'tok',
+      platform: 'android',
+    });
     expect(result).toEqual({ fcmToken: 'tok' });
   });
 
@@ -32,4 +38,4 @@ describe('DevicesController', () => {
     await controller.unregister('tok', { user: { uid: 'fb-uid' } } as any);
     expect(mockService.unregister).toHaveBeenCalledWith('fb-uid', 'tok');
   });
-})
+});

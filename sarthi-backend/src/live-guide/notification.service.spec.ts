@@ -2,7 +2,9 @@ import { Test } from '@nestjs/testing';
 import { NotificationService } from './notification.service';
 import { DevicesService } from '../devices/devices.service';
 
-const mockMessaging = { sendEachForMulticast: jest.fn().mockResolvedValue({ responses: [] }) };
+const mockMessaging = {
+  sendEachForMulticast: jest.fn().mockResolvedValue({ responses: [] }),
+};
 
 jest.mock('firebase-admin', () => ({
   messaging: () => mockMessaging,
@@ -45,12 +47,16 @@ describe('NotificationService', () => {
   it('sendToUser: fetches tokens then sends', async () => {
     mockDevicesService.getTokensForUser.mockResolvedValue(['tok-a']);
     await service.sendToUser('db-user-id', 'Title', 'Body');
-    expect(mockDevicesService.getTokensForUser).toHaveBeenCalledWith('db-user-id');
+    expect(mockDevicesService.getTokensForUser).toHaveBeenCalledWith(
+      'db-user-id',
+    );
     expect(mockMessaging.sendEachForMulticast).toHaveBeenCalled();
   });
 
   it('sendPush: swallows FCM errors (non-blocking)', async () => {
-    mockMessaging.sendEachForMulticast.mockRejectedValueOnce(new Error('FCM error'));
+    mockMessaging.sendEachForMulticast.mockRejectedValueOnce(
+      new Error('FCM error'),
+    );
     await expect(service.sendPush(['tok'], 'T', 'B')).resolves.not.toThrow();
   });
-})
+});

@@ -27,8 +27,13 @@ describe('CacheService', () => {
     });
 
     it('parses and returns cached value', async () => {
-      redisMock.get.mockResolvedValue(JSON.stringify({ mode: 'hybrid', results: [] }));
-      expect(await service.get('some-key')).toEqual({ mode: 'hybrid', results: [] });
+      redisMock.get.mockResolvedValue(
+        JSON.stringify({ mode: 'hybrid', results: [] }),
+      );
+      expect(await service.get('some-key')).toEqual({
+        mode: 'hybrid',
+        results: [],
+      });
     });
 
     it('returns null when Redis throws (graceful degradation)', async () => {
@@ -41,12 +46,18 @@ describe('CacheService', () => {
     it('serializes value and calls setex with TTL', async () => {
       redisMock.setex.mockResolvedValue('OK');
       await service.set('my-key', { foo: 'bar' }, 3600);
-      expect(redisMock.setex).toHaveBeenCalledWith('my-key', 3600, JSON.stringify({ foo: 'bar' }));
+      expect(redisMock.setex).toHaveBeenCalledWith(
+        'my-key',
+        3600,
+        JSON.stringify({ foo: 'bar' }),
+      );
     });
 
     it('does not throw when Redis is unavailable (graceful degradation)', async () => {
       redisMock.setex.mockRejectedValue(new Error('connection refused'));
-      await expect(service.set('my-key', { foo: 'bar' }, 3600)).resolves.toBeUndefined();
+      await expect(
+        service.set('my-key', { foo: 'bar' }, 3600),
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -68,9 +79,9 @@ describe('CacheService', () => {
     });
 
     it('handles combined transformations', () => {
-      expect(service.normalizeText('  Want something OFFBEAT, not too touristy!  ')).toBe(
-        'want something offbeat not too touristy',
-      );
+      expect(
+        service.normalizeText('  Want something OFFBEAT, not too touristy!  '),
+      ).toBe('want something offbeat not too touristy');
     });
   });
 
@@ -81,8 +92,14 @@ describe('CacheService', () => {
     });
 
     it('returns the same hash for identical params', () => {
-      const key1 = service.buildKey({ dates: { from: '2025-05-01' }, budget: { min: 5000 } });
-      const key2 = service.buildKey({ dates: { from: '2025-05-01' }, budget: { min: 5000 } });
+      const key1 = service.buildKey({
+        dates: { from: '2025-05-01' },
+        budget: { min: 5000 },
+      });
+      const key2 = service.buildKey({
+        dates: { from: '2025-05-01' },
+        budget: { min: 5000 },
+      });
       expect(key1).toBe(key2);
     });
 

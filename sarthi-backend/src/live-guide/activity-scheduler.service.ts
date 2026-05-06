@@ -9,17 +9,17 @@ interface Activity {
 
 // Constants for transport speeds (meters per second)
 const TRANSPORT_SPEEDS = {
-  walking: 1.4,        // m/s (5 km/h)
+  walking: 1.4, // m/s (5 km/h)
   public_transit: 8.3, // m/s (30 km/h)
   taxi: 8.3,
-  car: 11.1
+  car: 11.1,
 } as const;
 
 // Travel time buffer multipliers based on user pace
 const PACE_BUFFERS = {
   packed: 1.2,
   loose: 1.1,
-  no_plan: 1.0
+  no_plan: 1.0,
 } as const;
 
 // Valid transport modes
@@ -45,7 +45,7 @@ export class ActivitySchedulerService {
   calculateTravelTime(
     distanceMeters: number,
     userPace: string,
-    transportMode: string = 'public_transit'
+    transportMode: string = 'public_transit',
   ): number {
     // Validate distance
     if (distanceMeters == null || distanceMeters <= 0) {
@@ -68,22 +68,27 @@ export class ActivitySchedulerService {
       throw new BadRequestException(errorMsg);
     }
 
-    const speed = TRANSPORT_SPEEDS[transportMode as keyof typeof TRANSPORT_SPEEDS];
-    const baseTravelTime = (distanceMeters / speed) / 60; // minutes
+    const speed =
+      TRANSPORT_SPEEDS[transportMode as keyof typeof TRANSPORT_SPEEDS];
+    const baseTravelTime = distanceMeters / speed / 60; // minutes
 
     const multiplier = PACE_BUFFERS[userPace as keyof typeof PACE_BUFFERS];
     const travelTime = Math.ceil(baseTravelTime * multiplier);
 
     this.logger.debug(
-      `Travel time calculation: distance=${distanceMeters}m, mode=${transportMode}, pace=${userPace}, baseTime=${baseTravelTime.toFixed(2)}min, multiplier=${multiplier}, totalTime=${travelTime}min`
+      `Travel time calculation: distance=${distanceMeters}m, mode=${transportMode}, pace=${userPace}, baseTime=${baseTravelTime.toFixed(2)}min, multiplier=${multiplier}, totalTime=${travelTime}min`,
     );
 
     return travelTime;
   }
 
-  // Generate idempotency key to prevent duplicates
-  generateIdempotencyKey(tripId: string, dayIndex: number, activityIndex: number, scheduledTime: number): string {
-    return `${tripId}:${dayIndex}:${activityIndex}:${scheduledTime}`;
+  // Generate idempotency key to prevent duplicates (3-part key without time to allow rescheduling)
+  generateIdempotencyKey(
+    tripId: string,
+    dayIndex: number,
+    activityIndex: number,
+  ): string {
+    return `${tripId}:${dayIndex}:${activityIndex}`;
   }
 
   /**
@@ -126,7 +131,7 @@ export class ActivitySchedulerService {
     const totalMinutes = hours * 60 + minutes;
 
     this.logger.debug(
-      `Parsed activity time: "${timeStr}" -> ${hours}:${minutes.toString().padStart(2, '0')} (${totalMinutes} minutes since midnight)`
+      `Parsed activity time: "${timeStr}" -> ${hours}:${minutes.toString().padStart(2, '0')} (${totalMinutes} minutes since midnight)`,
     );
 
     return totalMinutes;
@@ -146,7 +151,7 @@ export class ActivitySchedulerService {
     const isPast = currentMinutes >= activityMinutes;
 
     this.logger.debug(
-      `isActivityTime check: current=${currentMinutes}min, activity=${activityMinutes}min, isPast=${isPast}`
+      `isActivityTime check: current=${currentMinutes}min, activity=${activityMinutes}min, isPast=${isPast}`,
     );
 
     return isPast;
@@ -159,18 +164,26 @@ export class ActivitySchedulerService {
    * @returns True if current date-time >= activity scheduled date-time
    * @throws BadRequestException if time string is invalid
    */
-  shouldLeaveNow(activityTimeStr: string, scheduledDate: Date | null = null): boolean {
+  shouldLeaveNow(
+    activityTimeStr: string,
+    scheduledDate: Date | null = null,
+  ): boolean {
     const targetDate = scheduledDate ? new Date(scheduledDate) : new Date();
     const activityMinutes = this.parseActivityTime(activityTimeStr);
 
     // Set the activity time on the target date
-    targetDate.setHours(Math.floor(activityMinutes / 60), activityMinutes % 60, 0, 0);
+    targetDate.setHours(
+      Math.floor(activityMinutes / 60),
+      activityMinutes % 60,
+      0,
+      0,
+    );
 
     const now = new Date();
     const shouldLeave = now >= targetDate;
 
     this.logger.debug(
-      `shouldLeaveNow check: now=${now.toISOString()}, targetTime=${targetDate.toISOString()}, shouldLeave=${shouldLeave}`
+      `shouldLeaveNow check: now=${now.toISOString()}, targetTime=${targetDate.toISOString()}, shouldLeave=${shouldLeave}`,
     );
 
     return shouldLeave;

@@ -5,6 +5,8 @@ export const liveBriefingSchema = z.object({
   pushSummary: z.string().max(160),
 });
 
-export const liveBriefingWrapperSchema = z.object({ result: liveBriefingSchema });
+export const liveBriefingWrapperSchema = z.object({
+  result: liveBriefingSchema,
+});
 
 export type LiveBriefing = z.infer<typeof liveBriefingSchema>;

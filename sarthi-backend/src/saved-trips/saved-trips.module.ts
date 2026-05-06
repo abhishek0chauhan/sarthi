@@ -12,7 +12,13 @@ import { AiModule } from '../ai/ai.module';
 @Module({
   imports: [CorrectionsModule, ProfileModule, AiModule],
   controllers: [SavedTripsController],
-  providers: [SavedTripsService, UserService, PhrasebookService, TripChatService, EnrichmentService],
+  providers: [
+    SavedTripsService,
+    UserService,
+    PhrasebookService,
+    TripChatService,
+    EnrichmentService,
+  ],
   exports: [SavedTripsService],
 })
 export class SavedTripsModule {}

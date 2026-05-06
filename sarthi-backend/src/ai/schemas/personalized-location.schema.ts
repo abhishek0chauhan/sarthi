@@ -12,4 +12,6 @@ export const personalizedSuggestionWrapperSchema = z.object({
   result: personalizedSuggestionSchema,
 });
 
-export type PersonalizedSuggestion = z.infer<typeof personalizedSuggestionSchema>;
+export type PersonalizedSuggestion = z.infer<
+  typeof personalizedSuggestionSchema
+>;

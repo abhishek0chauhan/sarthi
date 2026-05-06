@@ -50,12 +50,20 @@ describe('TripChatService', () => {
       mockSavedTripsService.getById.mockResolvedValue(mockTrip);
       mockPrisma.tripChatMessage.count.mockResolvedValue(0);
       mockPrisma.tripChatMessage.findMany.mockResolvedValue([]);
-      mockAiService.tripChat.mockResolvedValue('Living Root Bridge is about 3km from the main road.');
+      mockAiService.tripChat.mockResolvedValue(
+        'Living Root Bridge is about 3km from the main road.',
+      );
       mockPrisma.tripChatMessage.create.mockResolvedValue({});
 
-      const result = await service.sendMessage('trip-1', 'How far is the Root Bridge?', { uid: 'fb-1' } as any);
+      const result = await service.sendMessage(
+        'trip-1',
+        'How far is the Root Bridge?',
+        { uid: 'fb-1' } as any,
+      );
 
-      expect(result.reply).toBe('Living Root Bridge is about 3km from the main road.');
+      expect(result.reply).toBe(
+        'Living Root Bridge is about 3km from the main road.',
+      );
       expect(mockPrisma.tripChatMessage.create).toHaveBeenCalledTimes(2); // user + assistant
     });
 
@@ -65,7 +73,9 @@ describe('TripChatService', () => {
       mockPrisma.tripChatMessage.findMany.mockResolvedValue([]);
 
       await expect(
-        service.sendMessage('trip-1', 'Another question', { uid: 'fb-1' } as any),
+        service.sendMessage('trip-1', 'Another question', {
+          uid: 'fb-1',
+        } as any),
       ).rejects.toThrow(HttpException);
     });
   });
@@ -89,7 +99,9 @@ describe('TripChatService', () => {
       mockPrisma.tripChatMessage.deleteMany.mockResolvedValue({ count: 3 });
 
       await service.clearHistory('trip-1', { uid: 'fb-1' } as any);
-      expect(mockPrisma.tripChatMessage.deleteMany).toHaveBeenCalledWith({ where: { tripId: 'trip-1' } });
+      expect(mockPrisma.tripChatMessage.deleteMany).toHaveBeenCalledWith({
+        where: { tripId: 'trip-1' },
+      });
     });
   });
 });

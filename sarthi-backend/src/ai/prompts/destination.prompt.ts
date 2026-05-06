@@ -26,7 +26,8 @@ export interface PromptParams extends HealthProfile {
   hiddenGem?: boolean;
 }
 
-const SYSTEM_PROMPT = 'You are a travel recommendation engine for Indian destinations. You also assess health and fitness suitability for each destination based on the traveler\'s profile.';
+const SYSTEM_PROMPT =
+  "You are a travel recommendation engine for Indian destinations. You also assess health and fitness suitability for each destination based on the traveler's profile.";
 
 export function computeBmi(weight: number, heightCm: number): number {
   const heightM = heightCm / 100;
@@ -40,8 +41,18 @@ export function computeTripDays(dates: { from: string; to: string }): number {
 }
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 export function monthNameFromDate(dateStr: string): string {
@@ -53,10 +64,10 @@ export function monthNameFromDate(dateStr: string): string {
 }
 
 const GROUP_HINTS: Record<string, string> = {
-  solo:    'prioritize safe, social destinations with good transport connectivity',
-  couple:  'prioritize romantic, scenic stays and intimate experiences',
+  solo: 'prioritize safe, social destinations with good transport connectivity',
+  couple: 'prioritize romantic, scenic stays and intimate experiences',
   friends: 'prioritize nightlife, adventure activities, and shared experiences',
-  family:  'prioritize kid-friendly activities and accessible family stays',
+  family: 'prioritize kid-friendly activities and accessible family stays',
 };
 
 const GROUP_HINT_FALLBACK = "tailor to the group's vibe";
@@ -82,9 +93,10 @@ export function buildSearchContext(
   const monthName = monthNameFromDate(params.dates.from);
   const groupHint = GROUP_HINTS[params.group.type] ?? GROUP_HINT_FALLBACK;
 
-  const seasonRule = mode === 'trek'
-    ? `- Season: Flag any trek where conditions in ${monthName} are borderline (late-season snow, early-season monsoon) in healthAdvisory.alerts.`
-    : `- Season: If ${monthName} is sub-optimal for a destination (peak summer heat in the plains, monsoon flooding in the ghats, winter closures in the hills), surface it in weatherSnapshot and healthAdvisory.alerts. Do not pretend the weather is pleasant when it isn't.`;
+  const seasonRule =
+    mode === 'trek'
+      ? `- Season: Flag any trek where conditions in ${monthName} are borderline (late-season snow, early-season monsoon) in healthAdvisory.alerts.`
+      : `- Season: If ${monthName} is sub-optimal for a destination (peak summer heat in the plains, monsoon flooding in the ghats, winter closures in the hills), surface it in weatherSnapshot and healthAdvisory.alerts. Do not pretend the weather is pleasant when it isn't.`;
 
   const nearbyGemsRule = (() => {
     if (mode === 'trek') return '';
@@ -121,19 +133,25 @@ export interface TravelerProfileSnapshot {
   completeness?: number;
 }
 
-export function buildPersonalityBlock(profile: TravelerProfileSnapshot | null): string {
+export function buildPersonalityBlock(
+  profile: TravelerProfileSnapshot | null,
+): string {
   if (!profile) return '';
 
   const lines: string[] = [];
-  if (profile.travelPace)       lines.push(`- Pace: ${profile.travelPace}`);
-  if (profile.depthVsBreadth)   lines.push(`- Depth: ${profile.depthVsBreadth}`);
-  if (profile.comfortLevel)     lines.push(`- Comfort: ${profile.comfortLevel}`);
-  if (profile.crowdTolerance)   lines.push(`- Crowds: ${profile.crowdTolerance}`);
-  if (profile.travelMotivations?.length) lines.push(`- Motivations: ${profile.travelMotivations.join(', ')}`);
-  if (profile.physicalReadiness) lines.push(`- Physical: ${profile.physicalReadiness}`);
-  if (profile.spendingStyle)    lines.push(`- Spending: ${profile.spendingStyle}`);
-  if (profile.groundReality)    lines.push(`- Ground reality: ${profile.groundReality}`);
-  if (profile.languageComfort)  lines.push(`- Language: ${profile.languageComfort}`);
+  if (profile.travelPace) lines.push(`- Pace: ${profile.travelPace}`);
+  if (profile.depthVsBreadth) lines.push(`- Depth: ${profile.depthVsBreadth}`);
+  if (profile.comfortLevel) lines.push(`- Comfort: ${profile.comfortLevel}`);
+  if (profile.crowdTolerance) lines.push(`- Crowds: ${profile.crowdTolerance}`);
+  if (profile.travelMotivations?.length)
+    lines.push(`- Motivations: ${profile.travelMotivations.join(', ')}`);
+  if (profile.physicalReadiness)
+    lines.push(`- Physical: ${profile.physicalReadiness}`);
+  if (profile.spendingStyle) lines.push(`- Spending: ${profile.spendingStyle}`);
+  if (profile.groundReality)
+    lines.push(`- Ground reality: ${profile.groundReality}`);
+  if (profile.languageComfort)
+    lines.push(`- Language: ${profile.languageComfort}`);
 
   if (lines.length === 0) return '';
 
@@ -145,7 +163,9 @@ export interface CorrectionRecord {
   context: Record<string, unknown>;
 }
 
-export function buildCorrectionsBlock(corrections: CorrectionRecord[] | null): string {
+export function buildCorrectionsBlock(
+  corrections: CorrectionRecord[] | null,
+): string {
   if (!corrections?.length) return '';
 
   const lines = corrections.map((c) => {
@@ -163,21 +183,25 @@ export interface SuggestReplacementParams {
   state: string;
   day: number;
   currentActivity: { time: string; activity: string };
-  dayActivities: string[];  // other activities in the same day as context
+  dayActivities: string[]; // other activities in the same day as context
   profile?: TravelerProfileSnapshot | null;
   corrections?: CorrectionRecord[];
 }
 
-export function buildSuggestReplacementPrompt(params: SuggestReplacementParams): { system: string; user: string } {
+export function buildSuggestReplacementPrompt(
+  params: SuggestReplacementParams,
+): { system: string; user: string } {
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
   const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
-  const dayContext = params.dayActivities.length > 0
-    ? `\nOther activities on Day ${params.day}: ${params.dayActivities.join(' | ')}`
-    : '';
+  const dayContext =
+    params.dayActivities.length > 0
+      ? `\nOther activities on Day ${params.day}: ${params.dayActivities.join(' | ')}`
+      : '';
 
   return {
-    system: 'You are an expert Indian travel planner. Suggest specific, named alternative activities that fit the traveler\'s personality and avoid their past dislikes.',
+    system:
+      "You are an expert Indian travel planner. Suggest specific, named alternative activities that fit the traveler's personality and avoid their past dislikes.",
     user: `Suggest 2-3 alternative activities to replace this one:
 
 Trip: ${params.destination}, ${params.state}
@@ -208,7 +232,9 @@ function buildHealthContext(params: HealthProfile): string {
     lines.push(`Medical conditions: ${params.medicalConditions.join(', ')}`);
   }
 
-  return lines.length > 0 ? `\nTraveler health profile: ${lines.join(' | ')}` : '';
+  return lines.length > 0
+    ? `\nTraveler health profile: ${lines.join(' | ')}`
+    : '';
 }
 
 const HEALTH_ADVISORY_FORMAT = `"healthAdvisory":{"suitability":"<easy|moderate|challenging|not_recommended>","altitude":"<altitude info or Sea level>","physicalDemand":"<physical effort description>","alerts":["<health/safety warning>"],"prepTips":["<exercise or preparation tip>"]}`;
@@ -223,10 +249,14 @@ const TRIP_READINESS_FORMAT = `"tripReadiness":{"score":<0-100>,"label":"<Ready/
 // destinations — fewer results, shorter context. If truncation occurs on a very small model,
 // slim it the same way as buildAiFullPrompt (drop to suitability + readinessScore only).
 export function buildHybridPrompt(
-  params: PromptParams & { destinations: CompactDestination[]; profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] },
+  params: PromptParams & {
+    destinations: CompactDestination[];
+    profile?: TravelerProfileSnapshot | null;
+    corrections?: CorrectionRecord[];
+  },
 ): { system: string; user: string } {
   const destinationList = params.destinations
-    .map(d => `  {"id":"${d.id}","name":"${d.name}","state":"${d.state}"}`)
+    .map((d) => `  {"id":"${d.id}","name":"${d.name}","state":"${d.state}"}`)
     .join(',\n');
 
   const healthContext = buildHealthContext(params);
@@ -254,7 +284,12 @@ Max 5 results, best match first.`,
   };
 }
 
-export function buildAiFullPrompt(params: PromptParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
+export function buildAiFullPrompt(
+  params: PromptParams & {
+    profile?: TravelerProfileSnapshot | null;
+    corrections?: CorrectionRecord[];
+  },
+): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
   const searchContext = buildSearchContext(params);
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
@@ -298,7 +333,12 @@ export interface ItineraryParams extends HealthProfile {
 // Gemma 3n handles this acceptably — fields are made optional in the schema with safe defaults.
 // If truncation becomes an issue on a smaller model, slim it by removing packingList,
 // healthAdvisory, and permits from the JSON format string below.
-export function buildItineraryPrompt(params: ItineraryParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
+export function buildItineraryPrompt(
+  params: ItineraryParams & {
+    profile?: TravelerProfileSnapshot | null;
+    corrections?: CorrectionRecord[];
+  },
+): { system: string; user: string } {
   const travelerProfile = [
     `Group: ${params.group.size} ${params.group.type}`,
     `Budget: ₹${params.budget.min}–${params.budget.max}/person`,
@@ -310,14 +350,18 @@ export function buildItineraryPrompt(params: ItineraryParams & { profile?: Trave
   const travelLine = params.travelMode
     ? `\nTraveler is arriving by ${params.travelMode} from ${params.departureCity}.`
     : '';
-  const numDays = Math.ceil(
-    (new Date(params.dates.to).getTime() - new Date(params.dates.from).getTime()) / 86400000,
-  ) + 1;
+  const numDays =
+    Math.ceil(
+      (new Date(params.dates.to).getTime() -
+        new Date(params.dates.from).getTime()) /
+        86400000,
+    ) + 1;
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
   const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   return {
-    system: 'You are an expert Indian travel itinerary planner. You create detailed day-by-day plans personalized to the traveler\'s health, budget, and interests.',
+    system:
+      "You are an expert Indian travel itinerary planner. You create detailed day-by-day plans personalized to the traveler's health, budget, and interests.",
     user: `Plan a ${numDays}-day itinerary for ${params.destination}, ${params.state}.
 Traveler: ${params.freeText}
 ${travelerProfile}${healthContext}${travelLine}${personalityBlock}${correctionsBlock}
@@ -363,29 +407,46 @@ export function buildTasteProfileBlock(params: FoodGuideParams): string {
   if (!hasAny) return '';
 
   const lines = [
-    params.cuisinePreferences?.length && `- Cuisines: ${params.cuisinePreferences.join(', ')}`,
-    params.cookingStyles?.length && `- Cooking styles: ${params.cookingStyles.join(', ')}`,
-    params.flavorPreferences?.length && `- Flavors: ${params.flavorPreferences.join(', ')}`,
+    params.cuisinePreferences?.length &&
+      `- Cuisines: ${params.cuisinePreferences.join(', ')}`,
+    params.cookingStyles?.length &&
+      `- Cooking styles: ${params.cookingStyles.join(', ')}`,
+    params.flavorPreferences?.length &&
+      `- Flavors: ${params.flavorPreferences.join(', ')}`,
     params.adventurousness && `- Adventurousness: ${params.adventurousness}`,
     params.favoriteDishes && `- Favorite dishes: ${params.favoriteDishes}`,
-    params.meatPreferences?.length && `- Meat preferences: ${params.meatPreferences.join(', ')}`,
-  ].filter(Boolean).join('\n');
+    params.meatPreferences?.length &&
+      `- Meat preferences: ${params.meatPreferences.join(', ')}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return `\n## Taste Profile\n${lines}`;
 }
 
-export function buildFoodGuidePrompt(params: FoodGuideParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
+export function buildFoodGuidePrompt(
+  params: FoodGuideParams & {
+    profile?: TravelerProfileSnapshot | null;
+    corrections?: CorrectionRecord[];
+  },
+): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
-  const numDays = Math.ceil(
-    (new Date(params.dates.to).getTime() - new Date(params.dates.from).getTime()) / 86400000,
-  ) + 1;
+  const numDays =
+    Math.ceil(
+      (new Date(params.dates.to).getTime() -
+        new Date(params.dates.from).getTime()) /
+        86400000,
+    ) + 1;
 
   const dietLines: string[] = [];
   if (params.dietType) dietLines.push(`Diet: ${params.dietType}`);
-  if (params.spiceTolerance) dietLines.push(`Spice tolerance: ${params.spiceTolerance}`);
+  if (params.spiceTolerance)
+    dietLines.push(`Spice tolerance: ${params.spiceTolerance}`);
   if (params.foodBudget) dietLines.push(`Food budget: ${params.foodBudget}`);
-  if (params.allergies?.length) dietLines.push(`Allergies: ${params.allergies.join(', ')}`);
-  const dietContext = dietLines.length > 0 ? `\nFood preferences: ${dietLines.join(' | ')}` : '';
+  if (params.allergies?.length)
+    dietLines.push(`Allergies: ${params.allergies.join(', ')}`);
+  const dietContext =
+    dietLines.length > 0 ? `\nFood preferences: ${dietLines.join(' | ')}` : '';
 
   const tasteProfileBlock = buildTasteProfileBlock(params);
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
@@ -434,7 +495,8 @@ export function buildFoodGuidePrompt(params: FoodGuideParams & { profile?: Trave
   // const activeCount = paidCount;
 
   return {
-    system: 'You are an expert Indian food and travel cuisine guide. You recommend local food personalized to the traveler\'s health conditions, dietary preferences, and allergies.',
+    system:
+      "You are an expert Indian food and travel cuisine guide. You recommend local food personalized to the traveler's health conditions, dietary preferences, and allergies.",
     user: `Create a personalized food guide for ${params.destination}, ${params.state} (${numDays} days).
 Traveler: ${params.freeText}
 Group: ${params.group.size} ${params.group.type} | From: ${params.departureCity}${dietContext}${healthContext}${tasteProfileBlock}${personalityBlock}${correctionsBlock}
@@ -472,18 +534,27 @@ export interface TrekPromptParams extends HealthProfile {
   }>;
 }
 
-export function buildTrekPrompt(params: TrekPromptParams & { profile?: TravelerProfileSnapshot | null; corrections?: CorrectionRecord[] }): { system: string; user: string } {
+export function buildTrekPrompt(
+  params: TrekPromptParams & {
+    profile?: TravelerProfileSnapshot | null;
+    corrections?: CorrectionRecord[];
+  },
+): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
   const searchContext = buildSearchContext(params, { mode: 'trek' });
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
   const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
   const trekList = params.treks
-    .map(t => `  - ${t.name} | ${t.region} | ${t.peakAltitude}m | ${t.difficulty} | ${t.durationDays} days | Base: ${t.baseCamp} | Nearest city: ${t.nearestCity} | Terrain: ${t.terrain.join(', ')} | Highlights: ${t.highlights.join(', ')} | Permits: ${t.permits ? 'Yes' : 'No'} | Fitness: ${t.fitnessDemand}`)
+    .map(
+      (t) =>
+        `  - ${t.name} | ${t.region} | ${t.peakAltitude}m | ${t.difficulty} | ${t.durationDays} days | Base: ${t.baseCamp} | Nearest city: ${t.nearestCity} | Terrain: ${t.terrain.join(', ')} | Highlights: ${t.highlights.join(', ')} | Permits: ${t.permits ? 'Yes' : 'No'} | Fitness: ${t.fitnessDemand}`,
+    )
     .join('\n');
 
   return {
-    system: 'You are an expert Indian trek recommendation engine. You recommend specific named treks (not cities) based on the traveler\'s fitness, experience, dates, and preferences. You assess health and fitness suitability for each trek.',
+    system:
+      "You are an expert Indian trek recommendation engine. You recommend specific named treks (not cities) based on the traveler's fitness, experience, dates, and preferences. You assess health and fitness suitability for each trek.",
     user: `Traveler: ${params.freeText}${healthContext}
 
 ${searchContext}${personalityBlock}${correctionsBlock}

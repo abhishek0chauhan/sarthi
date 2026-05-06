@@ -13,14 +13,20 @@ describe('DevicesService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     const module = await Test.createTestingModule({
-      providers: [DevicesService, { provide: PrismaService, useValue: mockPrisma }],
+      providers: [
+        DevicesService,
+        { provide: PrismaService, useValue: mockPrisma },
+      ],
     }).compile();
     service = module.get(DevicesService);
   });
 
   it('register: upserts device under user', async () => {
     mockPrisma.user.upsert.mockResolvedValue({ id: 'db-uid' });
-    mockPrisma.userDevice.upsert.mockResolvedValue({ fcmToken: 'tok', platform: 'android' });
+    mockPrisma.userDevice.upsert.mockResolvedValue({
+      fcmToken: 'tok',
+      platform: 'android',
+    });
     await service.register('fb-uid', { fcmToken: 'tok', platform: 'android' });
     expect(mockPrisma.userDevice.upsert).toHaveBeenCalledWith(
       expect.objectContaining({ where: { fcmToken: 'tok' } }),
@@ -37,8 +43,11 @@ describe('DevicesService', () => {
   });
 
   it('getTokensForUser: returns array of tokens', async () => {
-    mockPrisma.userDevice.findMany.mockResolvedValue([{ fcmToken: 'a' }, { fcmToken: 'b' }]);
+    mockPrisma.userDevice.findMany.mockResolvedValue([
+      { fcmToken: 'a' },
+      { fcmToken: 'b' },
+    ]);
     const tokens = await service.getTokensForUser('db-uid');
     expect(tokens).toEqual(['a', 'b']);
   });
-})
+});

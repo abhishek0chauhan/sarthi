@@ -4,12 +4,32 @@ describe('phrasebookWrapperSchema', () => {
   const validPhrasebook = {
     result: {
       language: 'Khasi',
-      greeting: [{ english: 'Hello', local: 'Khublei', pronunciation: 'khoo-blay' }],
-      food: [{ english: 'How much?', local: 'Katno?', pronunciation: 'kat-no' }],
-      directions: [{ english: 'Where is...?', local: 'Hangta dei?', pronunciation: 'hang-ta day' }],
-      emergency: [{ english: 'Help!', local: 'Thaw bun!', pronunciation: 'thaw boon' }],
-      bargaining: [{ english: 'Too expensive', local: 'Booh pynsit', pronunciation: 'boo pin-sit' }],
-      culturalNotes: ['Khasi society is matrilineal — women are highly respected'],
+      greeting: [
+        { english: 'Hello', local: 'Khublei', pronunciation: 'khoo-blay' },
+      ],
+      food: [
+        { english: 'How much?', local: 'Katno?', pronunciation: 'kat-no' },
+      ],
+      directions: [
+        {
+          english: 'Where is...?',
+          local: 'Hangta dei?',
+          pronunciation: 'hang-ta day',
+        },
+      ],
+      emergency: [
+        { english: 'Help!', local: 'Thaw bun!', pronunciation: 'thaw boon' },
+      ],
+      bargaining: [
+        {
+          english: 'Too expensive',
+          local: 'Booh pynsit',
+          pronunciation: 'boo pin-sit',
+        },
+      ],
+      culturalNotes: [
+        'Khasi society is matrilineal — women are highly respected',
+      ],
     },
   };
 
@@ -21,7 +41,9 @@ describe('phrasebookWrapperSchema', () => {
   });
 
   it('allows optional script field', () => {
-    const withScript = { result: { ...validPhrasebook.result, script: 'Latin' } };
+    const withScript = {
+      result: { ...validPhrasebook.result, script: 'Latin' },
+    };
     const result = phrasebookWrapperSchema.parse(withScript);
     expect(result.result.script).toBe('Latin');
   });

@@ -4,8 +4,15 @@ import { AiService } from '../ai/ai.service';
 import type { SubmitQuizDto } from './dto/submit-quiz.dto';
 
 const DIMENSION_KEYS = [
-  'travelPace', 'depthVsBreadth', 'comfortLevel', 'crowdTolerance',
-  'travelMotivations', 'physicalReadiness', 'spendingStyle', 'groundReality', 'languageComfort',
+  'travelPace',
+  'depthVsBreadth',
+  'comfortLevel',
+  'crowdTolerance',
+  'travelMotivations',
+  'physicalReadiness',
+  'spendingStyle',
+  'groundReality',
+  'languageComfort',
 ] as const;
 
 @Injectable()
@@ -26,29 +33,37 @@ export class ProfileService {
   computeCompleteness(dimensions: Partial<Record<string, any>>): number {
     const filled = DIMENSION_KEYS.filter((k) => {
       const v = dimensions[k];
-      return v !== null && v !== undefined && (Array.isArray(v) ? v.length > 0 : true);
+      return (
+        v !== null &&
+        v !== undefined &&
+        (Array.isArray(v) ? v.length > 0 : true)
+      );
     }).length;
     return Math.round((filled / DIMENSION_KEYS.length) * 100);
   }
 
   async getProfile(firebaseUid: string) {
     const user = await this.findOrCreateUser(firebaseUid);
-    const profile = await this.prisma.travelerProfile.findUnique({ where: { userId: user.id } });
+    const profile = await this.prisma.travelerProfile.findUnique({
+      where: { userId: user.id },
+    });
     // Return empty profile if none exists (instead of null) to avoid empty response body
-    return profile ?? {
-      userId: user.id,
-      story: null,
-      travelPace: null,
-      depthVsBreadth: null,
-      comfortLevel: null,
-      crowdTolerance: null,
-      travelMotivations: [],
-      physicalReadiness: null,
-      spendingStyle: null,
-      groundReality: null,
-      languageComfort: null,
-      completeness: 0,
-    };
+    return (
+      profile ?? {
+        userId: user.id,
+        story: null,
+        travelPace: null,
+        depthVsBreadth: null,
+        comfortLevel: null,
+        crowdTolerance: null,
+        travelMotivations: [],
+        physicalReadiness: null,
+        spendingStyle: null,
+        groundReality: null,
+        languageComfort: null,
+        completeness: 0,
+      }
+    );
   }
 
   async submitStory(firebaseUid: string, story: string) {
@@ -75,7 +90,9 @@ export class ProfileService {
   async submitQuiz(firebaseUid: string, dto: SubmitQuizDto) {
     const user = await this.findOrCreateUser(firebaseUid);
 
-    const existing = await this.prisma.travelerProfile.findUnique({ where: { userId: user.id } });
+    const existing = await this.prisma.travelerProfile.findUnique({
+      where: { userId: user.id },
+    });
     const merged = { ...(existing ?? {}), ...dto };
     const completeness = this.computeCompleteness(merged);
 
@@ -92,7 +109,9 @@ export class ProfileService {
 
   async resetProfile(firebaseUid: string) {
     const user = await this.findOrCreateUser(firebaseUid);
-    await this.prisma.travelerProfile.delete({ where: { userId: user.id } }).catch(() => null);
+    await this.prisma.travelerProfile
+      .delete({ where: { userId: user.id } })
+      .catch(() => null);
   }
 
   async updateNotificationPrefs(
@@ -122,9 +141,17 @@ export class ProfileService {
     });
   }
 
-  async getNotificationPrefs(firebaseUid: string): Promise<{ notificationPrefs: { morningBriefing: boolean; mealNudges: boolean; smartSuggestions: boolean; locationAlerts: boolean; tripReminders: boolean } }> {
+  async getNotificationPrefs(firebaseUid: string): Promise<{
+    notificationPrefs: {
+      morningBriefing: boolean;
+      mealNudges: boolean;
+      smartSuggestions: boolean;
+      locationAlerts: boolean;
+      tripReminders: boolean;
+    };
+  }> {
     const user = await this.findOrCreateUser(firebaseUid);
-    const prefs = ((user?.notificationPrefs ?? {}) as Record<string, boolean>);
+    const prefs = (user?.notificationPrefs ?? {}) as Record<string, boolean>;
     return {
       notificationPrefs: {
         morningBriefing: prefs.morningBriefing ?? true,

@@ -1,24 +1,18 @@
 import { z } from 'zod';
 
 // AI models sometimes return a single string instead of an array — coerce gracefully
-const stringArray = z.preprocess(
-  (v) => {
-    if (Array.isArray(v)) return v;
-    if (typeof v === 'string') return v.length ? [v] : [];
-    return [];
-  },
-  z.array(z.string()),
-);
+const stringArray = z.preprocess((v) => {
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'string') return v.length ? [v] : [];
+  return [];
+}, z.array(z.string()));
 
 // AI models sometimes return "true"/"false" strings instead of booleans
-const coercedBoolean = z.preprocess(
-  (v) => {
-    if (typeof v === 'boolean') return v;
-    if (v === 'true' || v === '1' || v === 1) return true;
-    return false;
-  },
-  z.boolean(),
-);
+const coercedBoolean = z.preprocess((v) => {
+  if (typeof v === 'boolean') return v;
+  if (v === 'true' || v === '1' || v === 1) return true;
+  return false;
+}, z.boolean());
 
 // AI models sometimes return free-form suitability strings — map to nearest valid value
 const suitabilityEnum = z.preprocess(
@@ -26,8 +20,16 @@ const suitabilityEnum = z.preprocess(
     if (typeof v !== 'string') return 'moderate';
     const s = v.toLowerCase();
     if (s === 'easy' || s.includes('easy') || s.includes('low')) return 'easy';
-    if (s === 'not_recommended' || s.includes('not rec') || s.includes('avoid')) return 'not_recommended';
-    if (s === 'challenging' || s.includes('challeng') || s.includes('hard') || s.includes('difficult') || s.includes('strenuous')) return 'challenging';
+    if (s === 'not_recommended' || s.includes('not rec') || s.includes('avoid'))
+      return 'not_recommended';
+    if (
+      s === 'challenging' ||
+      s.includes('challeng') ||
+      s.includes('hard') ||
+      s.includes('difficult') ||
+      s.includes('strenuous')
+    )
+      return 'challenging';
     return 'moderate';
   },
   z.enum(['easy', 'moderate', 'challenging', 'not_recommended']),
@@ -65,24 +67,35 @@ export const tripReadinessSchema = z.object({
   actionItems: stringArray,
 });
 
-export const activityPlaceContextSchema = z.object({
-  whySpecial: z.string().optional().default(''),
-  bestTimeToVisit: z.string().optional().default(''),
-  suggestedDuration: z.string().optional().default(''),
-  insiderTips: z.array(z.string()).optional().default([]),
-  whatToCarry: z.array(z.string()).optional().default([]),
-  nearbyAlternative: z.string().optional(),
-}).optional();
+export const activityPlaceContextSchema = z
+  .object({
+    whySpecial: z.string().optional().default(''),
+    bestTimeToVisit: z.string().optional().default(''),
+    suggestedDuration: z.string().optional().default(''),
+    insiderTips: z.array(z.string()).optional().default([]),
+    whatToCarry: z.array(z.string()).optional().default([]),
+    nearbyAlternative: z.string().optional(),
+  })
+  .optional();
 
-export const dishPlaceContextSchema = z.object({
-  bestTimeToVisit: z.string().optional().default(''),
-  insiderTips: z.array(z.string()).optional().default([]),
-}).optional();
+export const dishPlaceContextSchema = z
+  .object({
+    bestTimeToVisit: z.string().optional().default(''),
+    insiderTips: z.array(z.string()).optional().default([]),
+  })
+  .optional();
 
-export const personalMatchSchema = z.object({
-  matchLevel: z.enum(['great_match', 'good_match', 'heads_up', 'not_your_style']),
-  reason: z.string(),
-}).optional();
+export const personalMatchSchema = z
+  .object({
+    matchLevel: z.enum([
+      'great_match',
+      'good_match',
+      'heads_up',
+      'not_your_style',
+    ]),
+    reason: z.string(),
+  })
+  .optional();
 
 export const rankResultSchema = z.object({
   id: z.string(),
@@ -161,7 +174,9 @@ export const itineraryDaySchema = z.object({
   day: z.number(),
   title: z.string().optional().default(''),
   activities: z.array(itineraryActivitySchema).optional().default([]),
-  meals: itineraryMealsSchema.optional().default({ breakfast: '', lunch: '', dinner: '' }),
+  meals: itineraryMealsSchema
+    .optional()
+    .default({ breakfast: '', lunch: '', dinner: '' }),
   healthNote: z.string().optional().default(''),
 });
 
@@ -178,13 +193,15 @@ export const itineraryResponseWrapperSchema = z.object({
   result: itineraryResponseSchema,
 });
 
-export const tasteProfileSchema = z.object({
-  sweet: z.number().min(0).max(5).default(0),
-  spicy: z.number().min(0).max(5).default(0),
-  sour: z.number().min(0).max(5).default(0),
-  salty: z.number().min(0).max(5).default(0),
-  umami: z.number().min(0).max(5).default(0),
-}).default({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
+export const tasteProfileSchema = z
+  .object({
+    sweet: z.number().min(0).max(5).default(0),
+    spicy: z.number().min(0).max(5).default(0),
+    sour: z.number().min(0).max(5).default(0),
+    salty: z.number().min(0).max(5).default(0),
+    umami: z.number().min(0).max(5).default(0),
+  })
+  .default({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
 
 export const dishSchema = z.object({
   name: z.string(),
@@ -193,8 +210,17 @@ export const dishSchema = z.object({
   priceRange: z.string(),
   spiceLevel: z.string(),
   healthNote: z.string(),
-  allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  allergens: z
+    .preprocess((v) => {
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return v.length ? [v] : [];
+      return [];
+    }, z.array(z.string()))
+    .default([]),
+  allergyAlert: z.preprocess(
+    (v) => (v == null || v === '' ? undefined : v),
+    z.string().optional(),
+  ),
   tasteProfile: tasteProfileSchema.optional(),
   mapQuery: z.string().optional().default(''),
   placeContext: dishPlaceContextSchema,
@@ -204,8 +230,17 @@ export const healthConsciousDishSchema = z.object({
   name: z.string(),
   description: z.string(),
   healthNote: z.string(),
-  allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  allergens: z
+    .preprocess((v) => {
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return v.length ? [v] : [];
+      return [];
+    }, z.array(z.string()))
+    .default([]),
+  allergyAlert: z.preprocess(
+    (v) => (v == null || v === '' ? undefined : v),
+    z.string().optional(),
+  ),
   tasteProfile: tasteProfileSchema.optional(),
 });
 
@@ -214,8 +249,17 @@ export const streetFoodItemSchema = z.object({
   where: z.string(),
   price: z.string(),
   healthNote: z.string(),
-  allergens: z.preprocess((v) => { if (Array.isArray(v)) return v; if (typeof v === 'string') return v.length ? [v] : []; return []; }, z.array(z.string())).default([]),
-  allergyAlert: z.preprocess((v) => (v == null || v === '' ? undefined : v), z.string().optional()),
+  allergens: z
+    .preprocess((v) => {
+      if (Array.isArray(v)) return v;
+      if (typeof v === 'string') return v.length ? [v] : [];
+      return [];
+    }, z.array(z.string()))
+    .default([]),
+  allergyAlert: z.preprocess(
+    (v) => (v == null || v === '' ? undefined : v),
+    z.string().optional(),
+  ),
   tasteProfile: tasteProfileSchema.optional(),
   mapQuery: z.string().optional().default(''),
 });
@@ -243,12 +287,20 @@ export const foodGuideResponseSchema = z.object({
     items: z.array(streetFoodItemSchema),
   }),
   mealPlan: z.array(dailyMealPlanSchema).optional().default([]),
-  dietaryInfo: z.object({
-    vegFriendly: z.string(),
-    veganOptions: z.string(),
-    halalAvailability: z.string(),
-    waterAdvice: z.string(),
-  }).optional().default({ vegFriendly: '', veganOptions: '', halalAvailability: '', waterAdvice: '' }),
+  dietaryInfo: z
+    .object({
+      vegFriendly: z.string(),
+      veganOptions: z.string(),
+      halalAvailability: z.string(),
+      waterAdvice: z.string(),
+    })
+    .optional()
+    .default({
+      vegFriendly: '',
+      veganOptions: '',
+      halalAvailability: '',
+      waterAdvice: '',
+    }),
 });
 
 export const foodGuideResponseWrapperSchema = z.object({

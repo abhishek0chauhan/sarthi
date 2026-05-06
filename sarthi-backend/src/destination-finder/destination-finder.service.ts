@@ -4,14 +4,23 @@ import { Destination } from '@prisma/client';
 import { DestinationQueryService } from './destination-query.service';
 import { AiService } from '../ai/ai.service';
 import { CacheService } from '../cache/cache.service';
-import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTrekPrompt } from '../ai/prompts/destination.prompt';
+import {
+  buildHybridPrompt,
+  buildAiFullPrompt,
+  buildItineraryPrompt,
+  buildFoodGuidePrompt,
+  buildTrekPrompt,
+} from '../ai/prompts/destination.prompt';
 import { TrekService } from '../treks/trek.service';
 import { SearchDestinationsDto } from './dto/search-destinations.dto';
 import { ItineraryDto } from './dto/itinerary.dto';
 import { FoodGuideDto } from './dto/food-guide.dto';
 import { ProfileService } from '../profile/profile.service';
 import { CorrectionsService } from '../corrections/corrections.service';
-import type { TravelerProfileSnapshot, CorrectionRecord } from '../ai/prompts/destination.prompt';
+import type {
+  TravelerProfileSnapshot,
+  CorrectionRecord,
+} from '../ai/prompts/destination.prompt';
 
 @Injectable()
 export class DestinationFinderService {
@@ -36,7 +45,9 @@ export class DestinationFinderService {
       const profile = await this.profileService.getProfile(firebaseUid);
       if (!profile) return { profile: null, corrections: [] };
       const user = await this.profileService['findOrCreateUser'](firebaseUid);
-      const corrections = await this.correctionsService.getRecentForPrompt(user.id);
+      const corrections = await this.correctionsService.getRecentForPrompt(
+        user.id,
+      );
       return { profile, corrections: corrections as CorrectionRecord[] };
     } catch {
       return { profile: null, corrections: [] };
@@ -44,7 +55,10 @@ export class DestinationFinderService {
   }
 
   async search(dto: SearchDestinationsDto, bust = false, firebaseUid?: string) {
-    const aiMode = this.config.get<string>('DESTINATION_FINDER_AI_MODE', 'hybrid');
+    const aiMode = this.config.get<string>(
+      'DESTINATION_FINDER_AI_MODE',
+      'hybrid',
+    );
 
     const { freeText, ...rest } = dto;
     const cacheKey = this.cacheService.buildKey({
@@ -62,14 +76,17 @@ export class DestinationFinderService {
     try {
       let result;
 
-      if (this.trekService.isTrekkingIntent(dto.experienceTypes, dto.freeText)) {
+      if (
+        this.trekService.isTrekkingIntent(dto.experienceTypes, dto.freeText)
+      ) {
         result = await this.runTrekMode(dto, profile, corrections);
       }
 
       if (!result) {
-        result = aiMode === 'ai_full'
-          ? await this.runAiFull(dto, profile, corrections)
-          : await this.runHybrid(dto, profile, corrections);
+        result =
+          aiMode === 'ai_full'
+            ? await this.runAiFull(dto, profile, corrections)
+            : await this.runHybrid(dto, profile, corrections);
       }
 
       await this.cacheService.set(cacheKey, result, 86400);
@@ -95,15 +112,24 @@ export class DestinationFinderService {
     });
 
     if (filtered.length === 0) {
-      this.logger.warn('No treks match filters — falling back to normal search');
+      this.logger.warn(
+        'No treks match filters — falling back to normal search',
+      );
       return null;
     }
 
-    const prompt = buildTrekPrompt({ ...dto, treks: filtered, profile, corrections });
+    const prompt = buildTrekPrompt({
+      ...dto,
+      treks: filtered,
+      profile,
+      corrections,
+    });
     const treks = await this.aiService.rankTreks(prompt);
 
     if (treks.length === 0) {
-      this.logger.warn('AI returned no trek results — falling back to normal search');
+      this.logger.warn(
+        'AI returned no trek results — falling back to normal search',
+      );
       return null;
     }
 
@@ -192,7 +218,7 @@ export class DestinationFinderService {
       return this.runAiFull(dto, profile, corrections);
     }
 
-    const compactShortlist = shortlist.map(d => ({
+    const compactShortlist = shortlist.map((d) => ({
       id: d.id,
       name: d.name,
       state: d.state,
@@ -203,27 +229,43 @@ export class DestinationFinderService {
       budgetMax: d.budgetMax,
     }));
 
-    const prompt = buildHybridPrompt({ ...dto, destinations: compactShortlist, profile, corrections });
-    const shortlistIds = shortlist.map(d => d.id);
+    const prompt = buildHybridPrompt({
+      ...dto,
+      destinations: compactShortlist,
+      profile,
+      corrections,
+    });
+    const shortlistIds = shortlist.map((d) => d.id);
     const ranked = await this.aiService.rankDestinations(prompt, shortlistIds);
 
     if (ranked.length === 0) {
       this.logger.warn('AI returned no results — returning top 5 DB results');
       return {
         mode: 'hybrid',
-        results: shortlist.slice(0, 5).map(d => this.formatDbResult(d, dto.departureCity)),
+        results: shortlist
+          .slice(0, 5)
+          .map((d) => this.formatDbResult(d, dto.departureCity)),
       };
     }
 
-    const destinationMap = new Map(shortlist.map(d => [d.id, d]));
-    const results = ranked.map(({ id, whyItMatches, healthAdvisory, costBreakdown, permits, tripReadiness }) => ({
-      ...this.formatDbResult(destinationMap.get(id)!, dto.departureCity),
-      whyItMatches,
-      healthAdvisory,
-      costBreakdown,
-      permits,
-      tripReadiness,
-    }));
+    const destinationMap = new Map(shortlist.map((d) => [d.id, d]));
+    const results = ranked.map(
+      ({
+        id,
+        whyItMatches,
+        healthAdvisory,
+        costBreakdown,
+        permits,
+        tripReadiness,
+      }) => ({
+        ...this.formatDbResult(destinationMap.get(id)!, dto.departureCity),
+        whyItMatches,
+        healthAdvisory,
+        costBreakdown,
+        permits,
+        tripReadiness,
+      }),
+    );
 
     return { mode: 'hybrid', results };
   }

@@ -23,7 +23,9 @@ const mockSocket = () => ({
 
 jest.mock('firebase-admin', () => ({
   auth: () => ({
-    verifyIdToken: jest.fn().mockResolvedValue({ uid: 'fb-uid', name: 'Test User' }),
+    verifyIdToken: jest
+      .fn()
+      .mockResolvedValue({ uid: 'fb-uid', name: 'Test User' }),
   }),
   apps: { length: 1 },
   initializeApp: jest.fn(),
@@ -67,20 +69,31 @@ describe('LiveGuideGateway', () => {
     it('emits guide_activated on success', async () => {
       const socket = mockSocket();
       socket.data = { userId: 'fb-uid' };
-      mockLiveGuideService.activateGuide.mockResolvedValue({ todayPlan: {}, briefing: 'GM!', sessionId: 'sess-1', status: 'during' });
+      mockLiveGuideService.activateGuide.mockResolvedValue({
+        todayPlan: {},
+        briefing: 'GM!',
+        sessionId: 'sess-1',
+        status: 'during',
+      });
       await gateway.onActivateGuide(socket as any, { tripId: 'trip-1' });
-      expect(socket.emit).toHaveBeenCalledWith('guide_activated', expect.objectContaining({ briefing: 'GM!' }));
+      expect(socket.emit).toHaveBeenCalledWith(
+        'guide_activated',
+        expect.objectContaining({ briefing: 'GM!' }),
+      );
     });
 
     it('emits error if not authenticated', async () => {
       const socket = mockSocket();
       socket.data = {};
       await gateway.onActivateGuide(socket as any, { tripId: 'trip-1' });
-      expect(socket.emit).toHaveBeenCalledWith('error', expect.objectContaining({ message: expect.any(String) }));
+      expect(socket.emit).toHaveBeenCalledWith(
+        'error',
+        expect.objectContaining({ message: expect.any(String) }),
+      );
     });
   });
 
   it('isConnected: returns false for unknown user', () => {
     expect(gateway.isConnected('unknown-uid')).toBe(false);
   });
-})
+});

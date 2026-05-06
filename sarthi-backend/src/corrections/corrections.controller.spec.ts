@@ -23,7 +23,11 @@ describe('CorrectionsController', () => {
 
   it('POST /corrections calls service.create', async () => {
     mockService.create.mockResolvedValue({ id: 'c-1' });
-    const dto = { tripId: 't-1', type: 'thumbs_down', context: { place: 'Elephant Falls' } };
+    const dto = {
+      tripId: 't-1',
+      type: 'thumbs_down',
+      context: { place: 'Elephant Falls' },
+    };
     const result = await controller.create(req, dto as any);
     expect(mockService.create).toHaveBeenCalledWith('fb-1', dto);
   });

@@ -74,7 +74,13 @@ describe('DestinationFinderService', () => {
 
   beforeEach(() => {
     queryService = { findShortlist: jest.fn() } as any;
-    aiService = { rankDestinations: jest.fn(), generateDestinations: jest.fn(), generateItinerary: jest.fn(), generateFoodGuide: jest.fn(), rankTreks: jest.fn() } as any;
+    aiService = {
+      rankDestinations: jest.fn(),
+      generateDestinations: jest.fn(),
+      generateItinerary: jest.fn(),
+      generateFoodGuide: jest.fn(),
+      rankTreks: jest.fn(),
+    } as any;
     cacheService = {
       get: jest.fn(),
       set: jest.fn(),
@@ -82,9 +88,18 @@ describe('DestinationFinderService', () => {
       normalizeText: jest.fn().mockReturnValue('offbeat trek'),
     } as any;
     configService = { get: jest.fn() } as any;
-    trekService = { isTrekkingIntent: jest.fn().mockReturnValue(false), filterForSearch: jest.fn() } as any;
+    trekService = {
+      isTrekkingIntent: jest.fn().mockReturnValue(false),
+      filterForSearch: jest.fn(),
+    } as any;
 
-    service = new DestinationFinderService(queryService, aiService, cacheService, configService, trekService);
+    service = new DestinationFinderService(
+      queryService,
+      aiService,
+      cacheService,
+      configService,
+      trekService,
+    );
   });
 
   describe('cache hit', () => {
@@ -122,7 +137,9 @@ describe('DestinationFinderService', () => {
       let callCount = 0;
       buildKeySpy.mockImplementation((input: any) => {
         callCount++;
-        return input.hiddenGem ? `key-with-hidden-gem-${callCount}` : `key-without-hidden-gem-${callCount}`;
+        return input.hiddenGem
+          ? `key-with-hidden-gem-${callCount}`
+          : `key-without-hidden-gem-${callCount}`;
       });
 
       try {
@@ -156,10 +173,17 @@ describe('DestinationFinderService', () => {
     it('returns ranked results merged with DB data including travelTime', async () => {
       queryService.findShortlist.mockResolvedValue([mockDestination] as any);
       aiService.rankDestinations.mockResolvedValue([
-        { id: 'uuid-1', whyItMatches: 'Great for trekking', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Great for trekking',
+          healthAdvisory: mockAdvisory,
+          costBreakdown: mockCostBreakdown,
+          permits: mockPermits,
+          tripReadiness: mockTripReadiness,
+        },
       ]);
 
-      const result = await service.search(makeDto()) as any;
+      const result = await service.search(makeDto());
 
       expect(result.mode).toBe('hybrid');
       expect(result.results[0].name).toBe('Kasol');
@@ -171,13 +195,23 @@ describe('DestinationFinderService', () => {
     });
 
     it('omits travelTime when departure city not in travelTimes map', async () => {
-      const destWithoutCity = { ...mockDestination, travelTimes: { Delhi: '10h bus' } };
+      const destWithoutCity = {
+        ...mockDestination,
+        travelTimes: { Delhi: '10h bus' },
+      };
       queryService.findShortlist.mockResolvedValue([destWithoutCity] as any);
       aiService.rankDestinations.mockResolvedValue([
-        { id: 'uuid-1', whyItMatches: 'Great trek', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Great trek',
+          healthAdvisory: mockAdvisory,
+          costBreakdown: mockCostBreakdown,
+          permits: mockPermits,
+          tripReadiness: mockTripReadiness,
+        },
       ]);
 
-      const result = await service.search(makeDto()) as any;
+      const result = await service.search(makeDto());
       expect(result.results[0].travelTime).toBeUndefined();
     });
 
@@ -185,7 +219,7 @@ describe('DestinationFinderService', () => {
       queryService.findShortlist.mockResolvedValue([mockDestination] as any);
       aiService.rankDestinations.mockResolvedValue([]);
 
-      const result = await service.search(makeDto()) as any;
+      const result = await service.search(makeDto());
 
       expect(result.mode).toBe('hybrid');
       expect(result.results[0].name).toBe('Kasol');
@@ -207,7 +241,7 @@ describe('DestinationFinderService', () => {
         },
       ]);
 
-      const result = await service.search(makeDto()) as any;
+      const result = await service.search(makeDto());
 
       expect(aiService.generateDestinations).toHaveBeenCalled();
       expect(result.mode).toBe('ai_full');
@@ -216,12 +250,23 @@ describe('DestinationFinderService', () => {
     it('caches the result after a successful search', async () => {
       queryService.findShortlist.mockResolvedValue([mockDestination] as any);
       aiService.rankDestinations.mockResolvedValue([
-        { id: 'uuid-1', whyItMatches: 'Great trek', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Great trek',
+          healthAdvisory: mockAdvisory,
+          costBreakdown: mockCostBreakdown,
+          permits: mockPermits,
+          tripReadiness: mockTripReadiness,
+        },
       ]);
 
       await service.search(makeDto());
 
-      expect(cacheService.set).toHaveBeenCalledWith('cache-key-hash', expect.any(Object), 86400);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        'cache-key-hash',
+        expect.any(Object),
+        86400,
+      );
     });
 
     it('builds cache key using normalizedFreeText field name (not freeText)', async () => {
@@ -265,7 +310,7 @@ describe('DestinationFinderService', () => {
         },
       ]);
 
-      const result = await service.search(makeDto()) as any;
+      const result = await service.search(makeDto());
 
       expect(queryService.findShortlist).not.toHaveBeenCalled();
       expect(result.mode).toBe('ai_full');
@@ -286,7 +331,15 @@ describe('DestinationFinderService', () => {
     const mockItineraryResult = {
       destination: 'Goa',
       totalEstimate: '₹34,000',
-      itinerary: [{ day: 1, title: 'Arrival', activities: [], meals: { breakfast: 'x', lunch: 'x', dinner: 'x' }, healthNote: '' }],
+      itinerary: [
+        {
+          day: 1,
+          title: 'Arrival',
+          activities: [],
+          meals: { breakfast: 'x', lunch: 'x', dinner: 'x' },
+          healthNote: '',
+        },
+      ],
       packingList: ['Sunscreen'],
       healthAdvisory: mockAdvisory,
       permits: mockPermits,
@@ -307,13 +360,19 @@ describe('DestinationFinderService', () => {
       aiService.generateItinerary.mockResolvedValue(mockItineraryResult);
       const result = await service.itinerary(itineraryDto as any);
       expect(aiService.generateItinerary).toHaveBeenCalled();
-      expect(cacheService.set).toHaveBeenCalledWith('cache-key-hash', mockItineraryResult, 86400);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        'cache-key-hash',
+        mockItineraryResult,
+        86400,
+      );
       expect(result).toEqual(mockItineraryResult);
     });
 
     it('throws 503 when AI fails', async () => {
       aiService.generateItinerary.mockRejectedValue(new Error('AI down'));
-      await expect(service.itinerary(itineraryDto as any)).rejects.toMatchObject({ status: 503 });
+      await expect(
+        service.itinerary(itineraryDto as any),
+      ).rejects.toMatchObject({ status: 503 });
     });
   });
 
@@ -335,7 +394,12 @@ describe('DestinationFinderService', () => {
       healthConscious: [],
       streetFood: { safetyTips: [], items: [] },
       mealPlan: [],
-      dietaryInfo: { vegFriendly: 'Yes', veganOptions: 'Limited', halalAvailability: 'Yes', waterAdvice: 'Bottled' },
+      dietaryInfo: {
+        vegFriendly: 'Yes',
+        veganOptions: 'Limited',
+        halalAvailability: 'Yes',
+        waterAdvice: 'Bottled',
+      },
     };
 
     beforeEach(() => {
@@ -353,13 +417,19 @@ describe('DestinationFinderService', () => {
       aiService.generateFoodGuide.mockResolvedValue(mockFoodGuideResult);
       const result = await service.foodGuide(foodGuideDto as any);
       expect(aiService.generateFoodGuide).toHaveBeenCalled();
-      expect(cacheService.set).toHaveBeenCalledWith('cache-key-hash', mockFoodGuideResult, 86400);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        'cache-key-hash',
+        mockFoodGuideResult,
+        86400,
+      );
       expect(result).toEqual(mockFoodGuideResult);
     });
 
     it('throws 503 when AI fails', async () => {
       aiService.generateFoodGuide.mockRejectedValue(new Error('AI down'));
-      await expect(service.foodGuide(foodGuideDto as any)).rejects.toMatchObject({ status: 503 });
+      await expect(
+        service.foodGuide(foodGuideDto as any),
+      ).rejects.toMatchObject({ status: 503 });
     });
 
     it('produces different cache keys when cuisinePreferences differs', async () => {
@@ -374,7 +444,10 @@ describe('DestinationFinderService', () => {
       const keyWithout = buildKeySpy.mock.results[0].value;
 
       buildKeySpy.mockClear();
-      await service.foodGuide({ ...foodGuideDto, cuisinePreferences: ['Rajasthani'] } as any);
+      await service.foodGuide({
+        ...foodGuideDto,
+        cuisinePreferences: ['Rajasthani'],
+      } as any);
       const keyWith = buildKeySpy.mock.results[0].value;
 
       expect(keyWith).not.toBe(keyWithout);
@@ -433,40 +506,61 @@ describe('DestinationFinderService', () => {
     });
 
     it('detects trekking intent and uses trek mode', async () => {
-      const result = await service.search(trekDto) as any;
+      const result = await service.search(trekDto);
       expect(result.mode).toBe('trek');
       expect(result.results[0].name).toBe('Hampta Pass');
-      expect(trekService.isTrekkingIntent).toHaveBeenCalledWith(['trekking'], 'challenging high altitude trek');
+      expect(trekService.isTrekkingIntent).toHaveBeenCalledWith(
+        ['trekking'],
+        'challenging high altitude trek',
+      );
     });
 
     it('falls back to normal hybrid when no treks match filters', async () => {
       trekService.filterForSearch.mockReturnValue([]);
       queryService.findShortlist.mockResolvedValue([mockDestination] as any);
       aiService.rankDestinations.mockResolvedValue([
-        { id: 'uuid-1', whyItMatches: 'Decent', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Decent',
+          healthAdvisory: mockAdvisory,
+          costBreakdown: mockCostBreakdown,
+          permits: mockPermits,
+          tripReadiness: mockTripReadiness,
+        },
       ]);
 
-      const result = await service.search(trekDto) as any;
+      const result = await service.search(trekDto);
       expect(result.mode).toBe('hybrid');
     });
 
     it('caches trek results', async () => {
       await service.search(trekDto);
-      expect(cacheService.set).toHaveBeenCalledWith('cache-key-hash', expect.objectContaining({ mode: 'trek' }), 86400);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        'cache-key-hash',
+        expect.objectContaining({ mode: 'trek' }),
+        86400,
+      );
     });
 
     it('skips trek mode when intent is not trekking', async () => {
       trekService.isTrekkingIntent.mockReturnValue(false);
       queryService.findShortlist.mockResolvedValue([mockDestination] as any);
       aiService.rankDestinations.mockResolvedValue([
-        { id: 'uuid-1', whyItMatches: 'Beach vibes', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Beach vibes',
+          healthAdvisory: mockAdvisory,
+          costBreakdown: mockCostBreakdown,
+          permits: mockPermits,
+          tripReadiness: mockTripReadiness,
+        },
       ]);
 
       const result = await service.search({
         ...trekDto,
         experienceTypes: ['beach'],
         freeText: 'relaxing beach vacation',
-      }) as any;
+      });
 
       expect(result.mode).toBe('hybrid');
       expect(trekService.isTrekkingIntent).toHaveBeenCalled();

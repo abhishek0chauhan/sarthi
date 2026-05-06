@@ -5,7 +5,8 @@ describe('buildTripChatSystem', () => {
     destination: 'Cherrapunji',
     state: 'Meghalaya',
     dates: { from: '2026-07-10', to: '2026-07-13' },
-    itinerarySummary: 'Day 1: Living Root Bridge, Elephant Falls. Day 2: Dawki.',
+    itinerarySummary:
+      'Day 1: Living Root Bridge, Elephant Falls. Day 2: Dawki.',
   };
 
   it('returns a system prompt string', () => {

@@ -1,4 +1,7 @@
-export function buildPhrasebookPrompt(destination: string, state: string): { system: string; user: string } {
+export function buildPhrasebookPrompt(
+  destination: string,
+  state: string,
+): { system: string; user: string } {
   return {
     system: `You are an expert travel language guide for India with deep knowledge of regional languages, local idioms, and authentic travel phrases.
 Your goal is to provide REAL, COMMONLY-USED phrases that travelers will actually hear and use - not direct word-for-word translations.

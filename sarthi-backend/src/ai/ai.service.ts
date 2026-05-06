@@ -37,12 +37,18 @@ import { buildReplanPrompt } from './prompts/live-replan.prompt';
 import type { ReplanParams } from './prompts/live-replan.prompt';
 import { buildLocationSuggestionPrompt } from './prompts/live-suggestion.prompt';
 import type { LocationSuggestionParams } from './prompts/live-suggestion.prompt';
-import { enrichmentWrapperSchema, enrichmentContextSchema } from './schemas/enrichment.schema';
+import {
+  enrichmentWrapperSchema,
+  enrichmentContextSchema,
+} from './schemas/enrichment.schema';
 import type { EnrichmentContext } from './schemas/enrichment.schema';
 import { buildPersonalizedLocationPrompt } from './prompts/personalized-location.prompt';
 import { personalizedSuggestionWrapperSchema } from './schemas/personalized-location.schema';
 import type { PersonalizedSuggestion } from './schemas/personalized-location.schema';
-import type { TravelerProfile, NearbyPlace } from './interfaces/personalized-location.interface';
+import type {
+  TravelerProfile,
+  NearbyPlace,
+} from './interfaces/personalized-location.interface';
 
 // Custom fetch with longer timeout for NVIDIA API (free tier can queue for 3+ minutes)
 const nvidiaFetch = (url: string, init?: RequestInit) => {
@@ -55,7 +61,9 @@ const nvidiaFetch = (url: string, init?: RequestInit) => {
     if (sdkSignal.aborted) {
       controller.abort();
     } else {
-      sdkSignal.addEventListener('abort', () => controller.abort(), { once: true });
+      sdkSignal.addEventListener('abort', () => controller.abort(), {
+        once: true,
+      });
     }
   }
 
@@ -92,7 +100,8 @@ export class AiService {
       : nvidia(NVIDIA_MODEL_ID);
 
   constructor() {
-    const modelId = AI_PROVIDER === 'gemini' ? GEMINI_MODEL_ID : NVIDIA_MODEL_ID;
+    const modelId =
+      AI_PROVIDER === 'gemini' ? GEMINI_MODEL_ID : NVIDIA_MODEL_ID;
     this.logger.log(`AI provider: ${AI_PROVIDER} (model: ${modelId})`);
   }
 
@@ -113,12 +122,15 @@ export class AiService {
       return [];
     }
 
-    return rankings.filter(item => shortlistIds.includes(item.id)).slice(0, 5);
+    return rankings
+      .filter((item) => shortlistIds.includes(item.id))
+      .slice(0, 5);
   }
 
-  async generateDestinations(
-    prompt: { system: string; user: string },
-  ): Promise<GenerateResult[]> {
+  async generateDestinations(prompt: {
+    system: string;
+    user: string;
+  }): Promise<GenerateResult[]> {
     const result = await generateJson({
       model: this.model,
       schema: generateResultsSchema,
@@ -129,9 +141,10 @@ export class AiService {
     return (result?.destinations ?? []).slice(0, 5);
   }
 
-  async generateItinerary(
-    prompt: { system: string; user: string },
-  ): Promise<ItineraryResponse> {
+  async generateItinerary(prompt: {
+    system: string;
+    user: string;
+  }): Promise<ItineraryResponse> {
     const result = await generateJson({
       model: this.model,
       schema: itineraryResponseWrapperSchema,
@@ -142,9 +155,10 @@ export class AiService {
     return result.result;
   }
 
-  async generateFoodGuide(
-    prompt: { system: string; user: string },
-  ): Promise<FoodGuideResponse> {
+  async generateFoodGuide(prompt: {
+    system: string;
+    user: string;
+  }): Promise<FoodGuideResponse> {
     const result = await generateJson({
       model: this.model,
       schema: foodGuideResponseWrapperSchema,
@@ -155,9 +169,10 @@ export class AiService {
     return result.result;
   }
 
-  async rankTreks(
-    prompt: { system: string; user: string },
-  ): Promise<TrekResult[]> {
+  async rankTreks(prompt: {
+    system: string;
+    user: string;
+  }): Promise<TrekResult[]> {
     const result = await generateJson({
       model: this.model,
       schema: trekResultsSchema,
@@ -169,7 +184,8 @@ export class AiService {
   }
 
   async extractPersonality(story: string): Promise<ProfileExtraction> {
-    const system = 'You are a travel personality analyst. Extract the traveler\'s personality dimensions from their story. Only extract dimensions you are confident about from the story — leave others absent.';
+    const system =
+      "You are a travel personality analyst. Extract the traveler's personality dimensions from their story. Only extract dimensions you are confident about from the story — leave others absent.";
     const user = `Analyze this traveler story and extract personality dimensions:
 
 "${story}"
@@ -188,7 +204,10 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     return result.result;
   }
 
-  async generatePhrasebook(destination: string, state: string): Promise<Phrasebook> {
+  async generatePhrasebook(
+    destination: string,
+    state: string,
+  ): Promise<Phrasebook> {
     const prompt = buildPhrasebookPrompt(destination, state);
     const result = await generateJson({
       model: this.model,
@@ -199,7 +218,9 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     return result.result;
   }
 
-  async suggestActivityReplacement(params: SuggestReplacementParams): Promise<ActivitySuggestion[]> {
+  async suggestActivityReplacement(
+    params: SuggestReplacementParams,
+  ): Promise<ActivitySuggestion[]> {
     const prompt = buildSuggestReplacementPrompt(params);
     const result = await generateJson({
       model: this.model,
@@ -242,7 +263,9 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     return result.result.activities;
   }
 
-  async generateLocationSuggestion(params: LocationSuggestionParams): Promise<LiveSuggestion> {
+  async generateLocationSuggestion(
+    params: LocationSuggestionParams,
+  ): Promise<LiveSuggestion> {
     const prompt = buildLocationSuggestionPrompt(params);
     const result = await generateJson({
       model: this.model,
@@ -259,7 +282,7 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     userProfile: TravelerProfile,
     availableMinutes: number,
     nearbyPlaces: NearbyPlace[],
-    alreadyPlanned: string[]
+    alreadyPlanned: string[],
   ): Promise<PersonalizedSuggestion> {
     // Input validation
     if (!destination?.trim()) {
@@ -287,7 +310,7 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
       userProfile,
       availableMinutes,
       nearbyPlaces,
-      alreadyPlanned
+      alreadyPlanned,
     );
 
     const result = await generateJson({
@@ -304,7 +327,8 @@ Set confidence to how much the story revealed (0=nothing useful, 100=all 9 dimen
     const result = await generateJson({
       model: this.model,
       schema: enrichmentWrapperSchema,
-      system: 'You are a travel expert enriching trip activities with detailed context.',
+      system:
+        'You are a travel expert enriching trip activities with detailed context.',
       prompt,
     });
     return result.contexts ?? [];

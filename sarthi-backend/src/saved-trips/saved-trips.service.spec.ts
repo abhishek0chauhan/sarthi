@@ -2,7 +2,12 @@ import { SavedTripsService } from './saved-trips.service';
 import { UserService } from './user.service';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
-const mockUser = { id: 'user-1', firebaseUid: 'fb-123', displayName: 'Abhishek', email: 'a@b.com' };
+const mockUser = {
+  id: 'user-1',
+  firebaseUid: 'fb-123',
+  displayName: 'Abhishek',
+  email: 'a@b.com',
+};
 
 const mockItinerary = {
   destination: 'Goa',
@@ -12,8 +17,18 @@ const mockItinerary = {
       day: 1,
       title: 'Arrival',
       activities: [
-        { time: '10:00 AM', activity: 'Check in', cost: '₹2000', healthNote: '' },
-        { time: '03:00 PM', activity: 'Beach walk', cost: 'Free', healthNote: '' },
+        {
+          time: '10:00 AM',
+          activity: 'Check in',
+          cost: '₹2000',
+          healthNote: '',
+        },
+        {
+          time: '03:00 PM',
+          activity: 'Beach walk',
+          cost: 'Free',
+          healthNote: '',
+        },
       ],
       meals: { breakfast: '', lunch: '', dinner: '' },
       healthNote: '',
@@ -22,7 +37,12 @@ const mockItinerary = {
       day: 2,
       title: 'Explore',
       activities: [
-        { time: '09:00 AM', activity: 'Fort tour', cost: '₹50', healthNote: '' },
+        {
+          time: '09:00 AM',
+          activity: 'Fort tour',
+          cost: '₹50',
+          healthNote: '',
+        },
       ],
       meals: { breakfast: '', lunch: '', dinner: '' },
       healthNote: '',
@@ -58,7 +78,15 @@ let aiServiceMock: { suggestActivityReplacement: jest.Mock };
 
 describe('SavedTripsService', () => {
   let service: SavedTripsService;
-  let prisma: { savedTrip: { create: jest.Mock; findMany: jest.Mock; findUnique: jest.Mock; update: jest.Mock; delete: jest.Mock } };
+  let prisma: {
+    savedTrip: {
+      create: jest.Mock;
+      findMany: jest.Mock;
+      findUnique: jest.Mock;
+      update: jest.Mock;
+      delete: jest.Mock;
+    };
+  };
   let userService: { findOrCreate: jest.Mock };
 
   beforeEach(() => {
@@ -74,7 +102,9 @@ describe('SavedTripsService', () => {
     userService = { findOrCreate: jest.fn() };
     correctionsService = { create: jest.fn().mockResolvedValue({}) };
     profileService = { getProfile: jest.fn().mockResolvedValue(null) };
-    aiServiceMock = { suggestActivityReplacement: jest.fn().mockResolvedValue([]) };
+    aiServiceMock = {
+      suggestActivityReplacement: jest.fn().mockResolvedValue([]),
+    };
     service = new SavedTripsService(
       prisma as any,
       userService as any,
@@ -96,9 +126,17 @@ describe('SavedTripsService', () => {
         destinationData: { name: 'Goa' },
       };
 
-      const result = await service.create(dto as any, { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.create(dto as any, {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
 
-      expect(userService.findOrCreate).toHaveBeenCalledWith('fb-123', 'Abhishek', 'a@b.com');
+      expect(userService.findOrCreate).toHaveBeenCalledWith(
+        'fb-123',
+        'Abhishek',
+        'a@b.com',
+      );
       expect(prisma.savedTrip.create).toHaveBeenCalledWith({
         data: {
           userId: 'user-1',
@@ -117,7 +155,10 @@ describe('SavedTripsService', () => {
 
     it('uses provided name instead of default', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
-      prisma.savedTrip.create.mockResolvedValue({ ...mockTrip, name: 'My Custom Trip' });
+      prisma.savedTrip.create.mockResolvedValue({
+        ...mockTrip,
+        name: 'My Custom Trip',
+      });
 
       const dto = {
         name: 'My Custom Trip',
@@ -127,10 +168,16 @@ describe('SavedTripsService', () => {
         destinationData: { name: 'Goa' },
       };
 
-      await service.create(dto as any, { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      await service.create(dto as any, {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
 
       expect(prisma.savedTrip.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ name: 'My Custom Trip' }) }),
+        expect.objectContaining({
+          data: expect.objectContaining({ name: 'My Custom Trip' }),
+        }),
       );
     });
   });
@@ -140,10 +187,19 @@ describe('SavedTripsService', () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findMany.mockResolvedValue([
         { ...mockTrip, itineraryData: { day: 1 }, foodGuideData: null },
-        { ...mockTrip, id: 'trip-2', itineraryData: null, foodGuideData: { overview: 'x' } },
+        {
+          ...mockTrip,
+          id: 'trip-2',
+          itineraryData: null,
+          foodGuideData: { overview: 'x' },
+        },
       ]);
 
-      const result = await service.listByUser({ uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.listByUser({
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
 
       expect(prisma.savedTrip.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-1' },
@@ -161,7 +217,11 @@ describe('SavedTripsService', () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTrip);
 
-      const result = await service.getById('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.getById('trip-1', {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
       expect(result).toEqual(mockTrip);
     });
 
@@ -169,16 +229,29 @@ describe('SavedTripsService', () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(null);
 
-      await expect(service.getById('bad-id', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' }))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.getById('bad-id', {
+          uid: 'fb-123',
+          name: 'Abhishek',
+          email: 'a@b.com',
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('throws 403 when trip belongs to another user', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
-      prisma.savedTrip.findUnique.mockResolvedValue({ ...mockTrip, userId: 'other-user' });
+      prisma.savedTrip.findUnique.mockResolvedValue({
+        ...mockTrip,
+        userId: 'other-user',
+      });
 
-      await expect(service.getById('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' }))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.getById('trip-1', {
+          uid: 'fb-123',
+          name: 'Abhishek',
+          email: 'a@b.com',
+        }),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -186,9 +259,17 @@ describe('SavedTripsService', () => {
     it('updates trip name and travel mode', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTrip);
-      prisma.savedTrip.update.mockResolvedValue({ ...mockTrip, name: 'Updated', travelMode: 'train' });
+      prisma.savedTrip.update.mockResolvedValue({
+        ...mockTrip,
+        name: 'Updated',
+        travelMode: 'train',
+      });
 
-      const result = await service.update('trip-1', { name: 'Updated', travelMode: 'train' } as any, { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.update(
+        'trip-1',
+        { name: 'Updated', travelMode: 'train' } as any,
+        { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' },
+      );
 
       expect(prisma.savedTrip.update).toHaveBeenCalledWith({
         where: { id: 'trip-1' },
@@ -199,10 +280,18 @@ describe('SavedTripsService', () => {
 
     it('rejects update for non-owner', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
-      prisma.savedTrip.findUnique.mockResolvedValue({ ...mockTrip, userId: 'other-user' });
+      prisma.savedTrip.findUnique.mockResolvedValue({
+        ...mockTrip,
+        userId: 'other-user',
+      });
 
-      await expect(service.update('trip-1', { name: 'x' } as any, { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' }))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.update('trip-1', { name: 'x' } as any, {
+          uid: 'fb-123',
+          name: 'Abhishek',
+          email: 'a@b.com',
+        }),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -212,8 +301,14 @@ describe('SavedTripsService', () => {
       prisma.savedTrip.findUnique.mockResolvedValue(mockTrip);
       prisma.savedTrip.delete.mockResolvedValue(mockTrip);
 
-      await service.remove('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
-      expect(prisma.savedTrip.delete).toHaveBeenCalledWith({ where: { id: 'trip-1' } });
+      await service.remove('trip-1', {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
+      expect(prisma.savedTrip.delete).toHaveBeenCalledWith({
+        where: { id: 'trip-1' },
+      });
     });
   });
 
@@ -221,28 +316,52 @@ describe('SavedTripsService', () => {
     it('generates share token', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTrip);
-      prisma.savedTrip.update.mockResolvedValue({ ...mockTrip, shareToken: 'token-uuid' });
+      prisma.savedTrip.update.mockResolvedValue({
+        ...mockTrip,
+        shareToken: 'token-uuid',
+      });
 
-      const result = await service.enableSharing('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.enableSharing('trip-1', {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
       expect(result.shareToken).toBe('token-uuid');
       expect(prisma.savedTrip.update).toHaveBeenCalled();
     });
 
     it('returns existing token if already shared', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
-      prisma.savedTrip.findUnique.mockResolvedValue({ ...mockTrip, shareToken: 'existing-token' });
+      prisma.savedTrip.findUnique.mockResolvedValue({
+        ...mockTrip,
+        shareToken: 'existing-token',
+      });
 
-      const result = await service.enableSharing('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      const result = await service.enableSharing('trip-1', {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
       expect(result.shareToken).toBe('existing-token');
       expect(prisma.savedTrip.update).not.toHaveBeenCalled();
     });
 
     it('removes share token on disable', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
-      prisma.savedTrip.findUnique.mockResolvedValue({ ...mockTrip, shareToken: 'token' });
-      prisma.savedTrip.update.mockResolvedValue({ ...mockTrip, shareToken: null });
+      prisma.savedTrip.findUnique.mockResolvedValue({
+        ...mockTrip,
+        shareToken: 'token',
+      });
+      prisma.savedTrip.update.mockResolvedValue({
+        ...mockTrip,
+        shareToken: null,
+      });
 
-      await service.disableSharing('trip-1', { uid: 'fb-123', name: 'Abhishek', email: 'a@b.com' });
+      await service.disableSharing('trip-1', {
+        uid: 'fb-123',
+        name: 'Abhishek',
+        email: 'a@b.com',
+      });
       expect(prisma.savedTrip.update).toHaveBeenCalledWith({
         where: { id: 'trip-1' },
         data: { shareToken: null },
@@ -250,7 +369,11 @@ describe('SavedTripsService', () => {
     });
 
     it('getShared returns trip with sharer name', async () => {
-      prisma.savedTrip.findUnique.mockResolvedValue({ ...mockTrip, shareToken: 'token', user: mockUser });
+      prisma.savedTrip.findUnique.mockResolvedValue({
+        ...mockTrip,
+        shareToken: 'token',
+        user: mockUser,
+      });
 
       const result = await service.getShared('token');
       expect(result.sharedBy).toBe('Abhishek');
@@ -259,7 +382,9 @@ describe('SavedTripsService', () => {
     it('getShared throws 404 for invalid token', async () => {
       prisma.savedTrip.findUnique.mockResolvedValue(null);
 
-      await expect(service.getShared('bad-token')).rejects.toThrow(NotFoundException);
+      await expect(service.getShared('bad-token')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -267,15 +392,19 @@ describe('SavedTripsService', () => {
     it('appends activity to end of day by default', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
-        ...mockTripWithItinerary,
-        itineraryData: data.itineraryData,
-      }));
+      prisma.savedTrip.update.mockImplementation(({ data }) =>
+        Promise.resolve({
+          ...mockTripWithItinerary,
+          itineraryData: data.itineraryData,
+        }),
+      );
 
-      await service.addActivity('trip-1', 1, { activity: 'Sunset cruise' }, { uid: 'fb-123' } as any);
+      await service.addActivity('trip-1', 1, { activity: 'Sunset cruise' }, {
+        uid: 'fb-123',
+      } as any);
 
       const updateCall = prisma.savedTrip.update.mock.calls[0][0];
-      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      const updatedDay = updateCall.data.itineraryData.itinerary[0];
       expect(updatedDay.activities).toHaveLength(3);
       expect(updatedDay.activities[2].activity).toBe('Sunset cruise');
     });
@@ -283,15 +412,22 @@ describe('SavedTripsService', () => {
     it('inserts activity at specified position', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
-        ...mockTripWithItinerary,
-        itineraryData: data.itineraryData,
-      }));
+      prisma.savedTrip.update.mockImplementation(({ data }) =>
+        Promise.resolve({
+          ...mockTripWithItinerary,
+          itineraryData: data.itineraryData,
+        }),
+      );
 
-      await service.addActivity('trip-1', 1, { activity: 'Market visit', position: 0 }, { uid: 'fb-123' } as any);
+      await service.addActivity(
+        'trip-1',
+        1,
+        { activity: 'Market visit', position: 0 },
+        { uid: 'fb-123' } as any,
+      );
 
       const updateCall = prisma.savedTrip.update.mock.calls[0][0];
-      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      const updatedDay = updateCall.data.itineraryData.itinerary[0];
       expect(updatedDay.activities[0].activity).toBe('Market visit');
     });
 
@@ -300,7 +436,9 @@ describe('SavedTripsService', () => {
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
 
       await expect(
-        service.addActivity('trip-1', 99, { activity: 'anything' }, { uid: 'fb-123' } as any),
+        service.addActivity('trip-1', 99, { activity: 'anything' }, {
+          uid: 'fb-123',
+        } as any),
       ).rejects.toThrow('Day 99 not found in itinerary');
     });
   });
@@ -309,15 +447,17 @@ describe('SavedTripsService', () => {
     it('removes activity at given index', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
-        ...mockTripWithItinerary,
-        itineraryData: data.itineraryData,
-      }));
+      prisma.savedTrip.update.mockImplementation(({ data }) =>
+        Promise.resolve({
+          ...mockTripWithItinerary,
+          itineraryData: data.itineraryData,
+        }),
+      );
 
       await service.removeActivity('trip-1', 1, 0, { uid: 'fb-123' } as any);
 
       const updateCall = prisma.savedTrip.update.mock.calls[0][0];
-      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      const updatedDay = updateCall.data.itineraryData.itinerary[0];
       expect(updatedDay.activities).toHaveLength(1);
       expect(updatedDay.activities[0].activity).toBe('Beach walk');
     });
@@ -336,15 +476,19 @@ describe('SavedTripsService', () => {
     it('replaces activity at index', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
-        ...mockTripWithItinerary,
-        itineraryData: data.itineraryData,
-      }));
+      prisma.savedTrip.update.mockImplementation(({ data }) =>
+        Promise.resolve({
+          ...mockTripWithItinerary,
+          itineraryData: data.itineraryData,
+        }),
+      );
 
-      await service.swapActivity('trip-1', 1, 0, { activity: 'Yoga session' }, { uid: 'fb-123' } as any);
+      await service.swapActivity('trip-1', 1, 0, { activity: 'Yoga session' }, {
+        uid: 'fb-123',
+      } as any);
 
       const updateCall = prisma.savedTrip.update.mock.calls[0][0];
-      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      const updatedDay = updateCall.data.itineraryData.itinerary[0];
       expect(updatedDay.activities[0].activity).toBe('Yoga session');
     });
   });
@@ -353,15 +497,19 @@ describe('SavedTripsService', () => {
     it('reorders activities by new index array', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      prisma.savedTrip.update.mockImplementation(({ data }) => Promise.resolve({
-        ...mockTripWithItinerary,
-        itineraryData: data.itineraryData,
-      }));
+      prisma.savedTrip.update.mockImplementation(({ data }) =>
+        Promise.resolve({
+          ...mockTripWithItinerary,
+          itineraryData: data.itineraryData,
+        }),
+      );
 
-      await service.reorderActivities('trip-1', 1, [1, 0], { uid: 'fb-123' } as any);
+      await service.reorderActivities('trip-1', 1, [1, 0], {
+        uid: 'fb-123',
+      } as any);
 
       const updateCall = prisma.savedTrip.update.mock.calls[0][0];
-      const updatedDay = (updateCall.data.itineraryData as any).itinerary[0];
+      const updatedDay = updateCall.data.itineraryData.itinerary[0];
       expect(updatedDay.activities[0].activity).toBe('Beach walk');
       expect(updatedDay.activities[1].activity).toBe('Check in');
     });
@@ -371,9 +519,13 @@ describe('SavedTripsService', () => {
     it('calls AI with trip context and returns suggestions', async () => {
       userService.findOrCreate.mockResolvedValue(mockUser);
       prisma.savedTrip.findUnique.mockResolvedValue(mockTripWithItinerary);
-      aiServiceMock.suggestActivityReplacement.mockResolvedValue([{ activity: 'Dudhsagar Falls' }]);
+      aiServiceMock.suggestActivityReplacement.mockResolvedValue([
+        { activity: 'Dudhsagar Falls' },
+      ]);
 
-      const result = await service.suggestReplacement('trip-1', 1, 0, { uid: 'fb-123' } as any);
+      const result = await service.suggestReplacement('trip-1', 1, 0, {
+        uid: 'fb-123',
+      } as any);
 
       expect(aiServiceMock.suggestActivityReplacement).toHaveBeenCalledWith(
         expect.objectContaining({ destination: 'Goa', day: 1 }),

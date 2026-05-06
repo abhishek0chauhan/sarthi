@@ -4,7 +4,11 @@ import { AiService } from '../ai/ai.service';
 import { SavedTripsService } from './saved-trips.service';
 import { Prisma } from '@prisma/client';
 
-interface FirebaseUser { uid: string; name?: string; email?: string; }
+interface FirebaseUser {
+  uid: string;
+  name?: string;
+  email?: string;
+}
 
 @Injectable()
 export class PhrasebookService {
@@ -23,11 +27,18 @@ export class PhrasebookService {
 
   async generateAndStore(tripId: string, fbUser: FirebaseUser) {
     const trip = await this.savedTripsService.getById(tripId, fbUser);
-    this.logger.log(`Generating phrasebook for ${trip.destination}, ${trip.state}`);
+    this.logger.log(
+      `Generating phrasebook for ${trip.destination}, ${trip.state}`,
+    );
 
     try {
-      const phrasebook = await this.aiService.generatePhrasebook(trip.destination, trip.state);
-      this.logger.log(`Successfully generated phrasebook for ${trip.destination}`);
+      const phrasebook = await this.aiService.generatePhrasebook(
+        trip.destination,
+        trip.state,
+      );
+      this.logger.log(
+        `Successfully generated phrasebook for ${trip.destination}`,
+      );
 
       await this.prisma.savedTrip.update({
         where: { id: tripId },
@@ -35,7 +46,10 @@ export class PhrasebookService {
       });
       return phrasebook;
     } catch (err) {
-      this.logger.error(`Failed to generate phrasebook for ${trip.destination}`, err);
+      this.logger.error(
+        `Failed to generate phrasebook for ${trip.destination}`,
+        err,
+      );
       throw err;
     }
   }

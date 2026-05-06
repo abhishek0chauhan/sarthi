@@ -34,13 +34,21 @@ export class EnrichmentService {
 
   constructor(private readonly aiService: AiService) {}
 
-  async enrichTrip(itineraryData: ItineraryData, destination: string, state: string): Promise<ItineraryData> {
+  async enrichTrip(
+    itineraryData: ItineraryData,
+    destination: string,
+    state: string,
+  ): Promise<ItineraryData> {
     if (!itineraryData.itinerary || itineraryData.itinerary.length === 0) {
       throw new BadRequestException('Itinerary is empty');
     }
 
     // Collect all activities that need enrichment
-    const activitiesToEnrich: { dayIndex: number; activityIndex: number; activity: ItineraryActivity }[] = [];
+    const activitiesToEnrich: {
+      dayIndex: number;
+      activityIndex: number;
+      activity: ItineraryActivity;
+    }[] = [];
     itineraryData.itinerary.forEach((day, dayIndex) => {
       day.activities.forEach((activity, activityIndex) => {
         if (!activity.placeContext) {
@@ -61,17 +69,23 @@ export class EnrichmentService {
       activitiesToEnrich.map((a) => a.activity),
     );
 
-    this.logger.log(`Enriching ${activitiesToEnrich.length} activities for ${destination}, ${state}`);
+    this.logger.log(
+      `Enriching ${activitiesToEnrich.length} activities for ${destination}, ${state}`,
+    );
 
     try {
       const response = await this.aiService.enrichActivities(prompt);
-      this.logger.log(`Received enrichment response with ${response.length} contexts`);
+      this.logger.log(
+        `Received enrichment response with ${response.length} contexts`,
+      );
 
       // Apply enriched context back to itinerary
       let contextIndex = 0;
       activitiesToEnrich.forEach(({ dayIndex, activityIndex }) => {
         if (contextIndex < response.length) {
-          itineraryData.itinerary[dayIndex].activities[activityIndex].placeContext = response[contextIndex];
+          itineraryData.itinerary[dayIndex].activities[
+            activityIndex
+          ].placeContext = response[contextIndex];
           contextIndex++;
         }
       });

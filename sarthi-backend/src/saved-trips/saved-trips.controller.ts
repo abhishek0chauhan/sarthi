@@ -1,4 +1,18 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Req, UseGuards, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
 import { SavedTripsService } from './saved-trips.service';
 import { PhrasebookService } from './phrasebook.service';
@@ -35,7 +49,11 @@ export class SavedTripsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateSavedTripDto, @Req() req: any) {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateSavedTripDto,
+    @Req() req: any,
+  ) {
     return this.service.update(id, dto, req.user);
   }
 
@@ -68,7 +86,11 @@ export class SavedTripsController {
       trip.destination,
       trip.state,
     );
-    return this.service.update(id, { itineraryData: enrichedItinerary }, req.user);
+    return this.service.update(
+      id,
+      { itineraryData: enrichedItinerary },
+      req.user,
+    );
   }
 
   @Post(':id/phrasebook')
@@ -78,7 +100,9 @@ export class SavedTripsController {
       return await this.phrasebookService.generateAndStore(id, req.user);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      throw new InternalServerErrorException(`Phrasebook generation failed: ${message}`);
+      throw new InternalServerErrorException(
+        `Phrasebook generation failed: ${message}`,
+      );
     }
   }
 
@@ -109,7 +133,12 @@ export class SavedTripsController {
     @Param('index') index: string,
     @Req() req: any,
   ) {
-    return this.service.removeActivity(id, Number(day), Number(index), req.user);
+    return this.service.removeActivity(
+      id,
+      Number(day),
+      Number(index),
+      req.user,
+    );
   }
 
   @Put(':id/itinerary/day/:day/activity/:index')
@@ -120,7 +149,13 @@ export class SavedTripsController {
     @Body() dto: AddActivityDto,
     @Req() req: any,
   ) {
-    return this.service.swapActivity(id, Number(day), Number(index), dto, req.user);
+    return this.service.swapActivity(
+      id,
+      Number(day),
+      Number(index),
+      dto,
+      req.user,
+    );
   }
 
   @Patch(':id/itinerary/day/:day/reorder')
@@ -141,7 +176,12 @@ export class SavedTripsController {
     @Param('index') index: string,
     @Req() req: any,
   ) {
-    return this.service.suggestReplacement(id, Number(day), Number(index), req.user);
+    return this.service.suggestReplacement(
+      id,
+      Number(day),
+      Number(index),
+      req.user,
+    );
   }
 
   @Post(':id/chat')

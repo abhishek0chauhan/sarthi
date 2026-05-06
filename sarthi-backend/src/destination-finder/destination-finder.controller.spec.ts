@@ -28,7 +28,9 @@ describe('DestinationFinderController', () => {
       .useValue(mockGuard)
       .compile();
 
-    controller = module.get<DestinationFinderController>(DestinationFinderController);
+    controller = module.get<DestinationFinderController>(
+      DestinationFinderController,
+    );
     mockService.search.mockReset();
     mockService.itinerary.mockReset();
     mockService.foodGuide.mockReset();

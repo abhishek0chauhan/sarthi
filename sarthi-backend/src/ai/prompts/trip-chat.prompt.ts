@@ -17,7 +17,9 @@ export function buildTripChatSystem(ctx: TripChatContext): string {
   const tripInfo = [
     `Destination: ${ctx.destination}, ${ctx.state}`,
     ctx.dates ? `Dates: ${ctx.dates.from} to ${ctx.dates.to}` : '',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   const itinerarySection = ctx.itinerarySummary
     ? `\n\nItinerary summary:\n${ctx.itinerarySummary}`
@@ -28,7 +30,7 @@ export function buildTripChatSystem(ctx: TripChatContext): string {
     : '';
 
   const historySection = ctx.recentMessages?.length
-    ? `\n\nRecent conversation:\n${ctx.recentMessages.map(m => `${m.role === 'user' ? 'Traveler' : 'Assistant'}: ${m.content}`).join('\n')}`
+    ? `\n\nRecent conversation:\n${ctx.recentMessages.map((m) => `${m.role === 'user' ? 'Traveler' : 'Assistant'}: ${m.content}`).join('\n')}`
     : '';
 
   return `You are a knowledgeable travel assistant for a trip to ${ctx.destination}, ${ctx.state}. Answer questions concisely and practically. Focus on what's useful on the ground — local tips, safety, logistics, culture.

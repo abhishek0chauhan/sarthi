@@ -1,4 +1,18 @@
-import { buildHybridPrompt, buildAiFullPrompt, buildItineraryPrompt, buildFoodGuidePrompt, buildTasteProfileBlock, buildTrekPrompt, computeBmi, computeTripDays, monthNameFromDate, buildSearchContext, buildPersonalityBlock, buildCorrectionsBlock, buildSuggestReplacementPrompt } from './destination.prompt';
+import {
+  buildHybridPrompt,
+  buildAiFullPrompt,
+  buildItineraryPrompt,
+  buildFoodGuidePrompt,
+  buildTasteProfileBlock,
+  buildTrekPrompt,
+  computeBmi,
+  computeTripDays,
+  monthNameFromDate,
+  buildSearchContext,
+  buildPersonalityBlock,
+  buildCorrectionsBlock,
+  buildSuggestReplacementPrompt,
+} from './destination.prompt';
 
 const baseParams = {
   freeText: 'want something offbeat',
@@ -142,7 +156,16 @@ describe('buildHybridPrompt', () => {
       dates: { from: '2026-04-17', to: '2026-04-19' },
       departureCity: 'Ahmedabad',
       destinations: [
-        { id: 'uuid-1', name: 'Kasol', state: 'HP', experienceTypes: ['mountains'], isHiddenGem: true, weatherSummary: 'Cool', budgetMin: 700, budgetMax: 1200 },
+        {
+          id: 'uuid-1',
+          name: 'Kasol',
+          state: 'HP',
+          experienceTypes: ['mountains'],
+          isHiddenGem: true,
+          weatherSummary: 'Cool',
+          budgetMin: 700,
+          budgetMax: 1200,
+        },
       ],
     });
     expect(user).toContain('## Context');
@@ -162,7 +185,16 @@ describe('buildHybridPrompt', () => {
       departureCity: 'Ahmedabad',
       hiddenGem: true,
       destinations: [
-        { id: 'uuid-1', name: 'Polo Forest', state: 'Gujarat', experienceTypes: ['nature'], isHiddenGem: true, weatherSummary: 'Mild', budgetMin: 1500, budgetMax: 3000 },
+        {
+          id: 'uuid-1',
+          name: 'Polo Forest',
+          state: 'Gujarat',
+          experienceTypes: ['nature'],
+          isHiddenGem: true,
+          weatherSummary: 'Mild',
+          budgetMin: 1500,
+          budgetMax: 3000,
+        },
       ],
     });
     expect(user).toContain('Hidden gems ONLY:');
@@ -550,26 +582,40 @@ describe('buildSearchContext', () => {
   it('contains group size, type, and hint', () => {
     const ctx = buildSearchContext(baseParams);
     expect(ctx).toContain('4 friends');
-    expect(ctx).toContain('nightlife, adventure activities, and shared experiences');
+    expect(ctx).toContain(
+      'nightlife, adventure activities, and shared experiences',
+    );
   });
 
   it('uses couple hint for couple group type', () => {
-    const ctx = buildSearchContext({ ...baseParams, group: { size: 2, type: 'couple' } });
+    const ctx = buildSearchContext({
+      ...baseParams,
+      group: { size: 2, type: 'couple' },
+    });
     expect(ctx).toContain('romantic, scenic stays');
   });
 
   it('uses family hint for family group type', () => {
-    const ctx = buildSearchContext({ ...baseParams, group: { size: 4, type: 'family' } });
+    const ctx = buildSearchContext({
+      ...baseParams,
+      group: { size: 4, type: 'family' },
+    });
     expect(ctx).toContain('kid-friendly');
   });
 
   it('uses solo hint for solo group type', () => {
-    const ctx = buildSearchContext({ ...baseParams, group: { size: 1, type: 'solo' } });
+    const ctx = buildSearchContext({
+      ...baseParams,
+      group: { size: 1, type: 'solo' },
+    });
     expect(ctx).toContain('safe, social destinations');
   });
 
   it('falls back to generic hint for unknown group type', () => {
-    const ctx = buildSearchContext({ ...baseParams, group: { size: 5, type: 'mystery' } });
+    const ctx = buildSearchContext({
+      ...baseParams,
+      group: { size: 5, type: 'mystery' },
+    });
     expect(ctx).toContain("tailor to the group's vibe");
   });
 
@@ -626,7 +672,10 @@ describe('buildSearchContext', () => {
   });
 
   it('does not add Hidden gems rule in trek mode even when hiddenGem is true', () => {
-    const ctx = buildSearchContext({ ...baseParams, hiddenGem: true }, { mode: 'trek' });
+    const ctx = buildSearchContext(
+      { ...baseParams, hiddenGem: true },
+      { mode: 'trek' },
+    );
     expect(ctx).not.toContain('Hidden gems ONLY:');
     expect(ctx).not.toContain('Nearby gems:');
   });
@@ -635,7 +684,9 @@ describe('buildSearchContext', () => {
 describe('buildTasteProfileBlock', () => {
   it('returns empty string when no taste-profile fields provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -645,7 +696,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Cuisines line when cuisinePreferences provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -656,7 +709,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Cooking styles line when cookingStyles provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -667,7 +722,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Flavors line when flavorPreferences provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -678,7 +735,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Adventurousness line when provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -689,7 +748,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Favorite dishes line when provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -700,7 +761,9 @@ describe('buildTasteProfileBlock', () => {
 
   it('includes Meat preferences line when provided', () => {
     const result = buildTasteProfileBlock({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -713,7 +776,9 @@ describe('buildTasteProfileBlock', () => {
 describe('buildFoodGuidePrompt — rules section', () => {
   it('user text always includes allergens rule', () => {
     const { user } = buildFoodGuidePrompt({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -725,7 +790,9 @@ describe('buildFoodGuidePrompt — rules section', () => {
   // Slim free-model format uses allergens only (no tasteProfile per dish).
   it('user text includes allergens rule (slim free-model format)', () => {
     const { user } = buildFoodGuidePrompt({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -735,7 +802,9 @@ describe('buildFoodGuidePrompt — rules section', () => {
 
   it('user text includes Taste Profile block when cuisinePreferences provided', () => {
     const { user } = buildFoodGuidePrompt({
-      destination: 'Goa', state: 'Goa', freeText: 'trip',
+      destination: 'Goa',
+      state: 'Goa',
+      freeText: 'trip',
       group: { size: 2, type: 'couple' },
       dates: { from: '2026-05-01', to: '2026-05-05' },
       departureCity: 'Mumbai',
@@ -752,7 +821,9 @@ describe('buildPersonalityBlock', () => {
   });
 
   it('returns empty string when profile has no dimensions set', () => {
-    expect(buildPersonalityBlock({ travelPace: null, completeness: 0 } as any)).toBe('');
+    expect(
+      buildPersonalityBlock({ travelPace: null, completeness: 0 } as any),
+    ).toBe('');
   });
 
   it('includes filled dimensions', () => {
@@ -771,13 +842,19 @@ describe('buildPersonalityBlock', () => {
   });
 
   it('omits dimensions that are null/undefined', () => {
-    const block = buildPersonalityBlock({ travelPace: 'packed', completeness: 11 } as any);
+    const block = buildPersonalityBlock({
+      travelPace: 'packed',
+      completeness: 11,
+    } as any);
     expect(block).not.toContain('Comfort:');
     expect(block).not.toContain('Crowds:');
   });
 
   it('includes personalMatch instruction', () => {
-    const block = buildPersonalityBlock({ travelPace: 'loose', completeness: 11 } as any);
+    const block = buildPersonalityBlock({
+      travelPace: 'loose',
+      completeness: 11,
+    } as any);
     expect(block).toContain('personalMatch');
     expect(block).toContain('matchLevel');
   });
@@ -794,7 +871,10 @@ describe('buildCorrectionsBlock', () => {
 
   it('includes corrections summary heading', () => {
     const block = buildCorrectionsBlock([
-      { type: 'thumbs_down', context: { place: 'Elephant Falls', reason: 'touristy' } },
+      {
+        type: 'thumbs_down',
+        context: { place: 'Elephant Falls', reason: 'touristy' },
+      },
     ] as any);
     expect(block).toContain('## Past Preferences');
     expect(block).toContain('thumbs_down');
@@ -841,7 +921,10 @@ describe('buildSuggestReplacementPrompt', () => {
       state: 'Meghalaya',
       day: 2,
       currentActivity: { time: '09:00 AM', activity: 'Crowded waterfall tour' },
-      dayActivities: ['09:00 AM: Crowded waterfall tour', '02:00 PM: Local market'],
+      dayActivities: [
+        '09:00 AM: Crowded waterfall tour',
+        '02:00 PM: Local market',
+      ],
     });
     expect(prompt).toHaveProperty('system');
     expect(prompt).toHaveProperty('user');

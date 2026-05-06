@@ -7,9 +7,16 @@ interface ItineraryActivity {
   placeContext?: any;
 }
 
-export function buildEnrichmentPrompt(destination: string, state: string, activities: ItineraryActivity[]): string {
+export function buildEnrichmentPrompt(
+  destination: string,
+  state: string,
+  activities: ItineraryActivity[],
+): string {
   const activitiesText = activities
-    .map((a, i) => `${i + 1}. ${a.activity} (${a.time || 'time TBD'})${a.cost ? ` - ${a.cost}` : ''}`)
+    .map(
+      (a, i) =>
+        `${i + 1}. ${a.activity} (${a.time || 'time TBD'})${a.cost ? ` - ${a.cost}` : ''}`,
+    )
     .join('\n');
 
   return `You are a travel expert enriching an existing trip itinerary with detailed context.

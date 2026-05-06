@@ -43,7 +43,9 @@ const mockTripReadiness = {
 
 describe('AiService', () => {
   let service: AiService;
-  const mockGenerateJson = generateJson as jest.MockedFunction<typeof generateJson>;
+  const mockGenerateJson = generateJson as jest.MockedFunction<
+    typeof generateJson
+  >;
 
   beforeEach(() => {
     service = new AiService();
@@ -54,16 +56,44 @@ describe('AiService', () => {
     it('returns ranked results filtered to shortlist IDs, capped at 5', async () => {
       mockGenerateJson.mockResolvedValue({
         rankings: [
-          { id: 'id-1', whyItMatches: 'Great for trekking', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
-          { id: 'id-2', whyItMatches: 'Offbeat and scenic', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
-          { id: 'unknown-id', whyItMatches: 'Should be filtered out', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness },
+          {
+            id: 'id-1',
+            whyItMatches: 'Great for trekking',
+            healthAdvisory: mockAdvisory,
+            costBreakdown: mockCostBreakdown,
+            permits: mockPermits,
+            tripReadiness: mockTripReadiness,
+          },
+          {
+            id: 'id-2',
+            whyItMatches: 'Offbeat and scenic',
+            healthAdvisory: mockAdvisory,
+            costBreakdown: mockCostBreakdown,
+            permits: mockPermits,
+            tripReadiness: mockTripReadiness,
+          },
+          {
+            id: 'unknown-id',
+            whyItMatches: 'Should be filtered out',
+            healthAdvisory: mockAdvisory,
+            costBreakdown: mockCostBreakdown,
+            permits: mockPermits,
+            tripReadiness: mockTripReadiness,
+          },
         ],
       } as any);
 
       const result = await service.rankDestinations(PROMPT, SHORTLIST_IDS);
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ id: 'id-1', whyItMatches: 'Great for trekking', healthAdvisory: mockAdvisory, costBreakdown: mockCostBreakdown, permits: mockPermits, tripReadiness: mockTripReadiness });
-      expect(result.find(r => r.id === 'unknown-id')).toBeUndefined();
+      expect(result[0]).toEqual({
+        id: 'id-1',
+        whyItMatches: 'Great for trekking',
+        healthAdvisory: mockAdvisory,
+        costBreakdown: mockCostBreakdown,
+        permits: mockPermits,
+        tripReadiness: mockTripReadiness,
+      });
+      expect(result.find((r) => r.id === 'unknown-id')).toBeUndefined();
     });
 
     it('returns empty array when AI returns empty rankings', async () => {
@@ -82,7 +112,7 @@ describe('AiService', () => {
         permits: mockPermits,
         tripReadiness: mockTripReadiness,
       }));
-      const largeShortlist = manyResults.map(r => r.id);
+      const largeShortlist = manyResults.map((r) => r.id);
       mockGenerateJson.mockResolvedValue({ rankings: manyResults } as any);
 
       const result = await service.rankDestinations(PROMPT, largeShortlist);
@@ -91,7 +121,9 @@ describe('AiService', () => {
 
     it('throws when AI API itself throws', async () => {
       mockGenerateJson.mockRejectedValue(new Error('API error'));
-      await expect(service.rankDestinations(PROMPT, SHORTLIST_IDS)).rejects.toThrow('API error');
+      await expect(
+        service.rankDestinations(PROMPT, SHORTLIST_IDS),
+      ).rejects.toThrow('API error');
     });
   });
 
@@ -153,7 +185,15 @@ describe('AiService', () => {
       const mockItinerary = {
         destination: 'Goa',
         totalEstimate: '₹34,000',
-        itinerary: [{ day: 1, title: 'Arrival', activities: [], meals: { breakfast: 'x', lunch: 'x', dinner: 'x' }, healthNote: '' }],
+        itinerary: [
+          {
+            day: 1,
+            title: 'Arrival',
+            activities: [],
+            meals: { breakfast: 'x', lunch: 'x', dinner: 'x' },
+            healthNote: '',
+          },
+        ],
         packingList: ['Sunscreen'],
         healthAdvisory: mockAdvisory,
         permits: mockPermits,
@@ -167,7 +207,9 @@ describe('AiService', () => {
 
     it('throws when AI fails', async () => {
       mockGenerateJson.mockRejectedValue(new Error('AI error'));
-      await expect(service.generateItinerary(PROMPT)).rejects.toThrow('AI error');
+      await expect(service.generateItinerary(PROMPT)).rejects.toThrow(
+        'AI error',
+      );
     });
   });
 
@@ -180,7 +222,12 @@ describe('AiService', () => {
         healthConscious: [],
         streetFood: { safetyTips: [], items: [] },
         mealPlan: [],
-        dietaryInfo: { vegFriendly: 'Yes', veganOptions: 'Limited', halalAvailability: 'Yes', waterAdvice: 'Bottled' },
+        dietaryInfo: {
+          vegFriendly: 'Yes',
+          veganOptions: 'Limited',
+          halalAvailability: 'Yes',
+          waterAdvice: 'Bottled',
+        },
       };
       mockGenerateJson.mockResolvedValue({ result: mockFoodGuide } as any);
 
@@ -190,7 +237,9 @@ describe('AiService', () => {
 
     it('throws when AI fails', async () => {
       mockGenerateJson.mockRejectedValue(new Error('AI error'));
-      await expect(service.generateFoodGuide(PROMPT)).rejects.toThrow('AI error');
+      await expect(service.generateFoodGuide(PROMPT)).rejects.toThrow(
+        'AI error',
+      );
     });
   });
 

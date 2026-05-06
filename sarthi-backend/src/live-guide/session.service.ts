@@ -13,12 +13,15 @@ export class SessionService {
   } {
     // Use IST (UTC+5:30) for date calculation — avoids wrong day before 5:30 AM IST
     const istOffset = 5.5 * 60 * 60 * 1000;
-    const todayStr = new Date(Date.now() + istOffset).toISOString().split('T')[0];
+    const todayStr = new Date(Date.now() + istOffset)
+      .toISOString()
+      .split('T')[0];
     const today = new Date(todayStr);
     const from = new Date(dates.from);
     const to = new Date(dates.to);
 
-    const totalDays = Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
+    const totalDays =
+      Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
 
     if (today < from) return { dayIndex: -1, status: 'before', totalDays };
     if (today > to) return { dayIndex: totalDays, status: 'after', totalDays };
@@ -27,13 +30,20 @@ export class SessionService {
     return { dayIndex, status: 'during', totalDays };
   }
 
-  async findActive(tripId: string, userId: string): Promise<LiveGuideSession | null> {
+  async findActive(
+    tripId: string,
+    userId: string,
+  ): Promise<LiveGuideSession | null> {
     return this.prisma.liveGuideSession.findFirst({
       where: { tripId, userId, isActive: true },
     });
   }
 
-  async create(tripId: string, userId: string, currentDay: number): Promise<LiveGuideSession> {
+  async create(
+    tripId: string,
+    userId: string,
+    currentDay: number,
+  ): Promise<LiveGuideSession> {
     return this.prisma.liveGuideSession.create({
       data: {
         tripId,
@@ -46,7 +56,10 @@ export class SessionService {
     });
   }
 
-  async update(sessionId: string, data: Partial<Omit<LiveGuideSession, 'id' | 'createdAt'>>): Promise<LiveGuideSession> {
+  async update(
+    sessionId: string,
+    data: Partial<Omit<LiveGuideSession, 'id' | 'createdAt'>>,
+  ): Promise<LiveGuideSession> {
     return this.prisma.liveGuideSession.update({
       where: { id: sessionId },
       data: { ...data, updatedAt: new Date() } as any,

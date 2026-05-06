@@ -5,7 +5,10 @@ describe('buildBriefingPrompt', () => {
     destination: 'Cherrapunji',
     state: 'Meghalaya',
     dayNumber: 2,
-    todayActivities: [{ time: '08:00', activity: 'Double Decker Root Bridge' }, { activity: 'Rainbow Falls' }],
+    todayActivities: [
+      { time: '08:00', activity: 'Double Decker Root Bridge' },
+      { activity: 'Rainbow Falls' },
+    ],
   };
 
   it('returns system and user strings', () => {
@@ -25,12 +28,18 @@ describe('buildBriefingPrompt', () => {
   });
 
   it('includes carried-over activities when provided', () => {
-    const { user } = buildBriefingPrompt({ ...base, carriedOver: [{ activity: 'Mawlynnong' }] });
+    const { user } = buildBriefingPrompt({
+      ...base,
+      carriedOver: [{ activity: 'Mawlynnong' }],
+    });
     expect(user).toContain('Mawlynnong');
   });
 
   it('includes personality when provided', () => {
-    const { user } = buildBriefingPrompt({ ...base, profileSummary: 'Adventure seeker, budget traveler' });
+    const { user } = buildBriefingPrompt({
+      ...base,
+      profileSummary: 'Adventure seeker, budget traveler',
+    });
     expect(user).toContain('Adventure seeker');
   });
-})
+});

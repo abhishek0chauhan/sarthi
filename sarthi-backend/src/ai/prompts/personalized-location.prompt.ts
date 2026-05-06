@@ -1,4 +1,7 @@
-import { TravelerProfile, NearbyPlace } from '../interfaces/personalized-location.interface';
+import {
+  TravelerProfile,
+  NearbyPlace,
+} from '../interfaces/personalized-location.interface';
 
 export function buildPersonalizedLocationPrompt(
   destination: string,
@@ -6,7 +9,7 @@ export function buildPersonalizedLocationPrompt(
   userProfile: TravelerProfile,
   availableMinutes: number,
   nearbyPlaces: NearbyPlace[],
-  alreadyPlanned: string[]
+  alreadyPlanned: string[],
 ): { system: string; user: string } {
   return {
     system: `You are a travel AI that understands regional travel preferences. Generate ONE nearby place suggestion that matches the traveler's style, not just any tourist spot.`,

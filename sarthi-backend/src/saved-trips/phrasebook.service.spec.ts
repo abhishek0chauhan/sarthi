@@ -15,8 +15,14 @@ const mockTrip = {
 
 const mockPhrasebook = {
   language: 'Khasi',
-  greeting: [{ english: 'Hello', local: 'Khublei', pronunciation: 'khoo-blay' }],
-  food: [], directions: [], emergency: [], bargaining: [], culturalNotes: [],
+  greeting: [
+    { english: 'Hello', local: 'Khublei', pronunciation: 'khoo-blay' },
+  ],
+  food: [],
+  directions: [],
+  emergency: [],
+  bargaining: [],
+  culturalNotes: [],
 };
 
 const mockSavedTripsService = {
@@ -51,14 +57,21 @@ describe('PhrasebookService', () => {
 
   describe('getPhrasebook', () => {
     it('returns stored phrasebook when it exists', async () => {
-      mockSavedTripsService.getById.mockResolvedValue({ ...mockTrip, phrasebookData: mockPhrasebook });
-      const result = await service.getPhrasebook('trip-1', { uid: 'fb-1' } as any);
+      mockSavedTripsService.getById.mockResolvedValue({
+        ...mockTrip,
+        phrasebookData: mockPhrasebook,
+      });
+      const result = await service.getPhrasebook('trip-1', {
+        uid: 'fb-1',
+      } as any);
       expect(result).toEqual(mockPhrasebook);
     });
 
     it('returns null when no phrasebook yet', async () => {
       mockSavedTripsService.getById.mockResolvedValue(mockTrip);
-      const result = await service.getPhrasebook('trip-1', { uid: 'fb-1' } as any);
+      const result = await service.getPhrasebook('trip-1', {
+        uid: 'fb-1',
+      } as any);
       expect(result).toBeNull();
     });
   });
@@ -67,11 +80,19 @@ describe('PhrasebookService', () => {
     it('calls AI and stores result', async () => {
       mockSavedTripsService.getById.mockResolvedValue(mockTrip);
       mockAiService.generatePhrasebook.mockResolvedValue(mockPhrasebook);
-      mockPrisma.savedTrip.update.mockResolvedValue({ ...mockTrip, phrasebookData: mockPhrasebook });
+      mockPrisma.savedTrip.update.mockResolvedValue({
+        ...mockTrip,
+        phrasebookData: mockPhrasebook,
+      });
 
-      const result = await service.generateAndStore('trip-1', { uid: 'fb-1' } as any);
+      const result = await service.generateAndStore('trip-1', {
+        uid: 'fb-1',
+      } as any);
 
-      expect(mockAiService.generatePhrasebook).toHaveBeenCalledWith('Cherrapunji', 'Meghalaya');
+      expect(mockAiService.generatePhrasebook).toHaveBeenCalledWith(
+        'Cherrapunji',
+        'Meghalaya',
+      );
       expect(mockPrisma.savedTrip.update).toHaveBeenCalledWith({
         where: { id: 'trip-1' },
         data: { phrasebookData: mockPhrasebook },

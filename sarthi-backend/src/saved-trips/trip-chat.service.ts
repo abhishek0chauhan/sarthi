@@ -5,7 +5,11 @@ import { ProfileService } from '../profile/profile.service';
 import { SavedTripsService } from './saved-trips.service';
 import { buildTripChatSystem } from '../ai/prompts/trip-chat.prompt';
 
-interface FirebaseUser { uid: string; name?: string; email?: string; }
+interface FirebaseUser {
+  uid: string;
+  name?: string;
+  email?: string;
+}
 
 const RATE_LIMIT = 10;
 
@@ -22,7 +26,9 @@ export class TripChatService {
     if (!itineraryData?.itinerary) return '';
     return itineraryData.itinerary
       .map((d: any) => {
-        const acts = (d.activities ?? []).map((a: any) => a.activity).join(', ');
+        const acts = (d.activities ?? [])
+          .map((a: any) => a.activity)
+          .join(', ');
         return `Day ${d.day}: ${acts || d.title}`;
       })
       .join('. ');
@@ -37,20 +43,29 @@ export class TripChatService {
       where: { tripId, role: 'user', createdAt: { gte: oneHourAgo } },
     });
     if (recentCount >= RATE_LIMIT) {
-      throw new HttpException('Rate limit: 10 messages per trip per hour', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'Rate limit: 10 messages per trip per hour',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     // Fetch last 3 messages for context continuity
     const history = await this.prisma.tripChatMessage.findMany({
       where: { tripId },
       orderBy: { createdAt: 'desc' },
-      take: 6,  // 3 pairs (user+assistant)
+      take: 6, // 3 pairs (user+assistant)
     });
-    const recentMessages = history.reverse().map(m => ({ role: m.role, content: m.content }));
+    const recentMessages = history
+      .reverse()
+      .map((m) => ({ role: m.role, content: m.content }));
 
     // Fetch personality (best-effort)
     let profile: any = null;
-    try { profile = await this.profileService.getProfile(fbUser.uid); } catch { /* non-fatal */ }
+    try {
+      profile = await this.profileService.getProfile(fbUser.uid);
+    } catch {
+      /* non-fatal */
+    }
 
     const system = buildTripChatSystem({
       destination: trip.destination,
@@ -64,8 +79,12 @@ export class TripChatService {
     const reply = await this.aiService.tripChat(system, message);
 
     // Store both messages
-    await this.prisma.tripChatMessage.create({ data: { tripId, role: 'user', content: message } });
-    await this.prisma.tripChatMessage.create({ data: { tripId, role: 'assistant', content: reply } });
+    await this.prisma.tripChatMessage.create({
+      data: { tripId, role: 'user', content: message },
+    });
+    await this.prisma.tripChatMessage.create({
+      data: { tripId, role: 'assistant', content: reply },
+    });
 
     return { reply };
   }

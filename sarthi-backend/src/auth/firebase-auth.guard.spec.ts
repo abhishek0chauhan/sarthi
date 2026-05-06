@@ -31,16 +31,22 @@ describe('FirebaseAuthGuard', () => {
   });
 
   it('throws 401 when no Authorization header', async () => {
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
+    await expect(guard.canActivate(mockContext())).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('throws 401 when header is not Bearer', async () => {
-    await expect(guard.canActivate(mockContext('Basic abc123'))).rejects.toThrow(UnauthorizedException);
+    await expect(
+      guard.canActivate(mockContext('Basic abc123')),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('throws 401 when token is invalid', async () => {
     verifyIdToken.mockRejectedValue(new Error('invalid token'));
-    await expect(guard.canActivate(mockContext('Bearer bad-token'))).rejects.toThrow(UnauthorizedException);
+    await expect(
+      guard.canActivate(mockContext('Bearer bad-token')),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('returns true and attaches user when token is valid', async () => {

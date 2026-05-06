@@ -8,7 +8,12 @@ export class NotificationService {
 
   constructor(private readonly devicesService: DevicesService) {}
 
-  async sendPush(tokens: string[], title: string, body: string, data?: Record<string, string>): Promise<void> {
+  async sendPush(
+    tokens: string[],
+    title: string,
+    body: string,
+    data?: Record<string, string>,
+  ): Promise<void> {
     if (!tokens.length) return;
     try {
       await admin.messaging().sendEachForMulticast({
@@ -21,7 +26,12 @@ export class NotificationService {
     }
   }
 
-  async sendToUser(userId: string, title: string, body: string, data?: Record<string, string>): Promise<void> {
+  async sendToUser(
+    userId: string,
+    title: string,
+    body: string,
+    data?: Record<string, string>,
+  ): Promise<void> {
     const tokens = await this.devicesService.getTokensForUser(userId);
     await this.sendPush(tokens, title, body, data);
   }

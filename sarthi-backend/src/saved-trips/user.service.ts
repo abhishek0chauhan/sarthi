@@ -6,7 +6,11 @@ import { User } from '@prisma/client';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOrCreate(firebaseUid: string, displayName?: string, email?: string): Promise<User> {
+  async findOrCreate(
+    firebaseUid: string,
+    displayName?: string,
+    email?: string,
+  ): Promise<User> {
     return this.prisma.user.upsert({
       where: { firebaseUid },
       update: { displayName, email },

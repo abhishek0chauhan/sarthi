@@ -32,16 +32,27 @@ describe('ProfileController', () => {
   });
 
   it('POST /profile/story calls service.submitStory', async () => {
-    mockService.submitStory.mockResolvedValue({ id: 'p-1', travelPace: 'loose' });
+    mockService.submitStory.mockResolvedValue({
+      id: 'p-1',
+      travelPace: 'loose',
+    });
     const result = await controller.story(req, { story: 'I loved Spiti...' });
-    expect(mockService.submitStory).toHaveBeenCalledWith('fb-1', 'I loved Spiti...');
+    expect(mockService.submitStory).toHaveBeenCalledWith(
+      'fb-1',
+      'I loved Spiti...',
+    );
     expect(result).toHaveProperty('travelPace', 'loose');
   });
 
   it('PUT /profile/quiz calls service.submitQuiz', async () => {
-    mockService.submitQuiz.mockResolvedValue({ id: 'p-1', travelPace: 'packed' });
+    mockService.submitQuiz.mockResolvedValue({
+      id: 'p-1',
+      travelPace: 'packed',
+    });
     const result = await controller.quiz(req, { travelPace: 'packed' });
-    expect(mockService.submitQuiz).toHaveBeenCalledWith('fb-1', { travelPace: 'packed' });
+    expect(mockService.submitQuiz).toHaveBeenCalledWith('fb-1', {
+      travelPace: 'packed',
+    });
     expect(result).toHaveProperty('travelPace', 'packed');
   });
 

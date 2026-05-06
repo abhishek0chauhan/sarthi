@@ -30,11 +30,15 @@ describe('TrekService', () => {
     });
 
     it('returns true when freeText mentions trek', () => {
-      expect(service.isTrekkingIntent(['nature'], 'want to do a challenging trek')).toBe(true);
+      expect(
+        service.isTrekkingIntent(['nature'], 'want to do a challenging trek'),
+      ).toBe(true);
     });
 
     it('returns true when freeText mentions hike', () => {
-      expect(service.isTrekkingIntent([], 'looking for a mountain hike')).toBe(true);
+      expect(service.isTrekkingIntent([], 'looking for a mountain hike')).toBe(
+        true,
+      );
     });
 
     it('returns true when freeText mentions summit', () => {
@@ -42,38 +46,50 @@ describe('TrekService', () => {
     });
 
     it('returns false for beach vacation', () => {
-      expect(service.isTrekkingIntent(['beach'], 'relaxing beach vacation')).toBe(false);
+      expect(
+        service.isTrekkingIntent(['beach'], 'relaxing beach vacation'),
+      ).toBe(false);
     });
 
     it('returns false for culture trip', () => {
-      expect(service.isTrekkingIntent(['culture', 'food'], 'explore temples')).toBe(false);
+      expect(
+        service.isTrekkingIntent(['culture', 'food'], 'explore temples'),
+      ).toBe(false);
     });
   });
 
   describe('filterTreks', () => {
     it('filters by travel month', () => {
       const result = service.filterTreks({ month: 1 });
-      result.forEach(t => expect(t.bestMonths).toContain(1));
+      result.forEach((t) => expect(t.bestMonths).toContain(1));
     });
 
     it('filters by max duration', () => {
       const result = service.filterTreks({ maxDays: 5 });
-      result.forEach(t => expect(t.durationDays).toBeLessThanOrEqual(5));
+      result.forEach((t) => expect(t.durationDays).toBeLessThanOrEqual(5));
     });
 
     it('filters by difficulty levels', () => {
-      const result = service.filterTreks({ difficulties: ['easy', 'easy_to_moderate'] });
-      result.forEach(t => expect(['easy', 'easy_to_moderate']).toContain(t.difficulty));
+      const result = service.filterTreks({
+        difficulties: ['easy', 'easy_to_moderate'],
+      });
+      result.forEach((t) =>
+        expect(['easy', 'easy_to_moderate']).toContain(t.difficulty),
+      );
     });
 
     it('filters by state', () => {
       const result = service.filterTreks({ state: 'Uttarakhand' });
-      result.forEach(t => expect(t.state).toBe('Uttarakhand'));
+      result.forEach((t) => expect(t.state).toBe('Uttarakhand'));
     });
 
     it('combines multiple filters', () => {
-      const result = service.filterTreks({ month: 6, maxDays: 7, state: 'Himachal Pradesh' });
-      result.forEach(t => {
+      const result = service.filterTreks({
+        month: 6,
+        maxDays: 7,
+        state: 'Himachal Pradesh',
+      });
+      result.forEach((t) => {
         expect(t.bestMonths).toContain(6);
         expect(t.durationDays).toBeLessThanOrEqual(7);
         expect(t.state).toBe('Himachal Pradesh');
@@ -92,7 +108,7 @@ describe('TrekService', () => {
       const result = service.filterForSearch({
         dates: { from: '2026-06-01', to: '2026-06-08' },
       });
-      result.forEach(t => {
+      result.forEach((t) => {
         expect(t.bestMonths).toContain(6);
         expect(t.durationDays).toBeLessThanOrEqual(8);
       });
@@ -103,8 +119,10 @@ describe('TrekService', () => {
         dates: { from: '2026-06-01', to: '2026-06-15' },
         medicalConditions: ['knee_issue'],
       });
-      result.forEach(t => {
-        expect(['easy', 'easy_to_moderate', 'moderate']).toContain(t.difficulty);
+      result.forEach((t) => {
+        expect(['easy', 'easy_to_moderate', 'moderate']).toContain(
+          t.difficulty,
+        );
       });
     });
 
@@ -113,8 +131,10 @@ describe('TrekService', () => {
         dates: { from: '2026-06-01', to: '2026-06-15' },
         age: 60,
       });
-      result.forEach(t => {
-        expect(['easy', 'easy_to_moderate', 'moderate']).toContain(t.difficulty);
+      result.forEach((t) => {
+        expect(['easy', 'easy_to_moderate', 'moderate']).toContain(
+          t.difficulty,
+        );
       });
     });
 
@@ -123,7 +143,7 @@ describe('TrekService', () => {
         dates: { from: '2026-06-01', to: '2026-06-15' },
         age: 25,
       });
-      const difficulties = new Set(result.map(t => t.difficulty));
+      const difficulties = new Set(result.map((t) => t.difficulty));
       expect(difficulties.size).toBeGreaterThan(1);
     });
 

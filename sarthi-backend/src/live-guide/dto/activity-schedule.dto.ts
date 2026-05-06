@@ -1,21 +1,43 @@
+import { IsNumber, IsString, IsArray } from 'class-validator';
+
 /**
  * DTO for a scheduled activity returned from the activity schedule endpoint.
  * Represents a notification that has not yet been sent to the user.
  */
 export class ScheduledActivityDto {
-  /** Index of the activity in the day's itinerary */
+  /**
+   * Index of this activity in the itinerary
+   * @example 0
+   */
+  @IsNumber()
   activityIndex: number;
 
-  /** Activity name/description */
+  /**
+   * Name/description of the activity
+   * @example Visit Gateway of India
+   */
+  @IsString()
   activity: string;
 
-  /** Unix timestamp in milliseconds when the user should leave for this activity */
+  /**
+   * Unix timestamp (milliseconds) when user should be notified
+   * @example 1714982400000
+   */
+  @IsNumber()
   scheduledTime: number;
 
-  /** Distance to activity location in meters */
+  /**
+   * Estimated distance in meters
+   * @example 2400
+   */
+  @IsNumber()
   distance: number;
 
-  /** Estimated travel time to activity in minutes (includes user's pace-based buffer) */
+  /**
+   * Estimated travel time in minutes
+   * @example 15
+   */
+  @IsNumber()
   estimatedTravelTime: number;
 }
 
@@ -24,6 +46,9 @@ export class ScheduledActivityDto {
  * Contains all unsent activity notifications for a trip, ordered by scheduled time.
  */
 export class ActivityScheduleResponseDto {
-  /** Array of scheduled activities, sorted by scheduled time (earliest first) */
+  /**
+   * Array of scheduled activities, sorted by scheduled time (earliest first)
+   */
+  @IsArray()
   scheduledActivities: ScheduledActivityDto[];
 }

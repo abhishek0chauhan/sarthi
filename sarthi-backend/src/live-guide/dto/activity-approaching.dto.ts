@@ -10,7 +10,7 @@ export enum TravelPace {
   LOOSE = 'loose',
 
   /** Tight schedule, maximum buffer (1.2x multiplier) */
-  PACKED = 'packed'
+  PACKED = 'packed',
 }
 
 /**

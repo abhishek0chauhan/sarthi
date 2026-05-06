@@ -19,13 +19,19 @@ export class DevicesService {
     return this.prisma.userDevice.upsert({
       where: { fcmToken: dto.fcmToken },
       update: { platform: dto.platform, userId: user.id },
-      create: { fcmToken: dto.fcmToken, platform: dto.platform, userId: user.id },
+      create: {
+        fcmToken: dto.fcmToken,
+        platform: dto.platform,
+        userId: user.id,
+      },
     });
   }
 
   async unregister(firebaseUid: string, fcmToken: string) {
     const user = await this.findOrCreateUser(firebaseUid);
-    await this.prisma.userDevice.deleteMany({ where: { fcmToken, userId: user.id } });
+    await this.prisma.userDevice.deleteMany({
+      where: { fcmToken, userId: user.id },
+    });
   }
 
   async getTokensForUser(userId: string): Promise<string[]> {

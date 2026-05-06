@@ -7,6 +7,8 @@ export const liveSuggestionSchema = z.object({
   pushSummary: z.string().max(160),
 });
 
-export const liveSuggestionWrapperSchema = z.object({ result: liveSuggestionSchema });
+export const liveSuggestionWrapperSchema = z.object({
+  result: liveSuggestionSchema,
+});
 
 export type LiveSuggestion = z.infer<typeof liveSuggestionSchema>;

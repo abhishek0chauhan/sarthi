@@ -65,7 +65,10 @@ describe('healthAdvisorySchema', () => {
   });
 
   it('coerces unrecognised suitability value to moderate', () => {
-    const result = healthAdvisorySchema.parse({ ...validAdvisory, suitability: 'extreme' });
+    const result = healthAdvisorySchema.parse({
+      ...validAdvisory,
+      suitability: 'extreme',
+    });
     expect(result.suitability).toBe('moderate');
   });
 
@@ -96,7 +99,10 @@ describe('rankResultSchema', () => {
 
   it('rejects missing id', () => {
     expect(() =>
-      rankResultSchema.parse({ whyItMatches: 'Great', healthAdvisory: validAdvisory }),
+      rankResultSchema.parse({
+        whyItMatches: 'Great',
+        healthAdvisory: validAdvisory,
+      }),
     ).toThrow();
   });
 
@@ -198,7 +204,9 @@ describe('permitsSchema', () => {
   });
 
   it('rejects non-boolean required', () => {
-    expect(() => permitsSchema.parse({ ...validPermits, required: 'yes' })).toThrow();
+    expect(() =>
+      permitsSchema.parse({ ...validPermits, required: 'yes' }),
+    ).toThrow();
   });
 });
 
@@ -222,25 +230,31 @@ describe('tripReadinessSchema', () => {
   });
 
   it('accepts score at boundary 0', () => {
-    expect(() => tripReadinessSchema.parse({ ...validTripReadiness, score: 0 })).not.toThrow();
+    expect(() =>
+      tripReadinessSchema.parse({ ...validTripReadiness, score: 0 }),
+    ).not.toThrow();
   });
 
   it('accepts score at boundary 100', () => {
-    expect(() => tripReadinessSchema.parse({ ...validTripReadiness, score: 100 })).not.toThrow();
+    expect(() =>
+      tripReadinessSchema.parse({ ...validTripReadiness, score: 100 }),
+    ).not.toThrow();
   });
 });
 
 describe('rankResultsSchema', () => {
   it('parses an array of ranked results', () => {
     const result = rankResultsSchema.parse({
-      rankings: [{
-        id: 'uuid-1',
-        whyItMatches: 'Great for trekking',
-        healthAdvisory: validAdvisory,
-        costBreakdown: validCostBreakdown,
-        permits: validPermits,
-        tripReadiness: validTripReadiness,
-      }],
+      rankings: [
+        {
+          id: 'uuid-1',
+          whyItMatches: 'Great for trekking',
+          healthAdvisory: validAdvisory,
+          costBreakdown: validCostBreakdown,
+          permits: validPermits,
+          tripReadiness: validTripReadiness,
+        },
+      ],
     });
     expect(result.rankings).toHaveLength(1);
   });
@@ -253,18 +267,20 @@ describe('rankResultsSchema', () => {
 describe('generateResultsSchema', () => {
   it('parses an array of generated destinations', () => {
     const result = generateResultsSchema.parse({
-      destinations: [{
-        name: 'Kasol',
-        state: 'Himachal Pradesh',
-        isHiddenGem: true,
-        budgetEstimate: '₹8,000–12,000',
-        weatherSnapshot: 'Pleasant',
-        travelTime: '14h bus',
-        highlights: ['Kheerganga trek'],
-        whyItMatches: 'Great for trekking',
-        suitability: 'easy',
-        readinessScore: 80,
-      }],
+      destinations: [
+        {
+          name: 'Kasol',
+          state: 'Himachal Pradesh',
+          isHiddenGem: true,
+          budgetEstimate: '₹8,000–12,000',
+          weatherSnapshot: 'Pleasant',
+          travelTime: '14h bus',
+          highlights: ['Kheerganga trek'],
+          whyItMatches: 'Great for trekking',
+          suitability: 'easy',
+          readinessScore: 80,
+        },
+      ],
     });
     expect(result.destinations).toHaveLength(1);
   });
@@ -287,13 +303,23 @@ const validItineraryDay = {
   day: 1,
   title: 'Arrival + North Goa Beaches',
   activities: [
-    { time: '10:00 AM', activity: 'Arrive at Goa airport', cost: '₹0', healthNote: '' },
-    { time: '4:00 PM', activity: 'Baga Beach sunset walk', cost: '₹0', healthNote: 'Light walking — no strain' },
+    {
+      time: '10:00 AM',
+      activity: 'Arrive at Goa airport',
+      cost: '₹0',
+      healthNote: '',
+    },
+    {
+      time: '4:00 PM',
+      activity: 'Baga Beach sunset walk',
+      cost: '₹0',
+      healthNote: 'Light walking — no strain',
+    },
   ],
   meals: {
     breakfast: '₹200 — Hotel buffet',
     lunch: '₹300 — Fish thali at local shack',
-    dinner: '₹800 — Britto\'s',
+    dinner: "₹800 — Britto's",
   },
   healthNote: 'Light day — no physical strain',
 };
@@ -344,17 +370,42 @@ describe('foodGuideResponseSchema', () => {
       destination: 'Jaipur',
       overview: 'Rajasthani cuisine is rich and heavy on ghee',
       mustTryDishes: [validDish],
-      healthConscious: [{ name: 'Ker Sangri', description: 'Low cal desert beans', healthNote: 'Good for blood sugar' }],
+      healthConscious: [
+        {
+          name: 'Ker Sangri',
+          description: 'Low cal desert beans',
+          healthNote: 'Good for blood sugar',
+        },
+      ],
       streetFood: {
         safetyTips: ['Stick to busy stalls'],
-        items: [{ name: 'Pyaaz Kachori', where: 'Rawat', price: '₹30', healthNote: 'Deep fried — limit to one' }],
+        items: [
+          {
+            name: 'Pyaaz Kachori',
+            where: 'Rawat',
+            price: '₹30',
+            healthNote: 'Deep fried — limit to one',
+          },
+        ],
       },
       mealPlan: [
         {
           day: 1,
-          breakfast: { suggestion: 'Poha + chai', cost: '₹100', healthNote: 'Light' },
-          lunch: { suggestion: 'Laal Maas + bajra roti', cost: '₹450', healthNote: 'High protein' },
-          dinner: { suggestion: 'Grilled kebabs', cost: '₹600', healthNote: 'Good choice' },
+          breakfast: {
+            suggestion: 'Poha + chai',
+            cost: '₹100',
+            healthNote: 'Light',
+          },
+          lunch: {
+            suggestion: 'Laal Maas + bajra roti',
+            cost: '₹450',
+            healthNote: 'High protein',
+          },
+          dinner: {
+            suggestion: 'Grilled kebabs',
+            cost: '₹600',
+            healthNote: 'Good choice',
+          },
         },
       ],
       dietaryInfo: {
@@ -377,16 +428,25 @@ describe('foodGuideResponseSchema', () => {
         healthConscious: [],
         streetFood: { safetyTips: [], items: [] },
         mealPlan: [],
-        dietaryInfo: { vegFriendly: 'Yes', veganOptions: 'Limited', halalAvailability: 'Yes', waterAdvice: 'Bottled' },
+        dietaryInfo: {
+          vegFriendly: 'Yes',
+          veganOptions: 'Limited',
+          halalAvailability: 'Yes',
+          waterAdvice: 'Bottled',
+        },
       }),
     ).toThrow();
   });
 
   it('rejects dish with missing healthNote', () => {
-    const badDish = { name: 'x', description: 'y', where: 'z', priceRange: '₹100', spiceLevel: 'low' };
-    expect(() =>
-      dishSchema.parse(badDish),
-    ).toThrow();
+    const badDish = {
+      name: 'x',
+      description: 'y',
+      where: 'z',
+      priceRange: '₹100',
+      spiceLevel: 'low',
+    };
+    expect(() => dishSchema.parse(badDish)).toThrow();
   });
 });
 
@@ -398,7 +458,8 @@ const validTrekResult = {
   difficulty: 'Moderate',
   durationDays: '5 days',
   terrain: 'Snow, meadows, river crossings',
-  whyItMatches: 'Perfect difficulty for your fitness level with stunning valley views',
+  whyItMatches:
+    'Perfect difficulty for your fitness level with stunning valley views',
   highlights: ['Lahaul Valley views', 'Chandratal Lake side trip'],
   healthAdvisory: validAdvisory,
   costBreakdown: validCostBreakdown,
@@ -438,7 +499,11 @@ describe('trekResultsSchema', () => {
 describe('tasteProfileSchema', () => {
   it('parses a full taste profile', () => {
     const result = tasteProfileSchema.parse({
-      sweet: 1, spicy: 4, sour: 3, salty: 2, umami: 3,
+      sweet: 1,
+      spicy: 4,
+      sour: 3,
+      salty: 2,
+      umami: 3,
     });
     expect(result).toEqual({ sweet: 1, spicy: 4, sour: 3, salty: 2, umami: 3 });
   });
@@ -467,7 +532,9 @@ describe('dishSchema allergen + tasteProfile', () => {
       tasteProfile: { sweet: 0, spicy: 4, sour: 4, salty: 3, umami: 3 },
     });
     expect(result.allergens).toEqual(['fish', 'coconut']);
-    expect(result.allergyAlert).toBe('⚠️ Contains fish — listed in your allergies');
+    expect(result.allergyAlert).toBe(
+      '⚠️ Contains fish — listed in your allergies',
+    );
     expect(result.tasteProfile.spicy).toBe(4);
   });
 
@@ -475,7 +542,13 @@ describe('dishSchema allergen + tasteProfile', () => {
     const result = dishSchema.parse(baseDish);
     expect(result.allergens).toEqual([]);
     expect(result.allergyAlert).toBeUndefined();
-    expect(result.tasteProfile).toEqual({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
+    expect(result.tasteProfile).toEqual({
+      sweet: 0,
+      spicy: 0,
+      sour: 0,
+      salty: 0,
+      umami: 0,
+    });
   });
 
   it('allergyAlert is optional (undefined is valid)', () => {
@@ -487,20 +560,37 @@ describe('dishSchema allergen + tasteProfile', () => {
 describe('healthConsciousDishSchema allergen + tasteProfile', () => {
   it('applies defaults when allergens and tasteProfile are missing', () => {
     const result = healthConsciousDishSchema.parse({
-      name: 'Steamed Rice', description: 'Plain', healthNote: 'Low cal',
+      name: 'Steamed Rice',
+      description: 'Plain',
+      healthNote: 'Low cal',
     });
     expect(result.allergens).toEqual([]);
-    expect(result.tasteProfile).toEqual({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
+    expect(result.tasteProfile).toEqual({
+      sweet: 0,
+      spicy: 0,
+      sour: 0,
+      salty: 0,
+      umami: 0,
+    });
   });
 });
 
 describe('streetFoodItemSchema allergen + tasteProfile', () => {
   it('applies defaults when allergens and tasteProfile are missing', () => {
     const result = streetFoodItemSchema.parse({
-      name: 'Vada Pav', where: 'Dadar', price: '₹20', healthNote: 'Avoid if gluten intolerant',
+      name: 'Vada Pav',
+      where: 'Dadar',
+      price: '₹20',
+      healthNote: 'Avoid if gluten intolerant',
     });
     expect(result.allergens).toEqual([]);
-    expect(result.tasteProfile).toEqual({ sweet: 0, spicy: 0, sour: 0, salty: 0, umami: 0 });
+    expect(result.tasteProfile).toEqual({
+      sweet: 0,
+      spicy: 0,
+      sour: 0,
+      salty: 0,
+      umami: 0,
+    });
   });
 });
 
@@ -521,7 +611,9 @@ describe('itineraryActivitySchema — placeContext + mapQuery', () => {
       },
     });
     expect(result.mapQuery).toBe('Living Root Bridge, Cherrapunji, Meghalaya');
-    expect(result.placeContext?.whySpecial).toBe('One of the oldest living root bridges');
+    expect(result.placeContext?.whySpecial).toBe(
+      'One of the oldest living root bridges',
+    );
   });
 
   it('parses activity without mapQuery or placeContext (backward compat)', () => {
@@ -571,7 +663,10 @@ describe('activitySuggestionSchema', () => {
     const result = activitySuggestionSchema.parse({
       activity: 'Wei Sawdong Waterfall',
       mapQuery: 'Wei Sawdong Waterfall, Meghalaya',
-      personalMatch: { matchLevel: 'great_match', reason: 'Offbeat, no crowds' },
+      personalMatch: {
+        matchLevel: 'great_match',
+        reason: 'Offbeat, no crowds',
+      },
     });
     expect(result.activity).toBe('Wei Sawdong Waterfall');
     expect(result.personalMatch?.matchLevel).toBe('great_match');

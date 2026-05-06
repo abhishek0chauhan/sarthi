@@ -33,7 +33,10 @@ function extractJson(text: string): string {
   const trimmed = text.trim();
 
   // Strip markdown fences
-  const fenced = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  const fenced = trimmed
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/i, '')
+    .trim();
 
   const start = Math.min(
     fenced.indexOf('{') === -1 ? Infinity : fenced.indexOf('{'),
@@ -52,9 +55,18 @@ function extractOrRepair(text: string, start: number): string {
 
   for (let i = start; i < text.length; i++) {
     const ch = text[i];
-    if (escape) { escape = false; continue; }
-    if (ch === '\\' && inString) { escape = true; continue; }
-    if (ch === '"') { inString = !inString; continue; }
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === '\\' && inString) {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
     if (inString) continue;
     if (ch === '{' || ch === '[') stack.push(ch === '{' ? '}' : ']');
     else if (ch === '}' || ch === ']') {

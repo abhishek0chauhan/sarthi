@@ -1,4 +1,9 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { UserService } from './user.service';
@@ -9,7 +14,10 @@ import { CreateSavedTripDto } from './dto/create-saved-trip.dto';
 import { UpdateSavedTripDto } from './dto/update-saved-trip.dto';
 import { AddActivityDto } from './dto/add-activity.dto';
 import { randomUUID } from 'crypto';
-import type { TravelerProfileSnapshot, CorrectionRecord } from '../ai/prompts/destination.prompt';
+import type {
+  TravelerProfileSnapshot,
+  CorrectionRecord,
+} from '../ai/prompts/destination.prompt';
 
 interface FirebaseUser {
   uid: string;
@@ -28,7 +36,11 @@ export class SavedTripsService {
   ) {}
 
   async create(dto: CreateSavedTripDto, fbUser: FirebaseUser) {
-    const user = await this.userService.findOrCreate(fbUser.uid, fbUser.name, fbUser.email);
+    const user = await this.userService.findOrCreate(
+      fbUser.uid,
+      fbUser.name,
+      fbUser.email,
+    );
 
     const createData: any = {
       userId: user.id,
@@ -41,10 +53,12 @@ export class SavedTripsService {
     };
 
     if (dto.itineraryData !== undefined) {
-      createData.itineraryData = dto.itineraryData as unknown as Prisma.JsonValue;
+      createData.itineraryData =
+        dto.itineraryData as unknown as Prisma.JsonValue;
     }
     if (dto.foodGuideData !== undefined) {
-      createData.foodGuideData = dto.foodGuideData as unknown as Prisma.JsonValue;
+      createData.foodGuideData =
+        dto.foodGuideData as unknown as Prisma.JsonValue;
     }
 
     return this.prisma.savedTrip.create({
@@ -53,14 +67,18 @@ export class SavedTripsService {
   }
 
   async listByUser(fbUser: FirebaseUser) {
-    const user = await this.userService.findOrCreate(fbUser.uid, fbUser.name, fbUser.email);
+    const user = await this.userService.findOrCreate(
+      fbUser.uid,
+      fbUser.name,
+      fbUser.email,
+    );
 
     const trips = await this.prisma.savedTrip.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
 
-    return trips.map(trip => ({
+    return trips.map((trip) => ({
       id: trip.id,
       name: trip.name,
       destination: trip.destination,
@@ -74,8 +92,14 @@ export class SavedTripsService {
   }
 
   async getById(tripId: string, fbUser: FirebaseUser) {
-    const user = await this.userService.findOrCreate(fbUser.uid, fbUser.name, fbUser.email);
-    const trip = await this.prisma.savedTrip.findUnique({ where: { id: tripId } });
+    const user = await this.userService.findOrCreate(
+      fbUser.uid,
+      fbUser.name,
+      fbUser.email,
+    );
+    const trip = await this.prisma.savedTrip.findUnique({
+      where: { id: tripId },
+    });
 
     if (!trip) throw new NotFoundException('Trip not found');
     if (trip.userId !== user.id) throw new ForbiddenException('Not your trip');
@@ -89,9 +113,14 @@ export class SavedTripsService {
     const updateData: any = {};
 
     if (dto.name !== undefined) updateData.name = dto.name;
-    if (dto.travelMode !== undefined) updateData.travelMode = dto.travelMode as any;
-    if (dto.itineraryData !== undefined) updateData.itineraryData = dto.itineraryData as unknown as Prisma.JsonValue;
-    if (dto.foodGuideData !== undefined) updateData.foodGuideData = dto.foodGuideData as unknown as Prisma.JsonValue;
+    if (dto.travelMode !== undefined)
+      updateData.travelMode = dto.travelMode as any;
+    if (dto.itineraryData !== undefined)
+      updateData.itineraryData =
+        dto.itineraryData as unknown as Prisma.JsonValue;
+    if (dto.foodGuideData !== undefined)
+      updateData.foodGuideData =
+        dto.foodGuideData as unknown as Prisma.JsonValue;
 
     return this.prisma.savedTrip.update({
       where: { id: tripId },
@@ -108,7 +137,10 @@ export class SavedTripsService {
     const trip = await this.getById(tripId, fbUser);
 
     if (trip.shareToken) {
-      return { shareToken: trip.shareToken, url: `/shared-trips/${trip.shareToken}` };
+      return {
+        shareToken: trip.shareToken,
+        url: `/shared-trips/${trip.shareToken}`,
+      };
     }
 
     const shareToken = randomUUID();
@@ -117,7 +149,10 @@ export class SavedTripsService {
       data: { shareToken },
     });
 
-    return { shareToken: updated.shareToken, url: `/shared-trips/${updated.shareToken}` };
+    return {
+      shareToken: updated.shareToken,
+      url: `/shared-trips/${updated.shareToken}`,
+    };
   }
 
   async disableSharing(tripId: string, fbUser: FirebaseUser) {
@@ -141,22 +176,31 @@ export class SavedTripsService {
   }
 
   private getItineraryDay(itineraryData: any, day: number) {
-    if (!itineraryData?.itinerary) throw new NotFoundException('No itinerary on this trip');
+    if (!itineraryData?.itinerary)
+      throw new NotFoundException('No itinerary on this trip');
     const dayObj = itineraryData.itinerary.find((d: any) => d.day === day);
-    if (!dayObj) throw new NotFoundException(`Day ${day} not found in itinerary`);
+    if (!dayObj)
+      throw new NotFoundException(`Day ${day} not found in itinerary`);
     return dayObj;
   }
 
   private async updateItinerary(tripId: string, itineraryData: any) {
     return this.prisma.savedTrip.update({
       where: { id: tripId },
-      data: { itineraryData: itineraryData as unknown as Prisma.InputJsonValue },
+      data: {
+        itineraryData: itineraryData as unknown as Prisma.InputJsonValue,
+      },
     });
   }
 
-  async addActivity(tripId: string, day: number, dto: AddActivityDto, fbUser: FirebaseUser) {
+  async addActivity(
+    tripId: string,
+    day: number,
+    dto: AddActivityDto,
+    fbUser: FirebaseUser,
+  ) {
     const trip = await this.getById(tripId, fbUser);
-    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData));
     const dayObj = this.getItineraryDay(itinerary, day);
 
     const newActivity = {
@@ -166,7 +210,11 @@ export class SavedTripsService {
       healthNote: dto.healthNote ?? '',
     };
 
-    if (dto.position !== undefined && dto.position >= 0 && dto.position <= dayObj.activities.length) {
+    if (
+      dto.position !== undefined &&
+      dto.position >= 0 &&
+      dto.position <= dayObj.activities.length
+    ) {
       dayObj.activities.splice(dto.position, 0, newActivity);
     } else {
       dayObj.activities.push(newActivity);
@@ -175,13 +223,20 @@ export class SavedTripsService {
     return this.updateItinerary(tripId, itinerary);
   }
 
-  async removeActivity(tripId: string, day: number, activityIndex: number, fbUser: FirebaseUser) {
+  async removeActivity(
+    tripId: string,
+    day: number,
+    activityIndex: number,
+    fbUser: FirebaseUser,
+  ) {
     const trip = await this.getById(tripId, fbUser);
-    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData));
     const dayObj = this.getItineraryDay(itinerary, day);
 
     if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
-      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+      throw new BadRequestException(
+        `Activity index ${activityIndex} out of range`,
+      );
     }
 
     const removed = dayObj.activities[activityIndex];
@@ -189,22 +244,32 @@ export class SavedTripsService {
     const updated = await this.updateItinerary(tripId, itinerary);
 
     // Log correction so Phase 2B personalisation learns from this removal
-    await this.correctionsService.create(fbUser.uid, {
-      tripId,
-      type: 'removed_place',
-      context: { place: removed.activity, day },
-    }).catch(() => null);  // non-blocking
+    await this.correctionsService
+      .create(fbUser.uid, {
+        tripId,
+        type: 'removed_place',
+        context: { place: removed.activity, day },
+      })
+      .catch(() => null); // non-blocking
 
     return { removed, trip: updated };
   }
 
-  async swapActivity(tripId: string, day: number, activityIndex: number, dto: AddActivityDto, fbUser: FirebaseUser) {
+  async swapActivity(
+    tripId: string,
+    day: number,
+    activityIndex: number,
+    dto: AddActivityDto,
+    fbUser: FirebaseUser,
+  ) {
     const trip = await this.getById(tripId, fbUser);
-    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData));
     const dayObj = this.getItineraryDay(itinerary, day);
 
     if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
-      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+      throw new BadRequestException(
+        `Activity index ${activityIndex} out of range`,
+      );
     }
 
     const old = dayObj.activities[activityIndex];
@@ -216,21 +281,31 @@ export class SavedTripsService {
     };
     const updated = await this.updateItinerary(tripId, itinerary);
 
-    await this.correctionsService.create(fbUser.uid, {
-      tripId,
-      type: 'swapped_place',
-      context: { oldPlace: old.activity, newPlace: dto.activity, day },
-    }).catch(() => null);
+    await this.correctionsService
+      .create(fbUser.uid, {
+        tripId,
+        type: 'swapped_place',
+        context: { oldPlace: old.activity, newPlace: dto.activity, day },
+      })
+      .catch(() => null);
 
     return { old, trip: updated };
   }
 
-  async reorderActivities(tripId: string, day: number, indices: number[], fbUser: FirebaseUser) {
+  async reorderActivities(
+    tripId: string,
+    day: number,
+    indices: number[],
+    fbUser: FirebaseUser,
+  ) {
     const trip = await this.getById(tripId, fbUser);
-    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData)) as any;
+    const itinerary = JSON.parse(JSON.stringify(trip.itineraryData));
     const dayObj = this.getItineraryDay(itinerary, day);
 
-    if (indices.length !== dayObj.activities.length || !indices.every(i => i >= 0 && i < dayObj.activities.length)) {
+    if (
+      indices.length !== dayObj.activities.length ||
+      !indices.every((i) => i >= 0 && i < dayObj.activities.length)
+    ) {
       throw new BadRequestException('Invalid reorder indices');
     }
 
@@ -249,7 +324,9 @@ export class SavedTripsService {
     const dayObj = this.getItineraryDay(itinerary, day);
 
     if (activityIndex < 0 || activityIndex >= dayObj.activities.length) {
-      throw new BadRequestException(`Activity index ${activityIndex} out of range`);
+      throw new BadRequestException(
+        `Activity index ${activityIndex} out of range`,
+      );
     }
 
     const currentActivity = dayObj.activities[activityIndex];
@@ -264,9 +341,13 @@ export class SavedTripsService {
       profile = await this.profileService.getProfile(fbUser.uid);
       if (profile) {
         const user = await this.userService.findOrCreate(fbUser.uid);
-        corrections = (await this.correctionsService.getRecentForPrompt(user.id)) as CorrectionRecord[];
+        corrections = (await this.correctionsService.getRecentForPrompt(
+          user.id,
+        )) as CorrectionRecord[];
       }
-    } catch { /* non-fatal */ }
+    } catch {
+      /* non-fatal */
+    }
 
     return this.aiService.suggestActivityReplacement({
       destination: trip.destination,
