@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Activity, Suggestion, ConnectionState } from '@/types/live-guide.types';
+import type { Activity, Suggestion, ConnectionState, ActivityApproachingAlert } from '@/types/live-guide.types';
 
 interface LiveGuideState {
   sessionId: string | null;
@@ -10,12 +10,14 @@ interface LiveGuideState {
   todayPlan: Activity[] | null;
   nearbySuggestion: Suggestion | null;
   mealNudge: { meal: string; suggestion: string } | null;
+  activityAlert: ActivityApproachingAlert | null;
   setSession: (sessionId: string, dayIndex: number) => void;
   setBriefing: (briefing: string | null) => void;
   setTodayPlan: (activities: Activity[]) => void;
   patchActivity: (dayIndex: number, activityIndex: number, status: 'done' | 'skipped') => void;
   setSuggestion: (suggestion: Suggestion | null) => void;
   setMealNudge: (nudge: { meal: string; suggestion: string } | null) => void;
+  setActivityAlert: (alert: ActivityApproachingAlert | null) => void;
   setConnectionState: (state: ConnectionState) => void;
   reset: () => void;
 }
@@ -29,6 +31,7 @@ const initialState = {
   todayPlan: null,
   nearbySuggestion: null,
   mealNudge: null,
+  activityAlert: null,
 };
 
 export const useLiveGuideStore = create<LiveGuideState>((set) => ({
@@ -55,6 +58,8 @@ export const useLiveGuideStore = create<LiveGuideState>((set) => ({
   setSuggestion: (nearbySuggestion) => set({ nearbySuggestion }),
 
   setMealNudge: (mealNudge) => set({ mealNudge }),
+
+  setActivityAlert: (activityAlert) => set({ activityAlert }),
 
   setConnectionState: (connectionState) => set({ connectionState }),
 
