@@ -64,9 +64,14 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
       Alert.alert('Missing info', 'Please enter your departure city.');
       return false;
     }
-    const budget = formValues.budget ?? 0;
-    if (budget < 0) {
-      Alert.alert('Invalid budget', 'Budget must be at least ₹0.');
+    const budgetMin = formValues.budget?.min ?? 0;
+    const budgetMax = formValues.budget?.max ?? 0;
+    if (budgetMin < 2000) {
+      Alert.alert('Invalid budget', 'Minimum budget must be at least ₹2000.');
+      return false;
+    }
+    if (budgetMax < budgetMin) {
+      Alert.alert('Invalid budget', 'Maximum budget must be greater than or equal to minimum.');
       return false;
     }
     return true;
@@ -166,13 +171,27 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         </View>
       </View>
 
-      <Input
-        label="Budget (₹)"
-        placeholder="10000"
-        value={formValues.budget?.toString() ?? ''}
-        onChangeText={(v) => updateFormValues({ budget: Math.max(0, parseInt(v) || 0) })}
-        keyboardType="numeric"
-      />
+      <View style={styles.section}>
+        <Text style={styles.label}>BUDGET (₹)</Text>
+        <View style={styles.row}>
+          <View style={styles.flex}>
+            <Input
+              placeholder="Min: 2000"
+              value={formValues.budget?.min?.toString() ?? ''}
+              onChangeText={(v) => updateFormValues({ budget: { min: Math.max(2000, parseInt(v) || 2000), max: formValues.budget?.max ?? 20000 } })}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={styles.flex}>
+            <Input
+              placeholder="Max: 50000"
+              value={formValues.budget?.max?.toString() ?? ''}
+              onChangeText={(v) => updateFormValues({ budget: { min: formValues.budget?.min ?? 2000, max: parseInt(v) || 20000 } })}
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.label}>Experiences</Text>

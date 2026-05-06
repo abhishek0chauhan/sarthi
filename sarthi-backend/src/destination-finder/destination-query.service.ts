@@ -12,7 +12,8 @@ export class DestinationQueryService {
     return this.prisma.destination.findMany({
       where: {
         experienceTypes: { hasSome: dto.experienceTypes },
-        budgetMin: { lte: dto.budget },
+        budgetMin: { lte: dto.budget.max },
+        budgetMax: { gte: dto.budget.min },
         bestMonths: { hasSome: months },
       },
       take: 15,

@@ -1,0 +1,893 @@
+
+> sarthi-backend@0.0.1 test
+> jest
+
+FAIL src/live-guide/session.service.spec.ts
+  ● SessionService › computeCurrentDay › returns during status with correct dayIndex
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+    [0m [90m 52 |[39m       [36mconst[39m result [33m=[39m service[33m.[39mcomputeCurrentDay({ [36mfrom[39m[33m,[39m to[33m:[39m future })[33m;[39m
+     [90m 53 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([32m'during'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 54 |[39m       expect(result[33m.[39mdayIndex)[33m.[39mtoBe([35m0[39m)[33m;[39m
+     [90m    |[39m                               [31m[1m^[22m[39m
+     [90m 55 |[39m     })[33m;[39m
+     [90m 56 |[39m
+     [90m 57 |[39m     it([32m'returns dayIndex 2 when today is the 3rd day'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (live-guide/session.service.spec.ts:54:31)
+
+  ● SessionService › computeCurrentDay › returns dayIndex 2 when today is the 3rd day
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 3
+
+    [0m [90m 64 |[39m         [33m.[39msplit([32m'T'[39m)[[35m0[39m][33m;[39m
+     [90m 65 |[39m       [36mconst[39m result [33m=[39m service[33m.[39mcomputeCurrentDay({ [36mfrom[39m[33m,[39m to })[33m;[39m
+    [31m[1m>[22m[39m[90m 66 |[39m       expect(result[33m.[39mdayIndex)[33m.[39mtoBe([35m2[39m)[33m;[39m
+     [90m    |[39m                               [31m[1m^[22m[39m
+     [90m 67 |[39m     })[33m;[39m
+     [90m 68 |[39m   })[33m;[39m
+     [90m 69 |[39m[0m
+
+      at Object.<anonymous> (live-guide/session.service.spec.ts:66:31)
+
+[31m[Nest] 8408  - [39m07/05/2026, 1:36:39 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mFailed to parse time string: "invalid". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").[39m
+[31m[Nest] 8408  - [39m07/05/2026, 1:36:39 am [31m  ERROR[39m [38;5;3m[LiveGuideService] [39m[31mFailed to schedule activity notifications for session sess-1:[39m
+Failed to parse time string: "invalid". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").
+FAIL src/live-guide/live-guide.controller.spec.ts (6.679 s)
+  ● LiveGuideController › GET /live-guide/:tripId/status calls getSessionStatus
+
+    Nest can't resolve dependencies of the LiveGuideController (LiveGuideService, ?). Please make sure that the argument PrismaService at index [1] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If PrismaService is a provider, is it part of the current RootTestModule?
+    - If PrismaService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing PrismaService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 11 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 12 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 13 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 14 |[39m       controllers[33m:[39m [[33mLiveGuideController[39m][33m,[39m
+     [90m 15 |[39m       providers[33m:[39m [{ provide[33m:[39m [33mLiveGuideService[39m[33m,[39m useValue[33m:[39m mockService }][33m,[39m
+     [90m 16 |[39m     })[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadController (../node_modules/@nestjs/core/injector/injector.js:94:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:68:13
+          at async Promise.all (index 0)
+      at TestingInstanceLoader.createInstancesOfControllers (../node_modules/@nestjs/core/injector/instance-loader.js:67:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:42:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.controller.spec.ts:13:20)
+
+FAIL src/live-guide/live-guide.service.spec.ts (6.906 s)
+  ● LiveGuideService › activateGuide › creates a new session and returns todayPlan + briefing
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › activateGuide › reuses existing active session
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › activateGuide › throws NotFoundException if trip not found
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › markActivityDone: updates activityStatus
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › skipActivity: logs correction
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › getSessionStatus: returns null when no active session
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid distance: 0. Distance must be greater than 0 meters.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid distance: -100. Distance must be greater than 0 meters.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid distance: null. Distance must be greater than 0 meters.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid distance: undefined. Distance must be greater than 0 meters.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid pace: invalid_pace. Must be one of: packed, loose, no_plan[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid transport mode: invalid_mode. Must be one of: walking, public_transit, taxi, car[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid transport mode: invalid_mode. Must be one of: walking, public_transit, taxi, car[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mFailed to parse time string: "invalid". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid time string: . Must be a non-empty string.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid time string:    . Must be a non-empty string.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid time string: null. Must be a non-empty string.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid time string: undefined. Must be a non-empty string.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mInvalid time string: 123. Must be a non-empty string.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mTime out of range: hours=25, minutes=0. Hours must be 0-23, minutes must be 0-59.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mTime out of range: hours=9, minutes=60. Hours must be 0-23, minutes must be 0-59.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mTime out of range: hours=24, minutes=30. Hours must be 0-23, minutes must be 0-59.[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:41 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mFailed to parse time string: "invalid". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").[39m
+[31m[Nest] 23924  - [39m07/05/2026, 1:36:42 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mFailed to parse time string: "invalid". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").[39m
+[31m[Nest] 17144  - [39m07/05/2026, 1:36:44 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mFailed to parse time string: "invalid-time". Expected format: "HH:MM [AM|PM]" (e.g., "9:00 AM" or "14:30").[39m
+[31m[Nest] 17144  - [39m07/05/2026, 1:36:44 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mTime out of range: hours=25, minutes=0. Hours must be 0-23, minutes must be 0-59.[39m
+[31m[Nest] 17144  - [39m07/05/2026, 1:36:44 am [31m  ERROR[39m [38;5;3m[ActivitySchedulerService] [39m[31mTime out of range: hours=12, minutes=60. Hours must be 0-23, minutes must be 0-59.[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mDB shortlist empty — falling back to ai_full[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39mObject(6) {
+  dates: {
+    from: [32m'2026-04-17'[39m,
+    to: [32m'2026-04-19'[39m
+  },
+  budget: {
+    min: [33m5000[39m,
+    max: [33m10000[39m
+  },
+  experienceTypes: [
+    [32m'nature'[39m
+  ],
+  departureCity: [32m'Ahmedabad'[39m,
+  group: {
+    size: [33m2[39m,
+    type: [32m'couple'[39m
+  },
+  freeText: [32m'offbeat trip'[39m
+}
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mDB shortlist empty — falling back to ai_full[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39mObject(7) {
+  dates: {
+    from: [32m'2026-04-17'[39m,
+    to: [32m'2026-04-19'[39m
+  },
+  budget: {
+    min: [33m5000[39m,
+    max: [33m10000[39m
+  },
+  experienceTypes: [
+    [32m'nature'[39m
+  ],
+  departureCity: [32m'Ahmedabad'[39m,
+  group: {
+    size: [33m2[39m,
+    type: [32m'couple'[39m
+  },
+  freeText: [32m'offbeat trip'[39m,
+  hiddenGem: [33mtrue[39m
+}
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mAI returned no results — returning top 5 DB results[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mDB shortlist empty — falling back to ai_full[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39mObject(6) {
+  dates: {
+    from: [32m'2025-05-01'[39m,
+    to: [32m'2025-05-07'[39m
+  },
+  budget: {
+    min: [33m5000[39m,
+    max: [33m15000[39m
+  },
+  experienceTypes: [
+    [32m'mountains'[39m
+  ],
+  departureCity: [32m'Mumbai'[39m,
+  group: {
+    size: [33m4[39m,
+    type: [32m'friends'[39m
+  },
+  freeText: [32m'offbeat trek'[39m
+}
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mAI returned no results — returning top 5 DB results[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39m[31mAI API error during search[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39mError: AI API down
+    at Object.<anonymous> [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39msrc\destination-finder\destination-finder.service.spec.ts:288:52[90m)[39m
+    at Promise.finally.completed [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1557:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1497:10[90m)[39m
+    at _callCircusTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1007:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at _runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:947:3[90m)[39m
+    at [90mC:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:862:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at run [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:761:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1918:21[90m)[39m
+    at jestAdapter [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\runner.js:101:19[90m)[39m
+    at runTestInternal [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:275:16[90m)[39m
+    at runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:343:7[90m)[39m
+    at Object.worker [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:497:12[90m)[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39m[31mAI error during itinerary generation[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39mError: AI down
+    at Object.<anonymous> [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39msrc\destination-finder\destination-finder.service.spec.ts:372:53[90m)[39m
+    at Promise.finally.completed [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1557:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1497:10[90m)[39m
+    at _callCircusTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1007:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at _runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:947:3[90m)[39m
+    at [90mC:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:862:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at run [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:761:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1918:21[90m)[39m
+    at jestAdapter [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\runner.js:101:19[90m)[39m
+    at runTestInternal [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:275:16[90m)[39m
+    at runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:343:7[90m)[39m
+    at Object.worker [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:497:12[90m)[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39m[31mAI error during food guide generation[39m
+[31m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [31m  ERROR[39m [38;5;3m[DestinationFinderService] [39mError: AI down
+    at Object.<anonymous> [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39msrc\destination-finder\destination-finder.service.spec.ts:429:53[90m)[39m
+    at Promise.finally.completed [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1557:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1497:10[90m)[39m
+    at _callCircusTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1007:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at _runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:947:3[90m)[39m
+    at [90mC:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:862:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at run [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:761:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1918:21[90m)[39m
+    at jestAdapter [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\runner.js:101:19[90m)[39m
+    at runTestInternal [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:275:16[90m)[39m
+    at runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:343:7[90m)[39m
+    at Object.worker [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:497:12[90m)[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:45 am [33m   WARN[39m [38;5;3m[DestinationFinderService] [39m[33mNo treks match filters — falling back to normal search[39m
+FAIL src/profile/profile.service.spec.ts
+  ● ProfileService › getProfile › returns null when no profile exists
+
+    expect(received).toBeNull()
+
+    Received: {"comfortLevel": null, "completeness": 0, "crowdTolerance": null, "depthVsBreadth": null, "groundReality": null, "languageComfort": null, "physicalReadiness": null, "spendingStyle": null, "story": null, "travelMotivations": [], "travelPace": null, "userId": "user-1"}
+
+    [0m [90m 38 |[39m       mockPrisma[33m.[39mtravelerProfile[33m.[39mfindUnique[33m.[39mmockResolvedValue([36mnull[39m)[33m;[39m
+     [90m 39 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m service[33m.[39mgetProfile([32m'fb-1'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 40 |[39m       expect(result)[33m.[39mtoBeNull()[33m;[39m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 41 |[39m     })[33m;[39m
+     [90m 42 |[39m
+     [90m 43 |[39m     it([32m'returns profile when it exists'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (profile/profile.service.spec.ts:40:22)
+
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[33m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [33m   WARN[39m [38;5;3m[AiService] [39m[33mAI returned empty array in rankDestinations[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[32m[Nest] 23924  - [39m07/05/2026, 1:36:47 am [32m    LOG[39m [38;5;3m[AiService] [39m[32mAI provider: nvidia (model: google/gemma-3n-e4b-it)[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:48 am [33m   WARN[39m [38;5;3m[CacheService] [39m[33mRedis get failed, proceeding without cache[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:48 am [33m   WARN[39m [38;5;3m[CacheService] [39mError: connection refused
+    at Object.<anonymous> [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39msrc\cache\cache.service.spec.ts:40:39[90m)[39m
+    at Promise.finally.completed [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1557:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1497:10[90m)[39m
+    at _callCircusTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1007:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at _runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:947:3[90m)[39m
+    at [90mC:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:862:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at run [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:761:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1918:21[90m)[39m
+    at jestAdapter [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\runner.js:101:19[90m)[39m
+    at runTestInternal [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:275:16[90m)[39m
+    at runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:343:7[90m)[39m
+    at Object.worker [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:497:12[90m)[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:48 am [33m   WARN[39m [38;5;3m[CacheService] [39m[33mRedis set failed, proceeding without cache[39m
+[33m[Nest] 21096  - [39m07/05/2026, 1:36:48 am [33m   WARN[39m [38;5;3m[CacheService] [39mError: connection refused
+    at Object.<anonymous> [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39msrc\cache\cache.service.spec.ts:57:41[90m)[39m
+    at Promise.finally.completed [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1557:28[90m)[39m
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1497:10[90m)[39m
+    at _callCircusTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1007:40[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m
+    at _runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:947:3[90m)[39m
+    at [90mC:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:849:7
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:862:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at _runTestsForDescribeBlock [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:857:11[90m)[39m
+    at run [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:761:3[90m)[39m
+    at runAndTransformResultsToJestFormat [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\jestAdapterInit.js:1918:21[90m)[39m
+    at jestAdapter [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-circus[24m\build\runner.js:101:19[90m)[39m
+    at runTestInternal [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:275:16[90m)[39m
+    at runTest [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:343:7[90m)[39m
+    at Object.worker [90m(C:\Users\Abhishek\OneDrive\Desktop\Sarthi\sarthi-backend\[39mnode_modules\[4mjest-runner[24m\build\testWorker.js:497:12[90m)[39m
+
+Summary of all failing tests
+FAIL live-guide/session.service.spec.ts
+  ● SessionService › computeCurrentDay › returns during status with correct dayIndex
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0
+    Received: 1
+
+    [0m [90m 52 |[39m       [36mconst[39m result [33m=[39m service[33m.[39mcomputeCurrentDay({ [36mfrom[39m[33m,[39m to[33m:[39m future })[33m;[39m
+     [90m 53 |[39m       expect(result[33m.[39mstatus)[33m.[39mtoBe([32m'during'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 54 |[39m       expect(result[33m.[39mdayIndex)[33m.[39mtoBe([35m0[39m)[33m;[39m
+     [90m    |[39m                               [31m[1m^[22m[39m
+     [90m 55 |[39m     })[33m;[39m
+     [90m 56 |[39m
+     [90m 57 |[39m     it([32m'returns dayIndex 2 when today is the 3rd day'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (live-guide/session.service.spec.ts:54:31)
+
+  ● SessionService › computeCurrentDay › returns dayIndex 2 when today is the 3rd day
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 3
+
+    [0m [90m 64 |[39m         [33m.[39msplit([32m'T'[39m)[[35m0[39m][33m;[39m
+     [90m 65 |[39m       [36mconst[39m result [33m=[39m service[33m.[39mcomputeCurrentDay({ [36mfrom[39m[33m,[39m to })[33m;[39m
+    [31m[1m>[22m[39m[90m 66 |[39m       expect(result[33m.[39mdayIndex)[33m.[39mtoBe([35m2[39m)[33m;[39m
+     [90m    |[39m                               [31m[1m^[22m[39m
+     [90m 67 |[39m     })[33m;[39m
+     [90m 68 |[39m   })[33m;[39m
+     [90m 69 |[39m[0m
+
+      at Object.<anonymous> (live-guide/session.service.spec.ts:66:31)
+
+FAIL live-guide/live-guide.controller.spec.ts (6.679 s)
+  ● LiveGuideController › GET /live-guide/:tripId/status calls getSessionStatus
+
+    Nest can't resolve dependencies of the LiveGuideController (LiveGuideService, ?). Please make sure that the argument PrismaService at index [1] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If PrismaService is a provider, is it part of the current RootTestModule?
+    - If PrismaService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing PrismaService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 11 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 12 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 13 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 14 |[39m       controllers[33m:[39m [[33mLiveGuideController[39m][33m,[39m
+     [90m 15 |[39m       providers[33m:[39m [{ provide[33m:[39m [33mLiveGuideService[39m[33m,[39m useValue[33m:[39m mockService }][33m,[39m
+     [90m 16 |[39m     })[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 1)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadController (../node_modules/@nestjs/core/injector/injector.js:94:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:68:13
+          at async Promise.all (index 0)
+      at TestingInstanceLoader.createInstancesOfControllers (../node_modules/@nestjs/core/injector/instance-loader.js:67:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:42:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.controller.spec.ts:13:20)
+
+FAIL live-guide/live-guide.service.spec.ts (6.906 s)
+  ● LiveGuideService › activateGuide › creates a new session and returns todayPlan + briefing
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › activateGuide › reuses existing active session
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › activateGuide › throws NotFoundException if trip not found
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › markActivityDone: updates activityStatus
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › skipActivity: logs correction
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+  ● LiveGuideService › getSessionStatus: returns null when no active session
+
+    Nest can't resolve dependencies of the LiveGuideService (PrismaService, SessionService, NotificationService, AiService, ProfileService, CorrectionsService, LiveGuideGateway, ?). Please make sure that the argument ActivitySchedulerService at index [7] is available in the RootTestModule module.
+
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If ActivitySchedulerService is a provider, is it part of the current RootTestModule?
+    - If ActivitySchedulerService is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing ActivitySchedulerService */ ]
+      })
+
+    For more common dependency resolution issues, see: https://docs.nestjs.com/faq/common-errors
+
+    [0m [90m 66 |[39m   beforeEach([36masync[39m () [33m=>[39m {
+     [90m 67 |[39m     jest[33m.[39mclearAllMocks()[33m;[39m
+    [31m[1m>[22m[39m[90m 68 |[39m     [36mconst[39m module [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({
+     [90m    |[39m                    [31m[1m^[22m[39m
+     [90m 69 |[39m       providers[33m:[39m [
+     [90m 70 |[39m         [33mLiveGuideService[39m[33m,[39m
+     [90m 71 |[39m         { provide[33m:[39m [33mPrismaService[39m[33m,[39m useValue[33m:[39m mockPrisma }[33m,[39m[0m
+
+      at TestingInjector.lookupComponentInParentModules (../node_modules/@nestjs/core/injector/injector.js:290:19)
+      at TestingInjector.resolveComponentWrapper (../node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (../node_modules/@nestjs/core/injector/injector.js:140:38)
+          at async Promise.all (index 7)
+      at TestingInjector.resolveConstructorParams (../node_modules/@nestjs/core/injector/injector.js:169:27)
+      at TestingInjector.loadInstance (../node_modules/@nestjs/core/injector/injector.js:75:13)
+      at TestingInjector.loadProvider (../node_modules/@nestjs/core/injector/injector.js:103:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (../node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at ../node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (../node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies (../node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (../node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (live-guide/live-guide.service.spec.ts:68:20)
+
+FAIL profile/profile.service.spec.ts
+  ● ProfileService › getProfile › returns null when no profile exists
+
+    expect(received).toBeNull()
+
+    Received: {"comfortLevel": null, "completeness": 0, "crowdTolerance": null, "depthVsBreadth": null, "groundReality": null, "languageComfort": null, "physicalReadiness": null, "spendingStyle": null, "story": null, "travelMotivations": [], "travelPace": null, "userId": "user-1"}
+
+    [0m [90m 38 |[39m       mockPrisma[33m.[39mtravelerProfile[33m.[39mfindUnique[33m.[39mmockResolvedValue([36mnull[39m)[33m;[39m
+     [90m 39 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m service[33m.[39mgetProfile([32m'fb-1'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 40 |[39m       expect(result)[33m.[39mtoBeNull()[33m;[39m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 41 |[39m     })[33m;[39m
+     [90m 42 |[39m
+     [90m 43 |[39m     it([32m'returns profile when it exists'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (profile/profile.service.spec.ts:40:22)
+
+
+Test Suites: 4 failed, 33 passed, 37 total
+Tests:       10 failed, 472 passed, 482 total
+Snapshots:   0 total
+Time:        19.683 s
+Ran all test suites.

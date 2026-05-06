@@ -3,7 +3,7 @@ export interface SearchDto {
   destination?: string;
   mode: 'find' | 'plan';
   dates: { from: string; to: string };
-  budget: number;
+  budget: { min: number; max: number };
   experienceTypes: string[];
   departureCity: string;
   group: { type: 'solo' | 'couple' | 'friends' | 'family' };
@@ -22,7 +22,7 @@ export interface ItineraryDto {
   destination: string;
   state: string;
   dates: { from: string; to: string };
-  budget: number;
+  budget: { min: number; max: number };
   group: { type: string };
   departureCity: string;
   freeText: string;

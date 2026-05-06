@@ -65,6 +65,7 @@ export class DestinationFinderService {
       ...rest,
       normalizedFreeText: freeText ? this.cacheService.normalizeText(freeText) : '',
       destination: destination || '',
+      budget: dto.budget,
     });
 
     if (!bust) {

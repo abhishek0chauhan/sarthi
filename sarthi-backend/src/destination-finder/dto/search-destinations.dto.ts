@@ -21,6 +21,16 @@ class DateRangeDto {
   to: string;
 }
 
+class BudgetDto {
+  @IsInt()
+  @Min(2000)
+  min: number;
+
+  @IsInt()
+  @Min(2000)
+  max: number;
+}
+
 class GroupDto {
   @IsEnum(['solo', 'couple', 'friends', 'family'])
   type: string;
@@ -34,9 +44,9 @@ export class SearchDestinationsDto {
   @Type(() => DateRangeDto)
   dates: DateRangeDto;
 
-  @IsInt()
-  @Min(0)
-  budget: number;
+  @ValidateNested()
+  @Type(() => BudgetDto)
+  budget: BudgetDto;
 
   @IsArray()
   @IsString({ each: true })
