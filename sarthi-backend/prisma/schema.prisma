@@ -137,6 +137,7 @@ model LiveGuideSession {
   deactivatedAt   DateTime?
   currentDay      Int
   activityStatus  Json
+  userProfile     Json?     // Cached user profile for personalization
   lastLocation    Json?
   lastBriefingAt  DateTime?
   lastBreakfastAt DateTime?
