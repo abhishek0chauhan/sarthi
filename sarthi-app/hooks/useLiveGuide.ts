@@ -1,7 +1,7 @@
 import { socketService } from '@/services/socket.service';
 import { authService } from '@/services/auth.service';
 import { useLiveGuideStore } from '@/stores/live-guide.store';
-import type { GuideActivatedPayload, Activity, Suggestion } from '@/types/live-guide.types';
+import type { GuideActivatedPayload, Activity, Suggestion, ActivityApproachingAlert } from '@/types/live-guide.types';
 
 export function useLiveGuide() {
   const store = useLiveGuideStore();
@@ -34,6 +34,10 @@ export function useLiveGuide() {
 
     socketService.on('location_suggestion', (suggestion: Suggestion) => {
       store.setSuggestion(suggestion);
+    });
+
+    socketService.on('activity_approaching', (payload: ActivityApproachingAlert) => {
+      store.setActivityAlert(payload);
     });
 
     socketService.on('morning_briefing', (payload: { briefing: string; todayPlan?: any }) => {
