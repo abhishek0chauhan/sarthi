@@ -13,9 +13,10 @@ interface SearchState {
 }
 
 const initialFormValues: PartialSearchDto = {
+  mode: 'find',
   experienceTypes: [],
-  group: { size: 2, type: 'friends' },
-  budget: { min: 5000, max: 20000 },
+  group: { type: 'friends' },
+  budget: 10000,
   hiddenGem: false,
 };
 

@@ -22,10 +22,6 @@ class DateRangeDto {
 }
 
 class GroupDto {
-  @IsInt()
-  @Min(1)
-  size: number;
-
   @IsEnum(['solo', 'couple', 'friends', 'family'])
   type: string;
 }
@@ -50,10 +46,6 @@ export class FoodGuideDto {
 
   @IsString()
   freeText: string;
-
-  @IsOptional()
-  @IsEnum(['veg', 'non-veg', 'vegan', 'eggetarian', 'jain'])
-  dietType?: string;
 
   @IsOptional()
   @IsEnum(['low', 'medium', 'high'])

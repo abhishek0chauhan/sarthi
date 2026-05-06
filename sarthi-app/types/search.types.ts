@@ -1,16 +1,17 @@
 export interface SearchDto {
-  freeText: string;
+  freeText?: string;
+  destination?: string;
+  mode: 'find' | 'plan';
   dates: { from: string; to: string };
-  budget: { min: number; max: number };
+  budget: number;
   experienceTypes: string[];
   departureCity: string;
-  group: { size: number; type: 'solo' | 'couple' | 'friends' | 'family' };
+  group: { type: 'solo' | 'couple' | 'friends' | 'family' };
   gender?: string;
   age?: number;
   weight?: number;
   height?: number;
   medicalConditions?: string[];
-  dietType?: string;
   spiceTolerance?: string;
   foodBudget?: string;
   allergies?: string[];
@@ -21,8 +22,8 @@ export interface ItineraryDto {
   destination: string;
   state: string;
   dates: { from: string; to: string };
-  budget: { min: number; max: number };
-  group: { size: number; type: string };
+  budget: number;
+  group: { type: string };
   departureCity: string;
   freeText: string;
   travelMode?: string;
@@ -37,10 +38,9 @@ export interface FoodGuideDto {
   destination: string;
   state: string;
   dates: { from: string; to: string };
-  group: { size: number; type: string };
+  group: { type: string };
   departureCity: string;
   freeText: string;
-  dietType?: string;
   spiceTolerance?: string;
   foodBudget?: string;
   allergies?: string[];

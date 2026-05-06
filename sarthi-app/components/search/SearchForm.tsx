@@ -31,6 +31,7 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
   const { formValues, updateFormValues } = useSearchStore();
   const colors = useColors();
   const styles = makeStyles(colors);
+  const mode = formValues.mode ?? 'find';
 
   const toggleExperience = (expType: string) => {
     const current = formValues.experienceTypes ?? [];
@@ -41,8 +42,12 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
   };
 
   const validate = (): boolean => {
-    if (!formValues.freeText?.trim()) {
+    if (mode === 'find' && !formValues.freeText?.trim()) {
       Alert.alert('Missing info', 'Please describe your dream trip.');
+      return false;
+    }
+    if (mode === 'plan' && !formValues.destination?.trim()) {
+      Alert.alert('Missing info', 'Please enter a destination.');
       return false;
     }
     const from = formValues.dates?.from;
@@ -59,10 +64,9 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
       Alert.alert('Missing info', 'Please enter your departure city.');
       return false;
     }
-    const min = formValues.budget?.min ?? 0;
-    const max = formValues.budget?.max ?? 0;
-    if (max <= min) {
-      Alert.alert('Invalid budget', 'Max budget must be greater than min budget.');
+    const budget = formValues.budget ?? 0;
+    if (budget < 0) {
+      Alert.alert('Invalid budget', 'Budget must be at least ₹0.');
       return false;
     }
     return true;
@@ -81,13 +85,42 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         <Text style={styles.greetingSubtitle}>Plan your next adventure</Text>
       </View>
 
-      <Input
-        placeholder="Describe your dream trip... beaches, mountains, culture?"
-        value={formValues.freeText ?? ''}
-        onChangeText={(v) => updateFormValues({ freeText: v })}
-        multiline
-        numberOfLines={3}
-      />
+      {/* Mode toggle */}
+      <View style={styles.modeToggle}>
+        <Pressable
+          onPress={() => updateFormValues({ mode: 'find' })}
+          style={[styles.modeBtn, mode === 'find' && styles.modeBtnActive]}
+        >
+          <Text style={[styles.modeBtnText, mode === 'find' && styles.modeBtnTextActive]}>
+            🔍 Find Destination
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => updateFormValues({ mode: 'plan' })}
+          style={[styles.modeBtn, mode === 'plan' && styles.modeBtnActive]}
+        >
+          <Text style={[styles.modeBtnText, mode === 'plan' && styles.modeBtnTextActive]}>
+            📍 Plan My Destination
+          </Text>
+        </Pressable>
+      </View>
+
+      {mode === 'find' ? (
+        <Input
+          placeholder="Describe your dream trip... beaches, mountains, culture?"
+          value={formValues.freeText ?? ''}
+          onChangeText={(v) => updateFormValues({ freeText: v })}
+          multiline
+          numberOfLines={3}
+        />
+      ) : (
+        <Input
+          placeholder="e.g., Goa, Himalayas, Kerala backwaters"
+          value={formValues.destination ?? ''}
+          onChangeText={(v) => updateFormValues({ destination: v })}
+          label="Destination"
+        />
+      )}
 
       <View style={styles.row}>
         <View style={styles.flex}>
@@ -114,22 +147,6 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         onChangeText={(v) => updateFormValues({ departureCity: v })}
       />
 
-      <View style={styles.row}>
-        <View style={styles.flex}>
-          <Input
-            label="Group size"
-            placeholder="2"
-            value={formValues.group?.size?.toString() ?? ''}
-            onChangeText={(v) =>
-              updateFormValues({
-                group: { size: Math.max(1, parseInt(v) || 1), type: formValues.group?.type ?? 'friends' },
-              })
-            }
-            keyboardType="numeric"
-          />
-        </View>
-      </View>
-
       <View style={styles.section}>
         <Text style={styles.label}>GROUP TYPE</Text>
         <View style={styles.groupTypeRow}>
@@ -138,7 +155,7 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
             return (
               <Pressable
                 key={key}
-                onPress={() => updateFormValues({ group: { size: formValues.group?.size ?? 2, type: key as any } })}
+                onPress={() => updateFormValues({ group: { type: key as any } })}
                 style={[styles.groupTypeBtn, active && styles.groupTypeBtnActive]}
               >
                 <Text style={styles.groupTypeIcon}>{icon}</Text>
@@ -149,34 +166,13 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         </View>
       </View>
 
-      <View style={styles.row}>
-        <View style={styles.flex}>
-          <Input
-            label="Budget min (₹)"
-            placeholder="5000"
-            value={formValues.budget?.min?.toString() ?? ''}
-            onChangeText={(v) =>
-              updateFormValues({
-                budget: { min: Math.max(5000, parseInt(v) || 5000), max: formValues.budget?.max ?? 20000 },
-              })
-            }
-            keyboardType="numeric"
-          />
-        </View>
-        <View style={styles.flex}>
-          <Input
-            label="Budget max (₹)"
-            placeholder="20000"
-            value={formValues.budget?.max?.toString() ?? ''}
-            onChangeText={(v) =>
-              updateFormValues({
-                budget: { min: formValues.budget?.min ?? 5000, max: parseInt(v) || 20000 },
-              })
-            }
-            keyboardType="numeric"
-          />
-        </View>
-      </View>
+      <Input
+        label="Budget (₹)"
+        placeholder="10000"
+        value={formValues.budget?.toString() ?? ''}
+        onChangeText={(v) => updateFormValues({ budget: Math.max(0, parseInt(v) || 0) })}
+        keyboardType="numeric"
+      />
 
       <View style={styles.section}>
         <Text style={styles.label}>Experiences</Text>
@@ -226,6 +222,20 @@ function makeStyles(colors: Colors) {
     label: { ...type.overline, color: colors.textSecondary },
     toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     toggleLabel: { ...type.body, color: colors.textPrimary },
+    modeToggle: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+    modeBtn: {
+      flex: 1,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      backgroundColor: colors.bgCard,
+      alignItems: 'center',
+    },
+    modeBtnActive: { backgroundColor: colors.primary500, borderColor: colors.primary500 },
+    modeBtnText: { ...type.caption, color: colors.textSecondary, fontFamily: 'Inter_600SemiBold' },
+    modeBtnTextActive: { color: '#fff' },
     hiddenGemsRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgCard, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: colors.border, marginBottom: 20, gap: 10 },
     hiddenGemsContent: { flexDirection: 'row', flex: 1, gap: 10, alignItems: 'center' },
     hiddenGemsIcon: { fontSize: 20 },

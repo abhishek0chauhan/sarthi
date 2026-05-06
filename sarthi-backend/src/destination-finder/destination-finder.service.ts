@@ -60,10 +60,11 @@ export class DestinationFinderService {
       'hybrid',
     );
 
-    const { freeText, ...rest } = dto;
+    const { freeText, destination, ...rest } = dto;
     const cacheKey = this.cacheService.buildKey({
       ...rest,
-      normalizedFreeText: this.cacheService.normalizeText(freeText),
+      normalizedFreeText: freeText ? this.cacheService.normalizeText(freeText) : '',
+      destination: destination || '',
     });
 
     if (!bust) {
@@ -77,7 +78,7 @@ export class DestinationFinderService {
       let result;
 
       if (
-        this.trekService.isTrekkingIntent(dto.experienceTypes, dto.freeText)
+        this.trekService.isTrekkingIntent(dto.experienceTypes, dto.freeText || '')
       ) {
         result = await this.runTrekMode(dto, profile, corrections);
       }
@@ -120,6 +121,8 @@ export class DestinationFinderService {
 
     const prompt = buildTrekPrompt({
       ...dto,
+      freeText: dto.freeText || '',
+      mode: (dto.mode as 'find' | 'plan' | undefined),
       treks: filtered,
       profile,
       corrections,
@@ -174,7 +177,6 @@ export class DestinationFinderService {
       state: dto.state,
       dates: dto.dates,
       group: dto.group,
-      dietType: dto.dietType,
       spiceTolerance: dto.spiceTolerance,
       foodBudget: dto.foodBudget,
       allergies: dto.allergies,
@@ -231,6 +233,7 @@ export class DestinationFinderService {
 
     const prompt = buildHybridPrompt({
       ...dto,
+      mode: (dto.mode as 'find' | 'plan' | undefined),
       destinations: compactShortlist,
       profile,
       corrections,
@@ -275,7 +278,7 @@ export class DestinationFinderService {
     profile?: TravelerProfileSnapshot | null,
     corrections?: CorrectionRecord[],
   ) {
-    const prompt = buildAiFullPrompt({ ...dto, profile, corrections });
+    const prompt = buildAiFullPrompt({ ...dto, mode: (dto.mode as 'find' | 'plan' | undefined), profile, corrections });
     const destinations = await this.aiService.generateDestinations(prompt);
     return { mode: 'ai_full', results: destinations };
   }

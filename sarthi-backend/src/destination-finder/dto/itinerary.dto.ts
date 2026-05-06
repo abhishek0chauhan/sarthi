@@ -20,21 +20,7 @@ class DateRangeDto {
   to: string;
 }
 
-class BudgetDto {
-  @IsInt()
-  @Min(0)
-  min: number;
-
-  @IsInt()
-  @Min(0)
-  max: number;
-}
-
 class GroupDto {
-  @IsInt()
-  @Min(1)
-  size: number;
-
   @IsEnum(['solo', 'couple', 'friends', 'family'])
   type: string;
 }
@@ -50,9 +36,9 @@ export class ItineraryDto {
   @Type(() => DateRangeDto)
   dates: DateRangeDto;
 
-  @ValidateNested()
-  @Type(() => BudgetDto)
-  budget: BudgetDto;
+  @IsInt()
+  @Min(0)
+  budget: number;
 
   @ValidateNested()
   @Type(() => GroupDto)

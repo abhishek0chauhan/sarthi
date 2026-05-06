@@ -21,33 +21,22 @@ class DateRangeDto {
   to: string;
 }
 
-class BudgetDto {
-  @IsInt()
-  @Min(0)
-  min: number;
-
-  @IsInt()
-  @Min(0)
-  max: number;
-}
-
 class GroupDto {
-  @IsInt()
-  @Min(1)
-  size: number;
-
   @IsEnum(['solo', 'couple', 'friends', 'family'])
   type: string;
 }
 
 export class SearchDestinationsDto {
+  @IsEnum(['find', 'plan'])
+  mode: string;
+
   @ValidateNested()
   @Type(() => DateRangeDto)
   dates: DateRangeDto;
 
-  @ValidateNested()
-  @Type(() => BudgetDto)
-  budget: BudgetDto;
+  @IsInt()
+  @Min(0)
+  budget: number;
 
   @IsArray()
   @IsString({ each: true })
@@ -60,8 +49,13 @@ export class SearchDestinationsDto {
   @Type(() => GroupDto)
   group: GroupDto;
 
+  @IsOptional()
   @IsString()
-  freeText: string;
+  freeText?: string;
+
+  @IsOptional()
+  @IsString()
+  destination?: string;
 
   @IsOptional()
   @IsEnum(['male', 'female', 'other'])
@@ -89,10 +83,6 @@ export class SearchDestinationsDto {
   @IsArray()
   @IsString({ each: true })
   medicalConditions?: string[];
-
-  @IsOptional()
-  @IsEnum(['veg', 'non-veg', 'vegan', 'eggetarian', 'jain'])
-  dietType?: string;
 
   @IsOptional()
   @IsEnum(['low', 'medium', 'high'])

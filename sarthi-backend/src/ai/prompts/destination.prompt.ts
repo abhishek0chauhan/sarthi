@@ -18,9 +18,11 @@ export interface HealthProfile {
 }
 
 export interface PromptParams extends HealthProfile {
-  freeText: string;
-  group: { size: number; type: string };
-  budget: { min: number; max: number };
+  freeText?: string;
+  destination?: string;
+  mode?: 'find' | 'plan';
+  group: { type: string };
+  budget: number;
   dates: { from: string; to: string };
   departureCity: string;
   hiddenGem?: boolean;
@@ -74,8 +76,8 @@ const GROUP_HINT_FALLBACK = "tailor to the group's vibe";
 
 export interface SearchContextParams {
   dates: { from: string; to: string };
-  group: { size: number; type: string };
-  budget: { min: number; max: number };
+  group: { type: string };
+  budget: number;
   departureCity: string;
   hiddenGem?: boolean;
 }
@@ -110,14 +112,14 @@ export function buildSearchContext(
 - Trip length: ${tripDays} days (${params.dates.from} to ${params.dates.to})
 - Travel month: ${monthName}
 - Departure city: ${params.departureCity}
-- Group: ${params.group.size} ${params.group.type} — ${groupHint}
-- Budget: ₹${params.budget.min}–${params.budget.max}/person total
+- Group: ${params.group.type} — ${groupHint}
+- Budget: ₹${params.budget}/person total
 
 ## Rules
 - Proximity: Prefer destinations reachable within 6–8h of ${params.departureCity}. For trips of ≤3 days, avoid destinations that need >4h one-way travel — it eats into the trip. Flag long travel in tripReadiness (e.g. "6h each way leaves only 1 full day onsite").
 ${seasonRule}
 - Group-fit: Tailor picks to the group type — do not recommend backpacker hostels to a family or temple tours to a friends trip unless explicitly requested.
-- Budget: If realistic cost exceeds ₹${params.budget.min}–${params.budget.max}/person, set costBreakdown.total to the honest number and explain the gap in tripReadiness.budget (e.g. "₹2000 over — drop to budget guesthouses and local transport to fit").${nearbyGemsRule}`;
+- Budget: If realistic cost exceeds ₹${params.budget}/person, set costBreakdown.total to the honest number and explain the gap in tripReadiness.budget (e.g. "₹2000 over — drop to budget guesthouses and local transport to fit").${nearbyGemsRule}`;
 }
 
 export interface TravelerProfileSnapshot {
@@ -322,8 +324,8 @@ export interface ItineraryParams extends HealthProfile {
   destination: string;
   state: string;
   freeText: string;
-  group: { size: number; type: string };
-  budget: { min: number; max: number };
+  group: { type: string };
+  budget: number;
   dates: { from: string; to: string };
   departureCity: string;
   travelMode?: string;
@@ -340,8 +342,8 @@ export function buildItineraryPrompt(
   },
 ): { system: string; user: string } {
   const travelerProfile = [
-    `Group: ${params.group.size} ${params.group.type}`,
-    `Budget: ₹${params.budget.min}–${params.budget.max}/person`,
+    `Group: ${params.group.type}`,
+    `Budget: ₹${params.budget}/person`,
     `Dates: ${params.dates.from} to ${params.dates.to}`,
     `From: ${params.departureCity}`,
   ].join(' | ');
@@ -380,10 +382,9 @@ export interface FoodGuideParams extends HealthProfile {
   destination: string;
   state: string;
   freeText: string;
-  group: { size: number; type: string };
+  group: { type: string };
   dates: { from: string; to: string };
   departureCity: string;
-  dietType?: string;
   spiceTolerance?: string;
   foodBudget?: string;
   allergies?: string[];
@@ -439,7 +440,6 @@ export function buildFoodGuidePrompt(
     ) + 1;
 
   const dietLines: string[] = [];
-  if (params.dietType) dietLines.push(`Diet: ${params.dietType}`);
   if (params.spiceTolerance)
     dietLines.push(`Spice tolerance: ${params.spiceTolerance}`);
   if (params.foodBudget) dietLines.push(`Food budget: ${params.foodBudget}`);
@@ -499,7 +499,7 @@ export function buildFoodGuidePrompt(
       "You are an expert Indian food and travel cuisine guide. You recommend local food personalized to the traveler's health conditions, dietary preferences, and allergies.",
     user: `Create a personalized food guide for ${params.destination}, ${params.state} (${numDays} days).
 Traveler: ${params.freeText}
-Group: ${params.group.size} ${params.group.type} | From: ${params.departureCity}${dietContext}${healthContext}${tasteProfileBlock}${personalityBlock}${correctionsBlock}
+Group: ${params.group.type} | From: ${params.departureCity}${dietContext}${healthContext}${tasteProfileBlock}${personalityBlock}${correctionsBlock}
 
 ## Rules
 ${activeRules}
@@ -513,8 +513,8 @@ ${activeCount}`,
 
 export interface TrekPromptParams extends HealthProfile {
   freeText: string;
-  group: { size: number; type: string };
-  budget: { min: number; max: number };
+  group: { type: string };
+  budget: number;
   dates: { from: string; to: string };
   departureCity: string;
   treks: Array<{
