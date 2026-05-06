@@ -18,6 +18,14 @@ export function useLiveGuide() {
     console.log('[useLiveGuide] connecting socket with auth token');
     socketService.connect(token);
 
+    // Wait for socket to connect before setting up listeners
+    await new Promise<void>((resolve) => {
+      socketService.on('connect', () => {
+        console.log('[useLiveGuide] socket connected');
+        resolve();
+      });
+    });
+
     socketService.on('guide_activated', (payload: GuideActivatedPayload) => {
       console.log('[useLiveGuide] guide_activated received', payload);
       store.setConnectionState('connected');
