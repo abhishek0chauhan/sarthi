@@ -528,6 +528,15 @@ export class LiveGuideService {
             (a: any) => a.activity,
           );
 
+          // TODO: Fetch nearby places from Google Places API
+          // For now, skip personalized suggestion when no places available
+          // and fall back to non-personalized suggestion below
+          const nearbyPlaces: any[] = [];
+
+          if (nearbyPlaces.length === 0) {
+            throw new Error('No nearby places available for personalization');
+          }
+
           // Pass profile to AI for personalization
           const result =
             await this.aiService.generatePersonalizedLocationSuggestion(
@@ -535,7 +544,7 @@ export class LiveGuideService {
               trip.state,
               profile || {},
               120, // In real code, calculate from next activity time
-              [], // In real code, fetch from Google Places API
+              nearbyPlaces,
               alreadyPlanned,
             );
 
