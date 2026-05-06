@@ -257,19 +257,24 @@ export function buildHybridPrompt(
     corrections?: CorrectionRecord[];
   },
 ): { system: string; user: string } {
-  // For "plan" mode, don't rank destinations - just confirm the specified one
+  // For "plan" mode, focus on the user's chosen destination with enriched info
   if (params.mode === 'plan' && params.destination) {
     const healthContext = buildHealthContext(params);
+    const searchContext = buildSearchContext(params);
     const personalityBlock = buildPersonalityBlock(params.profile ?? null);
     const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
     return {
       system: SYSTEM_PROMPT,
-      user: `Confirm destination for planning:
-Destination: ${params.destination}${healthContext}${personalityBlock}${correctionsBlock}
+      user: `User has chosen a destination for trip planning:
+Destination: ${params.destination}${healthContext}
 
-Return state name and confirmation. Respond ONLY with JSON (no extra text):
-{"destination":"${params.destination}","state":"<state name>","confirmed":true}`,
+${searchContext}${personalityBlock}${correctionsBlock}
+
+Provide detailed information about ${params.destination} tailored to this traveler's trip parameters and preferences.
+
+Respond ONLY with a JSON object in exactly this format (no extra text):
+{"destinations":[{"name":"${params.destination}","state":"<inferred state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<why this destination suits the traveler>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`,
     };
   }
 
@@ -312,15 +317,21 @@ export function buildAiFullPrompt(
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
   const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
-  // For "plan" mode with a specific destination, focus on that destination
+  // For "plan" mode with a specific destination, provide enriched info about that destination
   if (params.mode === 'plan' && params.destination) {
+    const searchContext = buildSearchContext(params);
+    const responseFormat = `{"destinations":[{"name":"${params.destination}","state":"<inferred state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<why this destination suits the traveler>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`;
     return {
       system: SYSTEM_PROMPT,
-      user: `Verify destination for trip planning:
-Destination: ${params.destination}${healthContext}${personalityBlock}${correctionsBlock}
+      user: `User has chosen a destination for trip planning:
+Destination: ${params.destination}${healthContext}
 
-Extract/infer the state. Respond ONLY with JSON (no extra text):
-{"destination":"${params.destination}","state":"<state name>","isValid":true}`,
+${searchContext}${personalityBlock}${correctionsBlock}
+
+Provide detailed information about ${params.destination} tailored to this traveler's trip parameters and preferences.
+
+Respond ONLY with a JSON object in exactly this format (no extra text):
+${responseFormat}`,
     };
   }
 
