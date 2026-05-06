@@ -7,7 +7,8 @@ import { socketService } from '@/services/socket.service';
 import { notificationsService } from '@/services/notifications.service';
 import { useTrip } from '@/hooks/useTrips';
 import { useColors } from '@/hooks/useColorScheme';
-import type { Activity } from '@/types/live-guide.types';
+import { MapLinkButton } from '@/components/trip/MapLinkButton';
+import type { Activity, ActivityApproachingAlert } from '@/types/live-guide.types';
 
 export default function LiveGuideScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,7 +18,7 @@ export default function LiveGuideScreen() {
 
   const {
     activate, deactivate, markDone, skipActivity, requestReplan,
-    briefing, todayPlan, dayIndex, nearbySuggestion, mealNudge, connectionState,
+    briefing, todayPlan, dayIndex, nearbySuggestion, mealNudge, connectionState, activityAlert, setActivityAlert,
   } = useLiveGuide();
 
   useEffect(() => {
@@ -48,6 +49,17 @@ export default function LiveGuideScreen() {
   }, [id]);
 
   const [isReplanning, setIsReplanning] = useState(false);
+  const alertDismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (alertDismissTimer.current) clearTimeout(alertDismissTimer.current);
+    if (activityAlert) {
+      alertDismissTimer.current = setTimeout(() => setActivityAlert(null), 30000);
+    }
+    return () => {
+      if (alertDismissTimer.current) clearTimeout(alertDismissTimer.current);
+    };
+  }, [activityAlert, setActivityAlert]);
 
   const handleReplan = () => {
     console.log('[LiveGuide] requestReplan dayIndex=', dayIndex);
@@ -95,6 +107,26 @@ export default function LiveGuideScreen() {
         )}
 
         <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+          {/* Activity Approaching Alert */}
+          {activityAlert && (
+            <View style={styles.activityAlertCard}>
+              <View style={styles.activityAlertHeader}>
+                <Text style={styles.activityAlertOverline}>⏰  TIME TO LEAVE</Text>
+                <Pressable onPress={() => setActivityAlert(null)} hitSlop={8}>
+                  <Text style={styles.activityAlertDismiss}>✕</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.activityAlertTitle}>{activityAlert.activity}</Text>
+              <Text style={styles.activityAlertMeta}>
+                {activityAlert.distance < 1000
+                  ? `${activityAlert.distance}m away`
+                  : `${(activityAlert.distance / 1000).toFixed(1)}km away`}
+                {' · '}{activityAlert.estimatedTravelTime} min travel
+              </Text>
+              <MapLinkButton mapQuery={activityAlert.mapQuery} />
+            </View>
+          )}
+
           {/* Morning Briefing */}
           {briefing && (
             <View style={styles.briefingCard}>
@@ -162,9 +194,23 @@ export default function LiveGuideScreen() {
                 {/* Nearby suggestion below current activity */}
                 {isCurrent && nearbySuggestion && (
                   <View style={styles.suggestionCard}>
-                    <Text style={styles.suggestionOverline}>📍 Nearby Suggestion</Text>
+                    <View style={styles.suggestionCardHeader}>
+                      <Text style={styles.suggestionOverline}>📍 Nearby Suggestion</Text>
+                      {nearbySuggestion.matchScore !== undefined && (
+                        <View style={styles.matchScoreBadge}>
+                          <Text style={styles.matchScoreText}>{nearbySuggestion.matchScore}% match</Text>
+                        </View>
+                      )}
+                    </View>
                     <Text style={styles.suggestionName}>{nearbySuggestion.placeName}</Text>
                     <Text style={styles.suggestionText}>{nearbySuggestion.suggestion}</Text>
+                    {nearbySuggestion.reasoning && (
+                      <Text style={styles.suggestionReasoning}>{nearbySuggestion.reasoning}</Text>
+                    )}
+                    {nearbySuggestion.estimatedTravelTime !== undefined && (
+                      <Text style={styles.suggestionTravelTime}>~{nearbySuggestion.estimatedTravelTime} min away</Text>
+                    )}
+                    <MapLinkButton mapQuery={nearbySuggestion.mapQuery} />
                   </View>
                 )}
               </View>
@@ -216,10 +262,87 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     btnSkipText: { fontSize: 11, fontWeight: '600', color: colors.textSecondary },
     btnReplan: { backgroundColor: colors.primary50, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, borderWidth: 1.5, borderColor: colors.primary200, marginLeft: 'auto' },
     btnReplanText: { fontSize: 11, fontWeight: '700', color: colors.primary500 },
+    // Activity Alert Card
+    activityAlertCard: {
+      backgroundColor: colors.warningBg,
+      borderRadius: 12,
+      padding: 14,
+      borderWidth: 2,
+      borderColor: colors.warning,
+      marginBottom: 4,
+      shadowColor: colors.warning,
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 3,
+    },
+    activityAlertHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    activityAlertOverline: {
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 1.5,
+      textTransform: 'uppercase',
+      color: colors.warning,
+    },
+    activityAlertDismiss: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.warning,
+      opacity: 0.7,
+    },
+    activityAlertTitle: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: colors.textPrimary,
+      marginBottom: 3,
+      letterSpacing: -0.3,
+    },
+    activityAlertMeta: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginBottom: 8,
+    },
+    // Suggestion Card Enhancements
     suggestionCard: { backgroundColor: colors.primary50, borderRadius: 12, padding: 12, borderWidth: 1.5, borderColor: colors.primary200, marginBottom: 6 },
-    suggestionOverline: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: colors.primary500, marginBottom: 3 },
+    suggestionCardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 3,
+    },
+    suggestionOverline: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: colors.primary500 },
+    matchScoreBadge: {
+      backgroundColor: colors.primary500,
+      borderRadius: 10,
+      paddingHorizontal: 7,
+      paddingVertical: 2,
+    },
+    matchScoreText: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: '#fff',
+    },
     suggestionName: { fontSize: 13, fontWeight: '700', color: colors.textPrimary },
     suggestionText: { fontSize: 11, color: colors.textSecondary, lineHeight: 17, marginTop: 2 },
+    suggestionReasoning: {
+      fontSize: 11,
+      fontStyle: 'italic',
+      color: colors.textSecondary,
+      lineHeight: 16,
+      marginTop: 3,
+    },
+    suggestionTravelTime: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.textTertiary,
+      marginTop: 1,
+      marginBottom: 6,
+    },
     mealNudgeCard: { backgroundColor: '#E8F5E9', borderRadius: 12, padding: 12, borderWidth: 1.5, borderColor: '#A5D6A7', marginBottom: 6 },
     mealNudgeOverline: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: '#2E7D32', marginBottom: 3 },
     mealNudgeText: { fontSize: 12, color: '#1B5E20', lineHeight: 18 },
