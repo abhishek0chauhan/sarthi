@@ -1,5 +1,6 @@
 import { apiRequest } from './api';
 import type { SavedTrip, TripSummary, CreateTripDto, UpdateTripDto, ShareResult } from '@/types/trip.types';
+import type { ActivityScheduleEntry } from '@/types/live-guide.types';
 
 export const tripsService = {
   list: () => apiRequest<TripSummary[]>('/saved-trips'),
@@ -14,4 +15,6 @@ export const tripsService = {
     apiRequest<ShareResult>(`/saved-trips/${id}/share`, { method: 'POST' }),
   disableSharing: (id: string) =>
     apiRequest<void>(`/saved-trips/${id}/share`, { method: 'DELETE' }),
+  getActivitySchedule: (tripId: string) =>
+    apiRequest<{ scheduledActivities: ActivityScheduleEntry[] }>(`/trips/${tripId}/activity-schedule`),
 };

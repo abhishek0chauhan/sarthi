@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tripsService } from '@/services/trips.service';
 import type { CreateTripDto, UpdateTripDto } from '@/types/trip.types';
+import type { ActivityScheduleEntry } from '@/types/live-guide.types';
 
 export function useTrips() {
   return useQuery({ queryKey: ['trips'], queryFn: tripsService.list });
@@ -54,5 +55,15 @@ export function useDisableSharing(id: string) {
   return useMutation({
     mutationFn: () => tripsService.disableSharing(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['trip', id] }); },
+  });
+}
+
+export function useActivitySchedule(tripId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['activity-schedule', tripId],
+    queryFn: () => tripsService.getActivitySchedule(tripId),
+    enabled: !!tripId && enabled,
+    staleTime: 60_000,
+    select: (data) => data.scheduledActivities,
   });
 }

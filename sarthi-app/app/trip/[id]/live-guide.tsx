@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import { useLiveGuide } from '@/hooks/useLiveGuide';
 import { socketService } from '@/services/socket.service';
 import { notificationsService } from '@/services/notifications.service';
-import { useTrip } from '@/hooks/useTrips';
+import { useTrip, useActivitySchedule } from '@/hooks/useTrips';
 import { useColors } from '@/hooks/useColorScheme';
 import { MapLinkButton } from '@/components/trip/MapLinkButton';
 import type { Activity, ActivityApproachingAlert } from '@/types/live-guide.types';
@@ -14,6 +14,7 @@ export default function LiveGuideScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const { data: trip } = useTrip(id ?? '');
+  const { data: activitySchedule } = useActivitySchedule(id ?? '', connectionState === 'connected');
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
 
   const {
@@ -81,9 +82,16 @@ export default function LiveGuideScreen() {
           <Pressable onPress={() => { deactivate(); router.back(); }}>
             <Text style={styles.backBtn}>← {trip?.name ?? 'Trip'}</Text>
           </Pressable>
-          <View style={styles.liveBadge}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveText}>Live</Text>
+          <View style={styles.headerBadges}>
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>Live</Text>
+            </View>
+            {(activitySchedule?.length ?? 0) > 0 && (
+              <View style={styles.pendingPill}>
+                <Text style={styles.pendingPillText}>{activitySchedule!.length} upcoming</Text>
+              </View>
+            )}
           </View>
         </View>
         <Text style={styles.screenTitle}>Live Guide</Text>
@@ -227,9 +235,12 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     container: { flex: 1, backgroundColor: colors.bgBase },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 52, paddingBottom: 4 },
     backBtn: { fontSize: 14, fontWeight: '700', color: colors.primary500 },
+    headerBadges: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#E8F5E9', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, borderWidth: 1, borderColor: '#A5D6A7' },
     liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#2E7D32' },
     liveText: { fontSize: 10, fontWeight: '700', color: '#2E7D32' },
+    pendingPill: { backgroundColor: colors.primary500, borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+    pendingPillText: { fontSize: 10, fontWeight: '700', color: '#fff' },
     screenTitle: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, paddingHorizontal: 16, marginTop: 4, letterSpacing: -0.5 },
     dayLabel: { fontSize: 12, color: colors.textSecondary, paddingHorizontal: 16, marginBottom: 4 },
     reconnectBanner: { backgroundColor: '#FFF3E0', padding: 8, alignItems: 'center' },
