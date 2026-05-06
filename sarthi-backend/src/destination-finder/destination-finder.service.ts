@@ -122,7 +122,6 @@ export class DestinationFinderService {
     const prompt = buildTrekPrompt({
       ...dto,
       freeText: dto.freeText || '',
-      mode: (dto.mode as 'find' | 'plan' | undefined),
       treks: filtered,
       profile,
       corrections,
