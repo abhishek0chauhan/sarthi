@@ -257,6 +257,22 @@ export function buildHybridPrompt(
     corrections?: CorrectionRecord[];
   },
 ): { system: string; user: string } {
+  // For "plan" mode, don't rank destinations - just confirm the specified one
+  if (params.mode === 'plan' && params.destination) {
+    const healthContext = buildHealthContext(params);
+    const personalityBlock = buildPersonalityBlock(params.profile ?? null);
+    const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
+
+    return {
+      system: SYSTEM_PROMPT,
+      user: `Confirm destination for planning:
+Destination: ${params.destination}${healthContext}${personalityBlock}${correctionsBlock}
+
+Return state name and confirmation. Respond ONLY with JSON (no extra text):
+{"destination":"${params.destination}","state":"<state name>","confirmed":true}`,
+    };
+  }
+
   const destinationList = params.destinations
     .map((d) => `  {"id":"${d.id}","name":"${d.name}","state":"${d.state}"}`)
     .join(',\n');
@@ -293,19 +309,24 @@ export function buildAiFullPrompt(
   },
 ): { system: string; user: string } {
   const healthContext = buildHealthContext(params);
-  const searchContext = buildSearchContext(params);
   const personalityBlock = buildPersonalityBlock(params.profile ?? null);
   const correctionsBlock = buildCorrectionsBlock(params.corrections ?? []);
 
-  // --- FREE MODEL (Gemma 3n / NVIDIA free tier) ---
-  // Slim format prevents JSON truncation on small-context models.
-  // To switch to a paid model (GPT-4o, Claude, Gemini Pro):
-  //   1. Comment out the slim responseFormat line below
-  //   2. Uncomment the paid responseFormat line
-  const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`;
+  // For "plan" mode with a specific destination, focus on that destination
+  if (params.mode === 'plan' && params.destination) {
+    return {
+      system: SYSTEM_PROMPT,
+      user: `Verify destination for trip planning:
+Destination: ${params.destination}${healthContext}${personalityBlock}${correctionsBlock}
 
-  // --- PAID MODEL format (uncomment to enable, comment out slim above) ---
-  // const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}]}`;
+Extract/infer the state. Respond ONLY with JSON (no extra text):
+{"destination":"${params.destination}","state":"<state name>","isValid":true}`,
+    };
+  }
+
+  // For "find" mode, recommend destinations
+  const searchContext = buildSearchContext(params);
+  const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`;
 
   return {
     system: SYSTEM_PROMPT,
