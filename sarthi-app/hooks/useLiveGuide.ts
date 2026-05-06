@@ -7,15 +7,19 @@ export function useLiveGuide() {
   const store = useLiveGuideStore();
 
   const activate = async (tripId: string, fcmToken: string | null) => {
+    console.log('[useLiveGuide] activate called for trip:', tripId, 'fcmToken:', fcmToken ? 'present' : 'null');
     store.setConnectionState('connecting');
     const token = await authService.getToken();
     if (!token) {
+      console.log('[useLiveGuide] Not authenticated');
       store.setConnectionState('idle');
       throw new Error('Not authenticated');
     }
+    console.log('[useLiveGuide] connecting socket with auth token');
     socketService.connect(token);
 
     socketService.on('guide_activated', (payload: GuideActivatedPayload) => {
+      console.log('[useLiveGuide] guide_activated received', payload);
       store.setConnectionState('connected');
       store.setSession(payload.sessionId, payload.todayPlan.dayIndex);
       store.setBriefing(payload.briefing);
@@ -53,7 +57,8 @@ export function useLiveGuide() {
       store.reset();
     });
 
-    socketService.on('error', () => {
+    socketService.on('error', (err) => {
+      console.log('[useLiveGuide] socket error:', err);
       // errors handled in UI via returned state; screen can roll back optimistic updates
     });
 
@@ -72,6 +77,7 @@ export function useLiveGuide() {
       }
     });
 
+    console.log('[useLiveGuide] emitting activate_guide event');
     socketService.emit('activate_guide', { tripId, fcmToken: fcmToken ?? undefined });
   };
 
