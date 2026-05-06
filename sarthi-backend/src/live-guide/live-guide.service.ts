@@ -122,10 +122,15 @@ export class LiveGuideService {
       }
     }
 
-    // Cache profile in database if available
+    // Cache profile in database if available (convert dates to ISO strings for JSON storage)
     if (session?.id && profile) {
+      const profileForStorage = {
+        ...profile,
+        createdAt: profile.createdAt instanceof Date ? profile.createdAt.toISOString() : profile.createdAt,
+        updatedAt: profile.updatedAt instanceof Date ? profile.updatedAt.toISOString() : profile.updatedAt,
+      };
       await this.sessionService.update(session.id, {
-        userProfile: profile,
+        userProfile: profileForStorage,
       } as any);
     }
 
