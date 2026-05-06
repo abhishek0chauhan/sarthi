@@ -94,24 +94,32 @@ export class LiveGuideGateway
     @MessageBody() payload: { tripId: string; fcmToken?: string },
   ) {
     const userId: string = client.data?.userId;
+    this.logger.log(`[activate_guide] Received from user ${userId}, trip ${payload.tripId}`);
+
     if (!userId) {
+      this.logger.warn(`[activate_guide] No userId found`);
       client.emit('error', { message: 'Not authenticated' });
       return;
     }
 
     try {
+      this.logger.log(`[activate_guide] Calling liveGuideService.activateGuide...`);
       const result = await this.liveGuideService.activateGuide(
         payload.tripId,
         userId,
         payload.fcmToken ?? '',
       );
+      this.logger.log(`[activate_guide] Got result, emitting guide_activated`);
+
       const ctx = this.connectedSockets.get(client.id);
       if (ctx) {
         ctx.sessionId = result.sessionId;
         ctx.tripId = payload.tripId;
       }
       client.emit('guide_activated', result);
+      this.logger.log(`[activate_guide] guide_activated emitted`);
     } catch (err) {
+      this.logger.error(`[activate_guide] Error: ${(err as Error).message}`, (err as Error).stack);
       client.emit('error', { message: (err as Error).message });
     }
   }
