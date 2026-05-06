@@ -569,8 +569,8 @@ export class LiveGuideService {
             lastSuggestAt: new Date(),
           });
         } catch (err) {
-          this.logger.warn(
-            `Personalized suggestion failed: ${(err as Error).message}`,
+          this.logger.debug(
+            `Personalized suggestion skipped (${(err as Error).message}), using generic suggestion`,
           );
 
           // Fallback to non-personalized location suggestion
