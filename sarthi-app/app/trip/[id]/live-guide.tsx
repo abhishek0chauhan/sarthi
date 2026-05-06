@@ -14,13 +14,14 @@ export default function LiveGuideScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const { data: trip } = useTrip(id ?? '');
-  const { data: activitySchedule } = useActivitySchedule(id ?? '', connectionState === 'connected');
   const locationSubscription = useRef<Location.LocationSubscription | null>(null);
 
   const {
     activate, deactivate, markDone, skipActivity, requestReplan,
     briefing, todayPlan, dayIndex, nearbySuggestion, mealNudge, connectionState, activityAlert, setActivityAlert,
   } = useLiveGuide();
+
+  const { data: activitySchedule } = useActivitySchedule(id ?? '', connectionState === 'connected');
 
   useEffect(() => {
     const fcmToken = notificationsService.getCachedToken();
