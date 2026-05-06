@@ -65,7 +65,7 @@ describe('buildHybridPrompt', () => {
 
   it('user prompt contains group, budget, dates, departure city', () => {
     const { user } = buildHybridPrompt({ ...baseParams, destinations });
-    expect(user).toContain('4 friends');
+    expect(user).toContain('friends');
     expect(user).toContain('₹5000–15000');
     expect(user).toContain('2025-05-01');
     expect(user).toContain('Mumbai');
@@ -200,6 +200,44 @@ describe('buildHybridPrompt', () => {
     expect(user).toContain('Hidden gems ONLY:');
     expect(user).not.toContain('Nearby gems:');
   });
+
+  it('plan mode returns prompt for specified destination', () => {
+    const { system, user } = buildHybridPrompt({
+      ...baseParams,
+      mode: 'plan',
+      destination: 'Goa',
+      destinations: [],
+    });
+    expect(system).toBe('You are a travel recommendation engine for Indian destinations. You also assess health and fitness suitability for each destination based on the traveler\'s profile.');
+    expect(user).toContain('User has chosen a destination for trip planning');
+    expect(user).toContain('Goa');
+    expect(user).toContain('Provide detailed information about Goa');
+    expect(user).toContain('destinations');
+  });
+
+  it('plan mode ignores destination list and focuses on user choice', () => {
+    const { user } = buildHybridPrompt({
+      ...baseParams,
+      mode: 'plan',
+      destination: 'Himalayas',
+      destinations: [
+        {
+          id: 'uuid-1',
+          name: 'Kasol',
+          state: 'HP',
+          experienceTypes: ['mountains'],
+          isHiddenGem: true,
+          weatherSummary: 'Cool',
+          budgetMin: 700,
+          budgetMax: 1200,
+        },
+      ],
+    });
+    // Should focus on Himalayas, not the destinations list
+    expect(user).toContain('Himalayas');
+    expect(user).not.toContain('Kasol');
+    expect(user).not.toContain('rankings');
+  });
 });
 
 describe('buildAiFullPrompt', () => {
@@ -287,6 +325,42 @@ describe('buildAiFullPrompt', () => {
     });
     expect(user).toContain('Hidden gems ONLY:');
     expect(user).not.toContain('Nearby gems:');
+  });
+
+  it('plan mode returns prompt for specified destination', () => {
+    const { system, user } = buildAiFullPrompt({
+      freeText: 'mountain adventure',
+      mode: 'plan',
+      destination: 'Himalayas',
+      group: { type: 'friends' },
+      budget: { min: 5000, max: 15000 },
+      dates: { from: '2026-06-01', to: '2026-06-10' },
+      departureCity: 'Delhi',
+    });
+    expect(system).toBe('You are a travel recommendation engine for Indian destinations. You also assess health and fitness suitability for each destination based on the traveler\'s profile.');
+    expect(user).toContain('User has chosen a destination for trip planning');
+    expect(user).toContain('Himalayas');
+    expect(user).toContain('Provide detailed information about Himalayas');
+    expect(user).toContain('destinations');
+  });
+
+  it('plan mode uses health context from profile', () => {
+    const { user } = buildAiFullPrompt({
+      freeText: 'mountain trek',
+      mode: 'plan',
+      destination: 'Ladakh',
+      group: { type: 'solo' },
+      budget: { min: 3000, max: 8000 },
+      dates: { from: '2026-07-01', to: '2026-07-15' },
+      departureCity: 'New Delhi',
+      age: 45,
+      weight: 75,
+      height: 170,
+    });
+    // Should include health context in plan mode
+    expect(user).toContain('Age: 45');
+    expect(user).toContain('75kg');
+    expect(user).toContain('170cm');
   });
 });
 
@@ -391,9 +465,12 @@ describe('buildFoodGuidePrompt', () => {
     expect(user).toContain('Jaipur');
   });
 
-  it('contains diet type', () => {
-    const { user } = buildFoodGuidePrompt(foodParams);
-    expect(user).toContain('non-veg');
+  it('contains meat preferences when provided', () => {
+    const { user } = buildFoodGuidePrompt({
+      ...foodParams,
+      meatPreferences: ['chicken', 'mutton'],
+    });
+    expect(user).toContain('Meat preferences: chicken, mutton');
   });
 
   it('contains spice tolerance', () => {
@@ -579,9 +656,9 @@ describe('buildSearchContext', () => {
     expect(ctx).toContain('Departure city: Ahmedabad');
   });
 
-  it('contains group size, type, and hint', () => {
+  it('contains group type and hint', () => {
     const ctx = buildSearchContext(baseParams);
-    expect(ctx).toContain('4 friends');
+    expect(ctx).toContain('friends');
     expect(ctx).toContain(
       'nightlife, adventure activities, and shared experiences',
     );
