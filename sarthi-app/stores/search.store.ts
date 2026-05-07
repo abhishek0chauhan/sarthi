@@ -1,14 +1,15 @@
 import { create } from 'zustand';
-import type { SearchDto, SearchResponse } from '@/types/search.types';
+import type { SearchDto, SearchResponse, PlanConfirmedResponse } from '@/types/search.types';
 
 type PartialSearchDto = Partial<SearchDto>;
+type SearchResultType = SearchResponse | PlanConfirmedResponse;
 
 interface SearchState {
   formValues: PartialSearchDto;
-  searchResults: SearchResponse | null;
+  searchResults: SearchResultType | null;
   setFormValues: (values: PartialSearchDto) => void;
   updateFormValues: (values: PartialSearchDto) => void;
-  setSearchResults: (results: SearchResponse) => void;
+  setSearchResults: (results: SearchResultType) => void;
   resetForm: () => void;
 }
 

@@ -60,9 +60,28 @@ export class DestinationFinderService {
       'hybrid',
     );
 
-    const { freeText, destination, ...rest } = dto;
+    const { freeText, destination, mode, ...rest } = dto;
+
+    // For plan mode, check if destination is valid/known
+    if (mode === 'plan' && destination) {
+      const knownDestination = await this.queryService.findByName(destination);
+      if (knownDestination) {
+        // Destination is recognized - return it as confirmed with info to prompt for itinerary/food guide
+        return {
+          mode: 'plan_confirmed',
+          destination: knownDestination.name,
+          state: knownDestination.state,
+          destinationId: knownDestination.id,
+          budgetEstimate: `₹${knownDestination.budgetMin}–${knownDestination.budgetMax} per person per day`,
+          highlights: knownDestination.highlights,
+        };
+      }
+      // If not found as specific destination, fall through to search mode to find destinations in that area
+    }
+
     const cacheKey = this.cacheService.buildKey({
       ...rest,
+      mode,
       normalizedFreeText: freeText ? this.cacheService.normalizeText(freeText) : '',
       destination: destination || '',
       budget: dto.budget,

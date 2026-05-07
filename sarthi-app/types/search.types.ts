@@ -116,7 +116,18 @@ export interface TrekResult {
   healthAdvisory: HealthAdvisory;
 }
 
+export interface PlanConfirmedResponse {
+  mode: 'plan_confirmed';
+  destination: string;
+  state: string;
+  destinationId: string;
+  budgetEstimate: string;
+  highlights: string[];
+}
+
 export interface SearchResponse {
   mode: 'hybrid' | 'ai_full' | 'trek';
   results: SearchResultDestination[] | TrekResult[];
 }
+
+export type SearchResponseWithPlan = SearchResponse | PlanConfirmedResponse;

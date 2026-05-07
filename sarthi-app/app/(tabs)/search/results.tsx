@@ -1,6 +1,7 @@
-import { FlatList, StyleSheet, View, Text } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { DestinationCard } from '@/components/search/DestinationCard';
 import { TrekCard } from '@/components/search/TrekCard';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -8,7 +9,7 @@ import { useSearchStore } from '@/stores/search.store';
 import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
-import type { SearchResultDestination, TrekResult } from '@/types/search.types';
+import type { SearchResultDestination, TrekResult, PlanConfirmedResponse } from '@/types/search.types';
 
 export default function SearchResultsScreen() {
   const router = useRouter();
@@ -16,8 +17,55 @@ export default function SearchResultsScreen() {
   const colors = useColors();
   const styles = makeStyles(colors);
 
+  useEffect(() => {
+    // Handle plan_confirmed mode - prompt user for itinerary or food guide
+    if (data && 'mode' in data && data.mode === 'plan_confirmed') {
+      const planData = data as PlanConfirmedResponse;
+      Alert.alert(
+        `You've selected ${planData.destination}`,
+        'What would you like to do?',
+        [
+          {
+            text: 'Get Itinerary',
+            onPress: () => {
+              router.push({
+                pathname: '/itinerary/new',
+                params: {
+                  destination: planData.destination,
+                  state: planData.state,
+                },
+              } as any);
+            },
+          },
+          {
+            text: 'Get Food Guide',
+            onPress: () => {
+              router.push({
+                pathname: '/food-guide/new',
+                params: {
+                  destination: planData.destination,
+                  state: planData.state,
+                },
+              } as any);
+            },
+          },
+          {
+            text: 'Cancel',
+            onPress: () => router.back(),
+            style: 'cancel',
+          },
+        ],
+      );
+    }
+  }, [data, router]);
+
   if (!data) {
     return <EmptyState title="No results yet" description="Go back and search for a destination." />;
+  }
+
+  // Don't show results list for plan_confirmed mode
+  if ('mode' in data && data.mode === 'plan_confirmed') {
+    return null;
   }
 
   const isTrekMode = data.mode === 'trek';
