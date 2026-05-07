@@ -102,9 +102,20 @@ export function useLiveGuide() {
   const requestReplan = (onResult?: () => void) => {
     const dayIndex = useLiveGuideStore.getState().dayIndex ?? 0;
     console.log('[useLiveGuide] emit request_replan dayIndex=', dayIndex);
+
+    // Set up one-time callback for completion (don't duplicate the main listener)
     if (onResult) {
-      socketService.on('replan_result', () => { onResult(); socketService.off('replan_result'); });
+      let called = false;
+      const handler = () => {
+        if (!called) {
+          called = true;
+          onResult();
+          socketService.off('replan_result', handler);
+        }
+      };
+      socketService.on('replan_result', handler);
     }
+
     socketService.emit('request_replan', { dayIndex });
   };
 
