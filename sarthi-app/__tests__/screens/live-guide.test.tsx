@@ -37,6 +37,7 @@ jest.mock('expo-location', () => ({
 }));
 jest.mock('@/hooks/useTrips', () => ({
   useTrip: () => ({ data: { name: 'Jaipur Trip' } }),
+  useActivitySchedule: () => ({ data: [] }),
 }));
 
 import React from 'react';
