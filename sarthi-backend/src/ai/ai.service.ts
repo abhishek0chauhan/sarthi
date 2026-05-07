@@ -141,6 +141,40 @@ export class AiService {
     return (result?.destinations ?? []).slice(0, 5);
   }
 
+  async validateDestinationInput(input: string): Promise<{
+    type: 'destination' | 'region' | 'unknown';
+    normalizedName?: string;
+    reasoning?: string;
+  }> {
+    const prompt = `You are a travel knowledge assistant for India. Classify the following user input:
+
+Input: "${input}"
+
+Determine if this is:
+1. A specific destination (city/town/landmark like "Kasol", "Goa", "Dharamshala")
+2. A region/state (like "Himachal Pradesh", "Kerala", "Rajasthan")
+3. Unknown/ambiguous
+
+Respond ONLY with JSON (no extra text):
+{"type":"destination|region|unknown","normalizedName":"<corrected name if applicable>","reasoning":"<brief explanation>"}`;
+
+    try {
+      const { text } = await generateText({
+        model: this.model,
+        prompt,
+      });
+
+      const parsed = JSON.parse(text);
+      return {
+        type: parsed.type || 'unknown',
+        normalizedName: parsed.normalizedName,
+        reasoning: parsed.reasoning,
+      };
+    } catch {
+      return { type: 'unknown' };
+    }
+  }
+
   async generateItinerary(prompt: {
     system: string;
     user: string;

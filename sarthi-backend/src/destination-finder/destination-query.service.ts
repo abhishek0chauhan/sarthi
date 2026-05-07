@@ -6,19 +6,6 @@ import { SearchDestinationsDto } from './dto/search-destinations.dto';
 export class DestinationQueryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByName(name: string) {
-    if (!name?.trim()) return null;
-    const normalized = name.toLowerCase().trim();
-    return this.prisma.destination.findFirst({
-      where: {
-        OR: [
-          { name: { mode: 'insensitive', equals: normalized } },
-          { name: { mode: 'insensitive', contains: normalized } },
-        ],
-      },
-    });
-  }
-
   async findShortlist(dto: SearchDestinationsDto) {
     const months = this.extractMonths(dto.dates.from, dto.dates.to);
 

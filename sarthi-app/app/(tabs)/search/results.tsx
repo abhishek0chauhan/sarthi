@@ -32,7 +32,6 @@ export default function SearchResultsScreen() {
                 pathname: '/itinerary/new',
                 params: {
                   destination: planData.destination,
-                  state: planData.state,
                 },
               } as any);
             },
@@ -44,7 +43,6 @@ export default function SearchResultsScreen() {
                 pathname: '/food-guide/new',
                 params: {
                   destination: planData.destination,
-                  state: planData.state,
                 },
               } as any);
             },

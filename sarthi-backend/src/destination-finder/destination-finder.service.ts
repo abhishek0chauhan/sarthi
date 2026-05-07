@@ -62,29 +62,46 @@ export class DestinationFinderService {
 
     const { freeText, destination, mode, ...rest } = dto;
 
-    // For plan mode, check if destination is valid/known
+    // For plan mode, use AI to validate if input is a known destination
     if (mode === 'plan' && destination) {
-      const knownDestination = await this.queryService.findByName(destination);
-      if (knownDestination) {
-        // Destination is recognized - return it as confirmed with info to prompt for itinerary/food guide
-        return {
-          mode: 'plan_confirmed',
-          destination: knownDestination.name,
-          state: knownDestination.state,
-          destinationId: knownDestination.id,
-          budgetEstimate: `₹${knownDestination.budgetMin}–${knownDestination.budgetMax} per person per day`,
-          highlights: knownDestination.highlights,
-        };
+      try {
+        const validation = await this.aiService.validateDestinationInput(destination);
+
+        if (validation.type === 'destination') {
+          // AI confirmed it's a specific destination - return plan_confirmed
+          return {
+            mode: 'plan_confirmed',
+            destination: validation.normalizedName || destination,
+            reasoning: validation.reasoning,
+          };
+        }
+        // If region or unknown, fall through to search mode to find destinations
+        // For regions, use the destination name as freeText to search in that area
+        if (validation.type === 'region') {
+          // Convert region/state name to search by using it as context in freeText
+          const searchDto = { ...dto, freeText: `destinations in ${destination}`, mode: 'find' as const };
+          return this.performSearch(searchDto, bust, firebaseUid, aiMode);
+        }
+      } catch (error) {
+        this.logger.warn('AI validation failed, falling back to search', error);
+        // Fall through to normal search
       }
-      // If not found as specific destination, fall through to search mode to find destinations in that area
     }
 
+    return this.performSearch(dto, bust, firebaseUid, aiMode);
+  }
+
+  private async performSearch(
+    dto: SearchDestinationsDto,
+    bust: boolean,
+    firebaseUid: string | undefined,
+    aiMode: string,
+  ) {
+    const { freeText, destination, mode } = dto;
     const cacheKey = this.cacheService.buildKey({
-      ...rest,
-      mode,
+      ...dto,
       normalizedFreeText: freeText ? this.cacheService.normalizeText(freeText) : '',
       destination: destination || '',
-      budget: dto.budget,
     });
 
     if (!bust) {

@@ -119,10 +119,7 @@ export interface TrekResult {
 export interface PlanConfirmedResponse {
   mode: 'plan_confirmed';
   destination: string;
-  state: string;
-  destinationId: string;
-  budgetEstimate: string;
-  highlights: string[];
+  reasoning?: string;
 }
 
 export interface SearchResponse {
