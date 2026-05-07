@@ -148,7 +148,7 @@ export default function TripDetailScreen() {
                     ? router.push(`/trip/${id}/itinerary` as any)
                     : router.push({
                         pathname: '/itinerary/new',
-                        params: { destination: trip.destination, state: trip.state },
+                        params: { destination: trip.destination, state: trip.state, tripId: id },
                       } as any)
                 }
               >

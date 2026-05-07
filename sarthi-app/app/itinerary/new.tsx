@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { DayTabs } from '@/components/trip/DayTabs';
 import { ActivityCard } from '@/components/trip/ActivityCard';
 import { useGenerateItinerary } from '@/hooks/useSearch';
-import { useCreateTrip, useTrips } from '@/hooks/useTrips';
+import { useCreateTrip, useTrips, useTrip } from '@/hooks/useTrips';
 import { useSearchStore } from '@/stores/search.store';
 import { useColors } from '@/hooks/useColorScheme';
 import { tripsService } from '@/services/trips.service';
@@ -19,12 +19,15 @@ import type { ItineraryData } from '@/types/trip.types';
 
 export default function NewItineraryScreen() {
   const router = useRouter();
-  const { destination, state } = useLocalSearchParams<{ destination: string; state: string }>();
+  const { destination, state, tripId } = useLocalSearchParams<{ destination: string; state: string; tripId?: string }>();
   const { formValues } = useSearchStore();
   const colors = useColors();
   const styles = makeStyles(colors);
   const [activeDay, setActiveDay] = useState(1);
   const queryClient = useQueryClient();
+
+  // If tripId provided, fetch trip data for dates
+  const { data: tripData } = useTrip(tripId ?? '');
 
   const itineraryMutation = useGenerateItinerary();
   const createTripMutation = useCreateTrip();
@@ -42,14 +45,21 @@ export default function NewItineraryScreen() {
   });
 
   const generate = () => {
+    // Use trip dates if available (generating from saved trip), otherwise use form values
+    const dates = tripData?.dates || formValues.dates || { from: '', to: '' };
+    const budget = formValues.budget || { min: 5000, max: 15000 };
+    const group = formValues.group || { type: 'friends' };
+    const departureCity = formValues.departureCity || '';
+    const freeText = formValues.freeText || '';
+
     itineraryMutation.mutate({
       destination: destination ?? '',
       state: state ?? '',
-      dates: formValues.dates ?? { from: '', to: '' },
-      budget: formValues.budget ?? { min: 5000, max: 15000 },
-      group: formValues.group ?? { type: 'friends' },
-      departureCity: formValues.departureCity ?? '',
-      freeText: formValues.freeText ?? '',
+      dates,
+      budget,
+      group,
+      departureCity,
+      freeText,
       gender: formValues.gender,
       age: formValues.age,
       weight: formValues.weight,
@@ -69,27 +79,33 @@ export default function NewItineraryScreen() {
     if (!itineraryMutation.data) return;
     const data = itineraryMutation.data as unknown as Record<string, unknown>;
 
-    const existing = existingTrips?.find(
-      (t) => t.destination === destination && t.state === state,
-    );
-
-    if (existing) {
-      updateMutation.mutate({ id: existing.id, dto: { itineraryData: data } });
+    // If tripId provided, update that trip. Otherwise search for existing or create new
+    if (tripId) {
+      updateMutation.mutate({ id: tripId, dto: { itineraryData: data } });
     } else {
-      createTripMutation.mutate(
-        {
-          destination: destination ?? '',
-          state: state ?? '',
-          dates: formValues.dates ?? { from: '', to: '' },
-          destinationData: {},
-          name: `${destination} Trip`,
-          itineraryData: data,
-        },
-        {
-          onSuccess: (trip) => router.replace(`/trip/${trip.id}` as any),
-          onError: () => Alert.alert('Error', 'Failed to save trip'),
-        },
+      const existing = existingTrips?.find(
+        (t) => t.destination === destination && t.state === state,
       );
+
+      if (existing) {
+        updateMutation.mutate({ id: existing.id, dto: { itineraryData: data } });
+      } else {
+        const dates = tripData?.dates || formValues.dates || { from: '', to: '' };
+        createTripMutation.mutate(
+          {
+            destination: destination ?? '',
+            state: state ?? '',
+            dates,
+            destinationData: {},
+            name: `${destination} Trip`,
+            itineraryData: data,
+          },
+          {
+            onSuccess: (trip) => router.replace(`/trip/${trip.id}` as any),
+            onError: () => Alert.alert('Error', 'Failed to save trip'),
+          },
+        );
+      }
     }
   };
 
