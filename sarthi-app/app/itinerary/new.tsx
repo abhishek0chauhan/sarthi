@@ -47,7 +47,7 @@ export default function NewItineraryScreen() {
       state: state ?? '',
       dates: formValues.dates ?? { from: '', to: '' },
       budget: formValues.budget ?? { min: 5000, max: 15000 },
-      group: formValues.group ?? { size: 2, type: 'friends' },
+      group: formValues.group ?? { type: 'friends' },
       departureCity: formValues.departureCity ?? '',
       freeText: formValues.freeText ?? '',
       gender: formValues.gender,

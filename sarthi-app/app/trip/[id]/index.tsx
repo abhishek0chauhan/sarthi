@@ -143,7 +143,14 @@ export default function TripDetailScreen() {
             <View style={styles.navGrid}>
               <Pressable
                 style={[styles.navTile, styles.navTilePrimary]}
-                onPress={() => trip.itineraryData && router.push(`/trip/${id}/itinerary` as any)}
+                onPress={() =>
+                  trip.itineraryData
+                    ? router.push(`/trip/${id}/itinerary` as any)
+                    : router.push({
+                        pathname: '/itinerary/new',
+                        params: { destination: trip.destination, state: trip.state },
+                      } as any)
+                }
               >
                 <Text style={styles.navTileIcon}>📅</Text>
                 <Text style={[styles.navTileLabel, { color: colors.textInverse }]}>Itinerary</Text>
