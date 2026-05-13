@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase 2E UI Mockup — Persistent Live Mode</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Inter', sans-serif;
+      background: #0F0F0F;
+      color: #fff;
+      display: flex;
+      gap: 40px;
+      padding: 40px;
+      min-height: 100vh;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .screen-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .screen-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Phone shell */
+    .phone {
+      width: 360px;
+      background: #141414;
+      border-radius: 40px;
+      border: 2px solid #2A2A2A;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .phone-status {
+      background: #1A1A1A;
+      padding: 12px 24px 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* ───── Trip Detail Screen ───── */
+    .trip-hero {
+      background: linear-gradient(135deg, #E8601C, #F59742);
+      padding: 20px 16px 16px;
+    }
+    .trip-hero-back {
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; margin-bottom: 12px;
+    }
+    .trip-hero-name { font-size: 20px; font-weight: 700; color: #fff; }
+    .trip-hero-dest { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 2px; }
+    .trip-hero-dates { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+    .trip-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* Readiness card */
+    .card {
+      background: #1E1E1E;
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid #2A2A2A;
+    }
+    .card-title {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #666; margin-bottom: 8px;
+    }
+    .readiness-row { display: flex; align-items: center; gap: 12px; }
+    .readiness-score { font-size: 15px; font-weight: 700; color: #E8601C; }
+    .progress-bar {
+      flex: 1; height: 7px; background: #2A2A2A;
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill { height: 100%; background: #E8601C; border-radius: 4px; width: 75%; }
+
+    /* LIVE ACTIVE BANNER — NEW */
+    .live-banner {
+      background: #1A2A1A;
+      border-radius: 16px;
+      border: 2px solid #10B981;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .live-banner:hover { opacity: 0.85; }
+    .live-banner-left { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .live-banner-top { display: flex; align-items: center; gap: 6px; }
+    .live-dot-pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+      70%  { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    .live-banner-overline {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: #10B981;
+    }
+    .live-banner-title { font-size: 14px; font-weight: 600; color: #E8F5E9; }
+    .live-banner-sub { font-size: 11px; color: #4CAF74; }
+    .live-banner-stop {
+      background: #1F3A2A;
+      border: 1.5px solid #10B981;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px; font-weight: 700; color: #10B981;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .live-banner-stop:hover { background: #10B981; color: #fff; }
+
+    /* Normal Live tile (for reference / "before" state) */
+    .nav-tiles { display: flex; gap: 10px; }
+    .tile {
+      flex: 1; border-radius: 14px; padding: 14px 12px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .tile-secondary { background: #1E1E1E; border: 1px solid #2A2A2A; }
+    .tile-icon { font-size: 22px; }
+    .tile-label { font-size: 12px; font-weight: 600; color: #ccc; }
+    .tile-detail { font-size: 11px; color: #666; }
+
+    .section-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #555;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: #2A2A2A;
+    }
+
+    /* ───── Live Guide Screen ───── */
+    .lg-header {
+      background: #1A1A1A;
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    .lg-back { font-size: 14px; color: #E8601C; font-weight: 600; flex: 1; }
+    .lg-badges { display: flex; gap: 8px; align-items: center; }
+    .live-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: #1A2A1A; border: 1px solid #10B981;
+      border-radius: 20px; padding: 4px 10px;
+    }
+    .live-badge-dot { width: 6px; height: 6px; background: #10B981; border-radius: 50%; }
+    .live-badge-text { font-size: 10px; font-weight: 700; color: #10B981; letter-spacing: 0.8px; }
+
+    /* STOP BUTTON in header — NEW */
+    .stop-btn {
+      background: #2A1A1A;
+      border: 1.5px solid #EF4444;
+      border-radius: 10px;
+      padding: 5px 12px;
+      font-size: 11px; font-weight: 700; color: #EF4444;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .stop-btn:hover { background: #EF4444; color: #fff; }
+
+    .lg-content { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .lg-title { font-size: 20px; font-weight: 700; color: #fff; }
+    .lg-day { font-size: 12px; color: #666; margin-top: -4px; }
+
+    .briefing-card {
+      background: #1A2030;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid #2A3050;
+    }
+    .briefing-overline {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #6A8FD8; margin-bottom: 6px;
+    }
+    .briefing-text { font-size: 13px; color: #C5D5F0; line-height: 1.5; }
+
+    .activity-card {
+      background: #1E1E1E;
+      border-radius: 14px; padding: 14px;
+      border: 1px solid #2A2A2A;
+    }
+    .activity-overline {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #888; margin-bottom: 6px;
+    }
+    .activity-name { font-size: 16px; font-weight: 700; color: #fff; }
+    .activity-meta { font-size: 11px; color: #666; margin-top: 3px; }
+    .activity-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-done {
+      flex: 1; background: #10B981; border-radius: 10px; padding: 8px;
+      font-size: 12px; font-weight: 700; color: #fff; text-align: center;
+    }
+    .btn-skip {
+      flex: 1; background: #2A2A2A; border-radius: 10px; padding: 8px;
+      font-size: 12px; font-weight: 600; color: #888; text-align: center;
+    }
+
+    /* Annotation tooltips */
+    .annotations { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 360px; }
+    .annotation {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: #1A1A1A; border-radius: 8px; padding: 8px 10px;
+      border-left: 3px solid #E8601C; font-size: 11px; color: #aaa; line-height: 1.4;
+    }
+    .annotation strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Screen 1: Trip Detail with Live Banner ─── -->
+  <div class="screen-wrap">
+    <div class="screen-label">Trip Detail — Live Mode Active</div>
+    <div class="phone">
+      <div class="phone-status">
+        <span>9:41</span><span>● ● ●</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="trip-hero">
+        <div class="trip-hero-back">←</div>
+        <div class="trip-hero-name">Jaipur Trip</div>
+        <div class="trip-hero-dest">Jaipur, Rajasthan</div>
+        <div class="trip-hero-dates">May 13 → May 16</div>
+      </div>
+
+      <div class="trip-content">
+
+        <!-- Readiness -->
+        <div class="card">
+          <div class="card-title">Trip Readiness</div>
+          <div class="readiness-row">
+            <span class="readiness-score">75%</span>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- ★ NEW: Live Active Banner (replaces Live Guide tile) -->
+        <div class="live-banner">
+          <div class="live-banner-left">
+            <div class="live-banner-top">
+              <div class="live-dot-pulse"></div>
+              <span class="live-banner-overline">Live Mode Active</span>
+            </div>
+            <div class="live-banner-title">🗺️ Live Guide is running</div>
+            <div class="live-banner-sub">Day 2 · Tracking your location</div>
+          </div>
+          <div class="live-banner-stop">■ Stop</div>
+        </div>
+
+        <!-- Secondary tiles -->
+        <div class="nav-tiles">
+          <div class="tile tile-secondary">
+            <span class="tile-icon">🍽️</span>
+            <span class="tile-label">Food Guide</span>
+            <span class="tile-detail">12 dishes</span>
+          </div>
+          <div class="tile tile-secondary">
+            <span class="tile-icon">🗣️</span>
+            <span class="tile-label">Phrasebook</span>
+            <span class="tile-detail">Ready</span>
+          </div>
+          <div class="tile tile-secondary">
+            <span class="tile-icon">💬</span>
+            <span class="tile-label">Trip Chat</span>
+            <span class="tile-detail">Ask Sarthi AI</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <div class="annotation">
+        <span>🟢</span>
+        <span><strong>Live Active Banner</strong> — replaces the Live Guide tile when live mode is running. Tapping the banner body navigates back to live guide.</span>
+      </div>
+      <div class="annotation">
+        <span>■</span>
+        <span><strong>Stop button</strong> — calls deactivate() in place. No navigation, banner disappears immediately.</span>
+      </div>
+      <div class="annotation">
+        <span>📍</span>
+        <span><strong>Pulsing dot</strong> — animated to show live location tracking is active.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Screen 2: Live Guide Header with Stop ─── -->
+  <div class="screen-wrap">
+    <div class="screen-label">Live Guide — Header with Stop</div>
+    <div class="phone">
+      <div class="phone-status">
+        <span>9:41</span><span>● ● ●</span>
+      </div>
+
+      <!-- ★ NEW: Header with Stop button -->
+      <div class="lg-header">
+        <span class="lg-back">← Jaipur Trip</span>
+        <div class="lg-badges">
+          <div class="live-badge">
+            <div class="live-badge-dot"></div>
+            <span class="live-badge-text">LIVE</span>
+          </div>
+          <!-- NEW STOP BUTTON -->
+          <div class="stop-btn">■ Stop</div>
+        </div>
+      </div>
+
+      <div class="lg-content">
+        <div class="lg-title">Live Guide</div>
+        <div class="lg-day">Day 2 · 13 May</div>
+
+        <!-- Briefing card -->
+        <div class="briefing-card">
+          <div class="briefing-overline">☀️ Morning Briefing</div>
+          <div class="briefing-text">Start early at Amber Fort to beat the crowds. Lunch near Nahargarh at 1 PM. Check-out from hotel by 12.</div>
+        </div>
+
+        <!-- Activity card -->
+        <div class="activity-card">
+          <div class="activity-overline">🎯 Current Activity</div>
+          <div class="activity-name">Amber Fort</div>
+          <div class="activity-meta">9:00 AM · ₹550 entry</div>
+          <div class="activity-btns">
+            <div class="btn-done">✓ Done</div>
+            <div class="btn-skip">Skip</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotations -->
+    <div class="annotations">
+      <div class="annotation">
+        <span>←</span>
+        <span><strong>Back arrow</strong> — now only calls router.back(). Does NOT deactivate live mode. Session stays alive.</span>
+      </div>
+      <div class="annotation">
+        <span>■</span>
+        <span><strong>Stop button</strong> — red border, calls deactivate() + router.back(). Ends session, clears persistence, stops location.</span>
+      </div>
+      <div class="annotation">
+        <span>🔄</span>
+        <span><strong>Auto-resume</strong> — if user reopens app while live mode was active, app navigates here automatically.</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
