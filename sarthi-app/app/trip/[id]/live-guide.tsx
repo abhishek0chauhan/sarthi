@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
-import * as Location from 'expo-location';
 import { useLiveGuide } from '@/hooks/useLiveGuide';
-import { socketService } from '@/services/socket.service';
 import { notificationsService } from '@/services/notifications.service';
 import { useTrip, useActivitySchedule } from '@/hooks/useTrips';
 import { useColors } from '@/hooks/useColorScheme';
@@ -14,8 +12,6 @@ export default function LiveGuideScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const { data: trip } = useTrip(id ?? '');
-  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
-
   const {
     activate, deactivate, markDone, skipActivity, requestReplan,
     briefing, todayPlan, dayIndex, nearbySuggestion, mealNudge, connectionState, activityAlert, setActivityAlert,
@@ -26,28 +22,10 @@ export default function LiveGuideScreen() {
   useEffect(() => {
     const fcmToken = notificationsService.getCachedToken();
     activate(id ?? '', fcmToken).catch(() => {
-      // Null Firebase token (Expo Go dev mode) — spec requires toast + navigate back
-      // Using Alert as a lightweight built-in fallback; replace with Toast if the app adds one
       Alert.alert('Live Guide unavailable', 'Live Guide is not available in Expo Go development mode.');
       router.back();
     });
-
-    Location.watchPositionAsync(
-      { accuracy: Location.Accuracy.Balanced, timeInterval: 60000, distanceInterval: 0 },
-      (loc) => {
-        console.log('[LiveGuide] location_update', loc.coords.latitude, loc.coords.longitude);
-        socketService.emit('location_update', {
-          lat: loc.coords.latitude,
-          lng: loc.coords.longitude,
-          timestamp: loc.timestamp,
-        });
-      }
-    ).then((sub) => { locationSubscription.current = sub; });
-
-    return () => {
-      locationSubscription.current?.remove();
-      deactivate();
-    };
+    // No cleanup — session persists after this screen unmounts
   }, [id]);
 
   const [isReplanning, setIsReplanning] = useState(false);
@@ -80,7 +58,7 @@ export default function LiveGuideScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Pressable onPress={() => { deactivate(); router.back(); }}>
+          <Pressable onPress={() => router.back()}>
             <Text style={styles.backBtn}>← {trip?.name ?? 'Trip'}</Text>
           </Pressable>
           <View style={styles.headerBadges}>
@@ -88,6 +66,9 @@ export default function LiveGuideScreen() {
               <View style={styles.liveDot} />
               <Text style={styles.liveText}>Live</Text>
             </View>
+            <Pressable style={styles.stopBtn} onPress={() => { deactivate(); router.back(); }}>
+              <Text style={styles.stopBtnText}>■ Stop</Text>
+            </Pressable>
             {(activitySchedule?.length ?? 0) > 0 && (
               <View style={styles.pendingPill}>
                 <Text style={styles.pendingPillText}>{activitySchedule!.length} upcoming</Text>
@@ -242,6 +223,15 @@ function makeStyles(colors: ReturnType<typeof useColors>) {
     liveText: { fontSize: 10, fontWeight: '700', color: '#2E7D32' },
     pendingPill: { backgroundColor: colors.primary500, borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
     pendingPillText: { fontSize: 10, fontWeight: '700', color: '#fff' },
+    stopBtn: {
+      backgroundColor: 'rgba(239,68,68,0.1)',
+      borderWidth: 1.5,
+      borderColor: '#EF4444',
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 5,
+    },
+    stopBtnText: { fontSize: 11, fontWeight: '700', color: '#EF4444' },
     screenTitle: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, paddingHorizontal: 16, marginTop: 4, letterSpacing: -0.5 },
     dayLabel: { fontSize: 12, color: colors.textSecondary, paddingHorizontal: 16, marginBottom: 4 },
     reconnectBanner: { backgroundColor: '#FFF3E0', padding: 8, alignItems: 'center' },

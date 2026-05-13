@@ -32,10 +32,6 @@ jest.mock('expo-router', () => ({
   router: { back: jest.fn() },
   Stack: { Screen: () => null },
 }));
-jest.mock('expo-location', () => ({
-  watchPositionAsync: jest.fn().mockResolvedValue({ remove: jest.fn() }),
-  Accuracy: { Balanced: 3 },
-}));
 jest.mock('@/hooks/useTrips', () => ({
   useTrip: () => ({ data: { name: 'Jaipur Trip' } }),
   useActivitySchedule: () => ({ data: [] }),
@@ -68,5 +64,19 @@ describe('LiveGuideScreen', () => {
     const { getByText } = render(<LiveGuideScreen />);
     fireEvent.press(getByText('Skip'));
     expect(mockSkipActivity).toHaveBeenCalledWith(0, 0);
+  });
+
+  it('pressing Stop calls deactivate and navigates back', () => {
+    const { getByText } = render(<LiveGuideScreen />);
+    fireEvent.press(getByText('■ Stop'));
+    expect(mockDeactivate).toHaveBeenCalled();
+    expect(require('expo-router').router.back).toHaveBeenCalled();
+  });
+
+  it('pressing back arrow does NOT call deactivate', () => {
+    mockDeactivate.mockClear();
+    const { getByText } = render(<LiveGuideScreen />);
+    fireEvent.press(getByText(`← Jaipur Trip`));
+    expect(mockDeactivate).not.toHaveBeenCalled();
   });
 });
