@@ -9,6 +9,9 @@ function getMessaging() {
   }
 }
 
+// Shared mutable flag — object property so mutations are visible to all importers under CommonJS/Metro
+export const notificationNavState = { navigatingToLiveGuide: false };
+
 class NotificationsService {
   private cachedToken: string | null = null;
 
@@ -38,13 +41,21 @@ class NotificationsService {
 
     messaging.onNotificationOpenedApp((notification: any) => {
       const tripId = notification?.data?.tripId;
-      if (tripId) router.push(`/trip/${tripId}/live-guide`);
+      if (tripId) {
+        notificationNavState.navigatingToLiveGuide = true;
+        setTimeout(() => { notificationNavState.navigatingToLiveGuide = false; }, 1500);
+        router.push(`/trip/${tripId}/live-guide`);
+      }
     });
 
     messaging.getInitialNotification().then((notification: any) => {
       if (!notification) return;
       const tripId = notification?.data?.tripId;
-      if (tripId) router.push(`/trip/${tripId}/live-guide`);
+      if (tripId) {
+        notificationNavState.navigatingToLiveGuide = true;
+        setTimeout(() => { notificationNavState.navigatingToLiveGuide = false; }, 1500);
+        router.push(`/trip/${tripId}/live-guide`);
+      }
     });
   }
 }

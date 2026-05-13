@@ -25,6 +25,7 @@ jest.mock('@/hooks/useLiveGuide', () => ({
 }));
 jest.mock('@/services/notifications.service', () => ({
   notificationsService: { getCachedToken: () => 'fcm-token' },
+  notificationNavState: { navigatingToLiveGuide: false },
 }));
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: 'trip-1' }),
