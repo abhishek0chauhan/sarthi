@@ -11,6 +11,7 @@ interface LiveGuideState {
   nearbySuggestion: Suggestion | null;
   mealNudge: { meal: string; suggestion: string } | null;
   activityAlert: ActivityApproachingAlert | null;
+  activeTripId: string | null;
   setSession: (sessionId: string, dayIndex: number) => void;
   setBriefing: (briefing: string | null) => void;
   setTodayPlan: (activities: Activity[]) => void;
@@ -18,6 +19,7 @@ interface LiveGuideState {
   setSuggestion: (suggestion: Suggestion | null) => void;
   setMealNudge: (nudge: { meal: string; suggestion: string } | null) => void;
   setActivityAlert: (alert: ActivityApproachingAlert | null) => void;
+  setActiveTripId: (id: string | null) => void;
   setConnectionState: (state: ConnectionState) => void;
   reset: () => void;
 }
@@ -32,6 +34,7 @@ const initialState = {
   nearbySuggestion: null,
   mealNudge: null,
   activityAlert: null,
+  activeTripId: null,
 };
 
 export const useLiveGuideStore = create<LiveGuideState>((set) => ({
@@ -60,6 +63,8 @@ export const useLiveGuideStore = create<LiveGuideState>((set) => ({
   setMealNudge: (mealNudge) => set({ mealNudge }),
 
   setActivityAlert: (activityAlert) => set({ activityAlert }),
+
+  setActiveTripId: (activeTripId) => set({ activeTripId }),
 
   setConnectionState: (connectionState) => set({ connectionState }),
 
