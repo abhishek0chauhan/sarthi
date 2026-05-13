@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
+import { AppState } from 'react-native';
 import { notificationsService } from '@/services/notifications.service';
 
 // Mock notifications service first
@@ -8,11 +9,23 @@ jest.mock('@/services/notifications.service', () => ({
     registerDevice: jest.fn().mockResolvedValue(undefined),
     setupTapHandler: jest.fn(),
   },
+  notificationNavState: {
+    navigatingToLiveGuide: false,
+  },
+}));
+
+// Mock live-mode persistence
+jest.mock('@/services/live-mode.persistence', () => ({
+  liveModePersistence: {
+    get: jest.fn().mockResolvedValue(null),
+  },
 }));
 
 // Mock other dependencies
 jest.mock('expo-router', () => ({
   Stack: ({ children }: any) => children,
+  router: { replace: jest.fn() },
+  usePathname: jest.fn(() => '/'),
 }));
 jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(),
@@ -51,6 +64,7 @@ jest.mock('@/services/auth.service', () => ({
 describe('RootLayout FCM initialization', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(AppState, 'addEventListener').mockReturnValue({ remove: jest.fn() } as any);
   });
 
   it('should call notificationsService.registerDevice() on mount', async () => {

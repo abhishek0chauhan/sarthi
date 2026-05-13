@@ -1,5 +1,8 @@
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { Stack, router, usePathname } from 'expo-router';
+import { AppState } from 'react-native';
+import { liveModePersistence } from '@/services/live-mode.persistence';
+import { notificationNavState } from '@/services/notifications.service';
 import { useFonts, Inter_400Regular, Inter_500Medium,
   Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -21,6 +24,10 @@ export default function RootLayout() {
   });
 
   const isAuthLoading = useAuthStore(s => s.isLoading);
+
+  const pathname = usePathname();
+  const pathnameRef = useRef(pathname);
+  useEffect(() => { pathnameRef.current = pathname; }, [pathname]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -53,6 +60,25 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded, isAuthLoading]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', async (state) => {
+      if (state !== 'active') return;
+
+      // Skip if notification tap handler is already navigating to live guide
+      if (notificationNavState.navigatingToLiveGuide) return;
+
+      const session = await liveModePersistence.get();
+      if (!session) return;
+
+      // Skip if already on the live guide screen for this trip
+      const targetPath = `/trip/${session.tripId}/live-guide`;
+      if (pathnameRef.current === targetPath) return;
+
+      router.replace(targetPath as any);
+    });
+    return () => sub.remove();
+  }, []);
 
   if (!fontsLoaded || isAuthLoading) return null;
 
