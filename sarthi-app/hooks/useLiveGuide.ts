@@ -2,12 +2,18 @@ import { socketService } from '@/services/socket.service';
 import { authService } from '@/services/auth.service';
 import { useLiveGuideStore } from '@/stores/live-guide.store';
 import type { GuideActivatedPayload, Activity, Suggestion, ActivityApproachingAlert } from '@/types/live-guide.types';
+import { liveModePersistence } from '@/services/live-mode.persistence';
+import { locationService } from '@/services/location.service';
+import * as Location from 'expo-location';
 
 export function useLiveGuide() {
   const store = useLiveGuideStore();
 
   const activate = async (tripId: string, fcmToken: string | null) => {
     console.log('[useLiveGuide] activate called for trip:', tripId, 'fcmToken:', fcmToken ? 'present' : 'null');
+    if (store.connectionState !== 'idle') return;
+    await Location.requestBackgroundPermissionsAsync();
+    // No status check — denied is silently accepted
     store.setConnectionState('connecting');
     const token = await authService.getToken();
     if (!token) {
@@ -15,6 +21,12 @@ export function useLiveGuide() {
       store.setConnectionState('idle');
       throw new Error('Not authenticated');
     }
+    const events = [
+      'guide_activated', 'activity_marked', 'replan_result',
+      'location_suggestion', 'activity_approaching', 'morning_briefing',
+      'meal_nudge', 'guide_deactivated', 'error', 'connect', 'disconnect',
+    ] as const;
+    events.forEach((e) => socketService.off(e));
     console.log('[useLiveGuide] connecting socket with auth token');
     socketService.connect(token);
 
@@ -34,6 +46,13 @@ export function useLiveGuide() {
       store.setTodayPlan(
         (payload.todayPlan.activities ?? []).map((a) => ({ ...a, status: a.status ?? 'pending' }))
       );
+      store.setActiveTripId(tripId);
+      liveModePersistence.save({
+        tripId,
+        sessionId: payload.sessionId,
+        dayIndex: payload.todayPlan.dayIndex,
+      });
+      locationService.startTracking();
     });
 
     socketService.on('activity_marked', (payload: { dayIndex: number; activityIndex: number; status: 'done' | 'skipped' }) => {
@@ -120,6 +139,9 @@ export function useLiveGuide() {
   };
 
   const deactivate = () => {
+    locationService.stopTracking();
+    liveModePersistence.clear();
+    store.setActiveTripId(null);
     socketService.emit('deactivate_guide');
     socketService.disconnect();
     store.reset();

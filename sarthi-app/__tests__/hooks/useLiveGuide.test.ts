@@ -1,5 +1,14 @@
 jest.mock('@/services/socket.service');
 jest.mock('@/services/auth.service');
+jest.mock('expo-location', () => ({
+  requestBackgroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+}));
+jest.mock('@/services/live-mode.persistence', () => ({
+  liveModePersistence: { save: jest.fn(), clear: jest.fn() },
+}));
+jest.mock('@/services/location.service', () => ({
+  locationService: { startTracking: jest.fn(), stopTracking: jest.fn() },
+}));
 
 import { useLiveGuide } from '@/hooks/useLiveGuide';
 import { useLiveGuideStore } from '@/stores/live-guide.store';
@@ -26,10 +35,14 @@ beforeEach(() => {
   useLiveGuideStore.setState({
     sessionId: null, isActive: false, connectionState: 'idle',
     briefing: null, dayIndex: null, todayPlan: null, nearbySuggestion: null, mealNudge: null,
+    activeTripId: null,
   });
-  // mockOn needs to store the handlers so they can be retrieved and invoked in tests
+  // mockOn stores handlers; auto-invokes 'connect' so the activate Promise resolves
   mockOn.mockImplementation((eventName: string, handler: Function) => {
-    // Just store the calls — the test will retrieve them via mock.calls
+    if (eventName === 'connect') {
+      handler();
+    }
+    // All calls are stored in mock.calls so tests can retrieve other handlers
   });
 });
 
