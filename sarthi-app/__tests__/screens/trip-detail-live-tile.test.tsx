@@ -1,3 +1,13 @@
+let mockLiveGuideStoreState = { activeTripId: null as string | null, dayIndex: 0 };
+jest.mock('@/stores/live-guide.store', () => ({
+  useLiveGuideStore: (selector: any) => selector(mockLiveGuideStoreState),
+}));
+
+const mockDeactivate = jest.fn();
+jest.mock('@/hooks/useLiveGuide', () => ({
+  useLiveGuide: () => ({ deactivate: mockDeactivate }),
+}));
+
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import TripDetailScreen from '@/app/trip/[id]/index';
@@ -73,9 +83,43 @@ const baseTrip = {
   }
 };
 
+describe('TripDetailScreen - Live Active Banner', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockLiveGuideStoreState = { activeTripId: 'trip-123', dayIndex: 1 };
+    (useTrip as jest.Mock).mockReturnValue({
+      data: baseTrip,
+      isLoading: false,
+      error: null
+    });
+  });
+
+  afterEach(() => {
+    mockLiveGuideStoreState = { activeTripId: null, dayIndex: 0 };
+  });
+
+  it('shows banner when activeTripId matches current trip', () => {
+    const { getByText } = render(<TripDetailScreen />);
+    expect(getByText('🗺️ Live Guide is running')).toBeTruthy();
+    expect(getByText('LIVE MODE ACTIVE')).toBeTruthy();
+  });
+
+  it('shows correct day number in banner', () => {
+    const { getByText } = render(<TripDetailScreen />);
+    expect(getByText(/Day 2/)).toBeTruthy(); // dayIndex 1 → Day 2
+  });
+
+  it('pressing Stop in banner calls deactivate', () => {
+    const { getByText } = render(<TripDetailScreen />);
+    fireEvent.press(getByText('■ Stop'));
+    expect(mockDeactivate).toHaveBeenCalled();
+  });
+});
+
 describe('TripDetailScreen - Live Guide Tile', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLiveGuideStoreState = { activeTripId: null, dayIndex: 0 };
   });
 
   it('shows Live Guide tile on active day', () => {

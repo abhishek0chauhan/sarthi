@@ -12,6 +12,8 @@ import { useColors } from '@/hooks/useColorScheme';
 import type { Colors } from '@/constants/colors';
 import { type } from '@/constants/typography';
 import { destinationGradient } from '@/utils/destinationGradient';
+import { useLiveGuide } from '@/hooks/useLiveGuide';
+import { useLiveGuideStore } from '@/stores/live-guide.store';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,6 +23,9 @@ export default function TripDetailScreen() {
   const colors = useColors();
   const styles = makeStyles(colors);
   const { mutate: enrichTrip, isPending: isEnriching } = useEnrichTrip(id ?? '');
+  const { deactivate } = useLiveGuide();
+  const activeTripId = useLiveGuideStore((s) => s.activeTripId);
+  const liveGuideDay = useLiveGuideStore((s) => s.dayIndex);
 
   if (isLoading) return <LoadingSpinner />;
   if (error || !trip) return <EmptyState title="Trip not found" />;
@@ -83,8 +88,27 @@ export default function TripDetailScreen() {
           </View>
 
           {/* 3. Quick nav tiles */}
-          {isActiveDay ? (
+          {activeTripId === id ? (
+            <Pressable style={styles.liveBanner} onPress={() => router.push(`/trip/${id}/live-guide` as any)}>
+              <View style={styles.liveBannerLeft}>
+                <View style={styles.liveBannerTop}>
+                  <View style={styles.liveDotPulse} />
+                  <Text style={styles.liveBannerOverline}>LIVE MODE ACTIVE</Text>
+                </View>
+                <Text style={styles.liveBannerTitle}>🗺️ Live Guide is running</Text>
+                <Text style={styles.liveBannerSub}>Day {(liveGuideDay ?? 0) + 1} · Tracking your location</Text>
+              </View>
+              <Pressable
+                style={styles.liveBannerStop}
+                onPress={(e) => { e?.stopPropagation?.(); deactivate(); }}
+                hitSlop={8}
+              >
+                <Text style={styles.liveBannerStopText}>■ Stop</Text>
+              </Pressable>
+            </Pressable>
+          ) : isActiveDay ? (
             <>
+            {/* existing isActiveDay JSX — unchanged */}
             <View style={styles.tilesGrid}>
               {/* Live Guide — large primary tile */}
               <Pressable
@@ -140,6 +164,7 @@ export default function TripDetailScreen() {
             </>
           ) : (
             <>
+            {/* existing non-active-day JSX — unchanged */}
             <View style={styles.navGrid}>
               <Pressable
                 style={[styles.navTile, styles.navTilePrimary]}
@@ -361,6 +386,39 @@ function makeStyles(colors: Colors) {
       borderRadius: 10,
     },
     shareBtnText: { ...type.caption, color: colors.textInverse, fontFamily: 'Inter_600SemiBold' },
+
+    // Live Active Banner
+    liveBanner: {
+      backgroundColor: '#1A2A1A',
+      borderRadius: 16,
+      borderWidth: 2,
+      borderColor: '#10B981',
+      padding: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    liveBannerLeft: { flex: 1, gap: 4 },
+    liveBannerTop: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    liveDotPulse: {
+      width: 8, height: 8, borderRadius: 4,
+      backgroundColor: '#10B981',
+    },
+    liveBannerOverline: {
+      fontSize: 9, fontWeight: '700', letterSpacing: 1.5,
+      textTransform: 'uppercase', color: '#10B981',
+    },
+    liveBannerTitle: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
+    liveBannerSub: { fontSize: 11, color: '#10B981' },
+    liveBannerStop: {
+      backgroundColor: 'rgba(16,185,129,0.1)',
+      borderWidth: 1.5,
+      borderColor: '#10B981',
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+    },
+    liveBannerStopText: { fontSize: 12, fontWeight: '700', color: '#10B981' },
 
     // Enrich button
     enrichBtn: {
