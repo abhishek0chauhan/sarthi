@@ -68,10 +68,6 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
             <Text style={styles.statText}>{destination.budgetEstimate}</Text>
           </View>
           <View style={styles.statChip}>
-            <Text style={styles.statIcon}>⛅</Text>
-            <Text style={styles.statText}>{destination.weatherSnapshot}</Text>
-          </View>
-          <View style={styles.statChip}>
             <Text style={styles.statIcon}>🕐</Text>
             <Text style={styles.statText}>{destination.travelTime}</Text>
           </View>
@@ -79,6 +75,10 @@ export function DestinationCard({ destination, onGetItinerary, onGetFoodGuide }:
             <Text style={styles.statIcon}>❤️</Text>
             <Text style={styles.statText}>{destination.suitability}</Text>
           </View>
+        </View>
+        <View style={styles.weatherChip}>
+          <Text style={styles.statIcon}>⛅</Text>
+          <Text style={styles.weatherText}>{destination.weatherSnapshot}</Text>
         </View>
 
         <View style={styles.actions}>
@@ -161,8 +161,10 @@ function makeStyles(colors: Colors) {
     why: { ...type.body, color: colors.textSecondary },
     statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     statChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgBase, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, gap: 4 },
+    weatherChip: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: colors.bgBase, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, gap: 4 },
     statIcon: { fontSize: 14 },
     statText: { ...type.caption, color: colors.textSecondary },
+    weatherText: { ...type.caption, color: colors.textSecondary, flex: 1 },
     actions: { flexDirection: 'row', gap: 10 },
   });
 }
