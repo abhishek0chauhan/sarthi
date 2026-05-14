@@ -47,6 +47,19 @@ export class LiveGuideGateway
       return;
     }
 
+    // Dev bypass: accept a hardcoded token in development so Expo Go can test live mode
+    const DEV_TOKEN = 'dev-token';
+    const DEV_UID = 'JPCVAZimotYED6TdfwMGTXERUIw2';
+    if (process.env.NODE_ENV !== 'production' && token === DEV_TOKEN) {
+      client.data.userId = DEV_UID;
+      client.data.displayName = 'Dev User';
+      this.connectedSockets.set(client.id, { userId: DEV_UID, sessionId: null, tripId: null });
+      if (!this.userSockets.has(DEV_UID)) this.userSockets.set(DEV_UID, new Set());
+      this.userSockets.get(DEV_UID)!.add(client.id);
+      this.logger.log(`WS connected (dev bypass): ${DEV_UID}`);
+      return;
+    }
+
     try {
       const decoded = await admin.auth().verifyIdToken(token);
       client.data.userId = decoded.uid;

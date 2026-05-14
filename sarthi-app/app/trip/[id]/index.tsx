@@ -30,8 +30,9 @@ export default function TripDetailScreen() {
   if (isLoading) return <LoadingSpinner />;
   if (error || !trip) return <EmptyState title="Trip not found" />;
 
-  // Check if today is within trip dates
-  const today = new Date().toISOString().split('T')[0];
+  // Check if today is within trip dates (use local date, not UTC, to avoid IST offset shifting the day)
+  const _now = new Date();
+  const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
   const isActiveDay = trip.dates.from <= today && today <= trip.dates.to;
 
   // Check if trip has place context in any activity

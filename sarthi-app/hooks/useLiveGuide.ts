@@ -12,8 +12,7 @@ export function useLiveGuide() {
   const activate = async (tripId: string, fcmToken: string | null) => {
     console.log('[useLiveGuide] activate called for trip:', tripId, 'fcmToken:', fcmToken ? 'present' : 'null');
     if (store.connectionState !== 'idle') return;
-    await Location.requestBackgroundPermissionsAsync();
-    // No status check — denied is silently accepted
+    try { await Location.requestBackgroundPermissionsAsync(); } catch { /* not supported in Expo Go — silently skip */ }
     store.setConnectionState('connecting');
     const token = await authService.getToken();
     if (!token) {

@@ -21,8 +21,8 @@ export default function LiveGuideScreen() {
 
   useEffect(() => {
     const fcmToken = notificationsService.getCachedToken();
-    activate(id ?? '', fcmToken).catch(() => {
-      Alert.alert('Live Guide unavailable', 'Live Guide is not available in Expo Go development mode.');
+    activate(id ?? '', fcmToken).catch((err) => {
+      Alert.alert('Live Guide unavailable', err?.message ?? 'Could not start Live Guide. Please try again.');
       router.back();
     });
     // No cleanup — session persists after this screen unmounts

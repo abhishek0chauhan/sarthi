@@ -70,7 +70,7 @@ export const authService = {
 
   async getToken(): Promise<string | null> {
     const auth = getAuth();
-    if (!auth) return null;
+    if (!auth) return 'dev-token'; // Expo Go: use dev bypass token accepted by the backend in non-production
     const user = auth().currentUser;
     if (!user) return null;
     return user.getIdToken();
