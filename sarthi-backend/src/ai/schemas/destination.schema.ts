@@ -109,6 +109,7 @@ export const rankResultSchema = z.object({
 
 export const rankResultsSchema = z.object({
   rankings: z.array(rankResultSchema),
+  budgetNote: z.string().optional(),
 });
 
 export const generateResultSchema = z.object({
@@ -132,6 +133,7 @@ export const generateResultSchema = z.object({
 
 export const generateResultsSchema = z.object({
   destinations: z.array(generateResultSchema),
+  budgetNote: z.string().optional(),
 });
 
 export const trekResultSchema = z.object({

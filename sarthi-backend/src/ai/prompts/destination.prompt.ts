@@ -22,7 +22,7 @@ export interface PromptParams extends HealthProfile {
   destination?: string;
   mode?: 'find' | 'plan';
   group: { type: string };
-  budget: { min: number; max: number };
+  budget?: { min?: number; max?: number };
   dates: { from: string; to: string };
   departureCity: string;
   hiddenGem?: boolean;
@@ -77,7 +77,7 @@ const GROUP_HINT_FALLBACK = "tailor to the group's vibe";
 export interface SearchContextParams {
   dates: { from: string; to: string };
   group: { type: string };
-  budget: { min: number; max: number };
+  budget?: { min?: number; max?: number };
   departureCity: string;
   hiddenGem?: boolean;
 }
@@ -113,13 +113,13 @@ export function buildSearchContext(
 - Travel month: ${monthName}
 - Departure city: ${params.departureCity}
 - Group: ${params.group.type} — ${groupHint}
-- Budget: ₹${params.budget.min}–${params.budget.max}/person total
+- Budget: ₹${params.budget?.min ?? 'flexible'}–${params.budget?.max ?? 'flexible'}/person total
 
 ## Rules
 - Proximity: Prefer destinations reachable within 6–8h of ${params.departureCity}. For trips of ≤3 days, avoid destinations that need >4h one-way travel — it eats into the trip. Flag long travel in tripReadiness (e.g. "6h each way leaves only 1 full day onsite").
 ${seasonRule}
 - Group-fit: Tailor picks to the group type — do not recommend backpacker hostels to a family or temple tours to a friends trip unless explicitly requested.
-- Budget: If realistic cost exceeds ₹${params.budget.min}–${params.budget.max}/person, set costBreakdown.total to the honest number and explain the gap in tripReadiness.budget (e.g. "₹2000 over — drop to budget guesthouses and local transport to fit").${nearbyGemsRule}`;
+- Budget: Evaluate whether ₹${params.budget?.min ?? 'flexible'}–${params.budget?.max ?? 'flexible'}/person is realistic. If budget appears low for the trip length and destination type, include a top-level "budgetNote" in your JSON response. If budget is fine or unspecified, omit it or set to null.${nearbyGemsRule}`;
 }
 
 export interface TravelerProfileSnapshot {
@@ -301,7 +301,7 @@ ${destinationList}
 ]
 
 Respond ONLY with a JSON object in exactly this format (no extra text):
-{"rankings":[{"id":"<exact id from above>","whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}]}
+{"rankings":[{"id":"<exact id from above>","whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}],"budgetNote":"<1-sentence if budget is low for the trip, e.g. 'Your budget of ₹X,XXX is on the lower side for a N-day trip. These destinations can still work — focused on budget-friendly options.' Omit or null if budget is fine.>"}
 
 Max 5 results, best match first.`,
   };
@@ -343,10 +343,10 @@ ${responseFormat}`,
   // To switch to a paid model (GPT-4o, Claude, Gemini Pro):
   //   1. Comment out the slim responseFormat line below
   //   2. Uncomment the paid responseFormat line
-  const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}]}`;
+  const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>","suitability":"<easy|moderate|challenging|not_recommended>","readinessScore":<0-100>}],"budgetNote":"<1-sentence if budget is low, null or omit otherwise>"}`;
 
   // --- PAID MODEL format (uncomment to enable, comment out slim above) ---
-  // const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}]}`;
+  // const responseFormat = `{"destinations":[{"name":"<city>","state":"<state>","isHiddenGem":<true/false>,"budgetEstimate":"<₹range/person>","weatherSnapshot":"<one sentence>","travelTime":"<e.g. 2h drive>","highlights":["<h1>","<h2>","<h3>"],"whyItMatches":"<one sentence>",${HEALTH_ADVISORY_FORMAT},${COST_BREAKDOWN_FORMAT},${PERMITS_FORMAT},${TRIP_READINESS_FORMAT}}],"budgetNote":"<1-sentence if budget is low, null or omit otherwise>"}`;
 
   return {
     system: SYSTEM_PROMPT,
@@ -555,7 +555,7 @@ ${activeCount}`,
 export interface TrekPromptParams extends HealthProfile {
   freeText: string;
   group: { type: string };
-  budget: { min: number; max: number };
+  budget?: { min?: number; max?: number };
   dates: { from: string; to: string };
   departureCity: string;
   treks: Array<{
