@@ -275,7 +275,7 @@ export class DestinationFinderService {
       corrections,
     });
     const shortlistIds = shortlist.map((d) => d.id);
-    const ranked = await this.aiService.rankDestinations(prompt, shortlistIds);
+    const { results: ranked, budgetNote } = await this.aiService.rankDestinations(prompt, shortlistIds);
 
     if (ranked.length === 0) {
       this.logger.warn('AI returned no results — returning top 5 DB results');
@@ -284,6 +284,7 @@ export class DestinationFinderService {
         results: shortlist
           .slice(0, 5)
           .map((d) => this.formatDbResult(d, dto.departureCity)),
+        budgetNote: budgetNote ?? null,
       };
     }
 
@@ -306,7 +307,7 @@ export class DestinationFinderService {
       }),
     );
 
-    return { mode: 'hybrid', results };
+    return { mode: 'hybrid', results, budgetNote: budgetNote ?? null };
   }
 
   private async runAiFull(
@@ -315,8 +316,8 @@ export class DestinationFinderService {
     corrections?: CorrectionRecord[],
   ) {
     const prompt = buildAiFullPrompt({ ...dto, mode: (dto.mode as 'find' | 'plan' | undefined), profile, corrections });
-    const destinations = await this.aiService.generateDestinations(prompt);
-    return { mode: 'ai_full', results: destinations };
+    const { results: destinations, budgetNote } = await this.aiService.generateDestinations(prompt);
+    return { mode: 'ai_full', results: destinations, budgetNote: budgetNote ?? null };
   }
 
   private formatDbResult(d: Destination, departureCity: string) {
