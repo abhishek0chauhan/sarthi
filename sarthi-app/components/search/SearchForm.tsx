@@ -64,13 +64,9 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
       Alert.alert('Missing info', 'Please enter your departure city.');
       return false;
     }
-    const budgetMin = formValues.budget?.min ?? 0;
-    const budgetMax = formValues.budget?.max ?? 0;
-    if (budgetMin < 2000) {
-      Alert.alert('Invalid budget', 'Minimum budget must be at least ₹2000.');
-      return false;
-    }
-    if (budgetMax < budgetMin) {
+    const budgetMin = formValues.budget?.min;
+    const budgetMax = formValues.budget?.max;
+    if (budgetMin !== undefined && budgetMax !== undefined && budgetMax < budgetMin) {
       Alert.alert('Invalid budget', 'Maximum budget must be greater than or equal to minimum.');
       return false;
     }
@@ -176,17 +172,27 @@ export function SearchForm({ onSubmit, loading }: SearchFormProps) {
         <View style={styles.row}>
           <View style={styles.flex}>
             <Input
-              placeholder="Min: 2000"
+              placeholder="Min (e.g. 5000)"
               value={formValues.budget?.min?.toString() ?? ''}
-              onChangeText={(v) => updateFormValues({ budget: { min: Math.max(2000, parseInt(v) || 2000), max: formValues.budget?.max ?? 20000 } })}
+              onChangeText={(v) => {
+                const parsed = parseInt(v, 10);
+                updateFormValues({
+                  budget: { min: isNaN(parsed) ? undefined : parsed, max: formValues.budget?.max },
+                });
+              }}
               keyboardType="numeric"
             />
           </View>
           <View style={styles.flex}>
             <Input
-              placeholder="Max: 50000"
+              placeholder="Max (e.g. 20000)"
               value={formValues.budget?.max?.toString() ?? ''}
-              onChangeText={(v) => updateFormValues({ budget: { min: formValues.budget?.min ?? 2000, max: parseInt(v) || 20000 } })}
+              onChangeText={(v) => {
+                const parsed = parseInt(v, 10);
+                updateFormValues({
+                  budget: { min: formValues.budget?.min, max: isNaN(parsed) ? undefined : parsed },
+                });
+              }}
               keyboardType="numeric"
             />
           </View>
