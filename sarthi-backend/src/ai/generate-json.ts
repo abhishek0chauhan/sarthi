@@ -11,7 +11,7 @@ export async function generateJson<T>(opts: {
   try {
     const { text } = await generateText({
       model: opts.model,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 16384,
       system: `${opts.system}\n\nRespond with ONLY valid JSON. No markdown fences, no prose, no explanations.`,
       prompt: opts.prompt,
     });
@@ -99,6 +99,9 @@ function extractOrRepair(text: string, start: number): string {
   repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');
   repaired = repaired.replace(/,\s*"[^"]*"\s*$/, '');
   repaired = repaired.replace(/,\s*$/, '');
+
+  // Remove incomplete objects from arrays (trailing , { without closing })
+  repaired = repaired.replace(/,\s*{\s*$/, '');
 
   // Close all open brackets/braces in reverse stack order
   while (stack.length > 0) repaired += stack.pop()!;
