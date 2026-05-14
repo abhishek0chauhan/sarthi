@@ -8,25 +8,30 @@ export async function generateJson<T>(opts: {
   system: string;
   prompt: string;
 }): Promise<T> {
-  const { text } = await generateText({
-    model: opts.model,
-    maxOutputTokens: 8192,
-    system: `${opts.system}\n\nRespond with ONLY valid JSON. No markdown fences, no prose, no explanations.`,
-    prompt: opts.prompt,
-  });
-
-  const cleaned = extractJson(text);
-
-  let parsed: unknown;
   try {
-    parsed = JSON.parse(cleaned);
-  } catch {
-    throw new Error(
-      `AI returned invalid JSON. First 200 chars: ${cleaned.slice(0, 200)}`,
-    );
-  }
+    const { text } = await generateText({
+      model: opts.model,
+      maxOutputTokens: 8192,
+      system: `${opts.system}\n\nRespond with ONLY valid JSON. No markdown fences, no prose, no explanations.`,
+      prompt: opts.prompt,
+    });
 
-  return opts.schema.parse(parsed);
+    const cleaned = extractJson(text);
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch {
+      throw new Error(
+        `AI returned invalid JSON. First 200 chars: ${cleaned.slice(0, 200)}`,
+      );
+    }
+
+    return opts.schema.parse(parsed);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new Error(`AI API call failed: ${errorMsg}`);
+  }
 }
 
 function extractJson(text: string): string {

@@ -22,13 +22,15 @@ class DateRangeDto {
 }
 
 class BudgetDto {
+  @IsOptional()
   @IsInt()
-  @Min(2000)
-  min: number;
+  @Min(0)
+  min?: number;
 
+  @IsOptional()
   @IsInt()
-  @Min(2000)
-  max: number;
+  @Min(0)
+  max?: number;
 }
 
 class GroupDto {
@@ -44,9 +46,10 @@ export class SearchDestinationsDto {
   @Type(() => DateRangeDto)
   dates: DateRangeDto;
 
+  @IsOptional()
   @ValidateNested()
   @Type(() => BudgetDto)
-  budget: BudgetDto;
+  budget?: BudgetDto;
 
   @IsArray()
   @IsString({ each: true })

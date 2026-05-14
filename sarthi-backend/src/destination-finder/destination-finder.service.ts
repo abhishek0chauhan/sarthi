@@ -130,7 +130,9 @@ export class DestinationFinderService {
       await this.cacheService.set(cacheKey, result, 86400);
       return result;
     } catch (error) {
-      this.logger.error('AI API error during search', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      this.logger.error(`AI API error during search: ${errorMsg}`, errorStack);
       throw new HttpException(
         'Our AI is temporarily unavailable. Please try again in a moment.',
         HttpStatus.SERVICE_UNAVAILABLE,
@@ -198,7 +200,9 @@ export class DestinationFinderService {
       await this.cacheService.set(cacheKey, result, 86400);
       return result;
     } catch (error) {
-      this.logger.error('AI error during itinerary generation', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      this.logger.error(`AI error during itinerary generation: ${errorMsg}`, errorStack);
       throw new HttpException(
         'Our AI is temporarily unavailable. Please try again in a moment.',
         HttpStatus.SERVICE_UNAVAILABLE,
@@ -236,7 +240,9 @@ export class DestinationFinderService {
       await this.cacheService.set(cacheKey, result, 86400);
       return result;
     } catch (error) {
-      this.logger.error('AI error during food guide generation', error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      this.logger.error(`AI error during food guide generation: ${errorMsg}`, errorStack);
       throw new HttpException(
         'Our AI is temporarily unavailable. Please try again in a moment.',
         HttpStatus.SERVICE_UNAVAILABLE,
