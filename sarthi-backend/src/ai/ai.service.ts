@@ -108,7 +108,7 @@ export class AiService {
   async rankDestinations(
     prompt: { system: string; user: string },
     shortlistIds: string[],
-  ): Promise<RankResult[]> {
+  ): Promise<{ results: RankResult[]; budgetNote?: string }> {
     const result = await generateJson({
       model: this.model,
       schema: rankResultsSchema,
@@ -119,18 +119,21 @@ export class AiService {
     const rankings = result?.rankings ?? [];
     if (rankings.length === 0) {
       this.logger.warn('AI returned empty array in rankDestinations');
-      return [];
+      return { results: [], budgetNote: result?.budgetNote ?? undefined };
     }
 
-    return rankings
-      .filter((item) => shortlistIds.includes(item.id))
-      .slice(0, 5);
+    return {
+      results: rankings
+        .filter((item) => shortlistIds.includes(item.id))
+        .slice(0, 5),
+      budgetNote: result?.budgetNote ?? undefined,
+    };
   }
 
   async generateDestinations(prompt: {
     system: string;
     user: string;
-  }): Promise<GenerateResult[]> {
+  }): Promise<{ results: GenerateResult[]; budgetNote?: string }> {
     const result = await generateJson({
       model: this.model,
       schema: generateResultsSchema,
@@ -138,7 +141,10 @@ export class AiService {
       prompt: prompt.user,
     });
 
-    return (result?.destinations ?? []).slice(0, 5);
+    return {
+      results: (result?.destinations ?? []).slice(0, 5),
+      budgetNote: result?.budgetNote ?? undefined,
+    };
   }
 
   async validateDestinationInput(input: string): Promise<{
