@@ -283,15 +283,8 @@ describe('buildAiFullPrompt', () => {
     expect(user).not.toContain('Traveler health profile');
   });
 
-  it('user prompt includes costBreakdown format', () => {
-    const { user } = buildAiFullPrompt(baseParams);
-    expect(user).toContain('costBreakdown');
-    expect(user).toContain('transport');
-    expect(user).toContain('total');
-  });
-
   // Slim free-model format uses suitability+readinessScore instead of full sub-schemas.
-  // permits and tripReadiness are in the PAID MODEL format (commented out in prompt).
+  // costBreakdown, permits and tripReadiness are in the PAID MODEL format (commented out in prompt).
   it('user prompt includes slim suitability field (free-model format)', () => {
     const { user } = buildAiFullPrompt(baseParams);
     expect(user).toContain('suitability');

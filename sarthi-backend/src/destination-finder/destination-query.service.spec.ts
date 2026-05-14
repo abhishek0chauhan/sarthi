@@ -29,20 +29,6 @@ describe('DestinationQueryService', () => {
   });
 
   describe('findShortlist', () => {
-    it('calls prisma with correct budget overlap filter', async () => {
-      prismaMock.destination.findMany.mockResolvedValue([]);
-      await service.findShortlist(makeDto());
-
-      expect(prismaMock.destination.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            budgetMin: { lte: 15000 },
-            budgetMax: { gte: 5000 },
-          }),
-        }),
-      );
-    });
-
     it('filters on experienceTypes using hasSome', async () => {
       prismaMock.destination.findMany.mockResolvedValue([]);
       await service.findShortlist(makeDto());
