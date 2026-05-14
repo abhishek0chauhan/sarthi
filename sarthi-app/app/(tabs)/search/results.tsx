@@ -68,6 +68,7 @@ export default function SearchResultsScreen() {
 
   const isTrekMode = data.mode === 'trek';
   const items: (SearchResultDestination | TrekResult)[] = data.results ?? [];
+  const budgetNote = data && 'budgetNote' in data ? data.budgetNote : null;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -76,9 +77,16 @@ export default function SearchResultsScreen() {
         keyExtractor={(_, i) => i.toString()}
         contentContainerStyle={styles.content}
         ListHeaderComponent={
-          <Text style={styles.header}>
-            {items.length} {isTrekMode ? 'treks' : 'destinations'} found
-          </Text>
+          <>
+            {budgetNote ? (
+              <View style={styles.budgetNoteCard}>
+                <Text style={styles.budgetNoteText}>{budgetNote}</Text>
+              </View>
+            ) : null}
+            <Text style={styles.header}>
+              {items.length} {isTrekMode ? 'treks' : 'destinations'} found
+            </Text>
+          </>
         }
         renderItem={({ item }) => {
           if (isTrekMode) {
@@ -114,5 +122,18 @@ function makeStyles(colors: Colors) {
     safe: { flex: 1, backgroundColor: colors.bgBase },
     content: { padding: 20, paddingBottom: 32 },
     header: { ...type.overline, color: colors.textSecondary, marginBottom: 16 },
+    budgetNoteCard: {
+      backgroundColor: colors.warningBg,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.warning,
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 12,
+    },
+    budgetNoteText: {
+      ...type.body,
+      color: colors.warning,
+      lineHeight: 20,
+    },
   });
 }
