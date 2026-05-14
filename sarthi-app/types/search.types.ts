@@ -3,7 +3,7 @@ export interface SearchDto {
   destination?: string;
   mode: 'find' | 'plan';
   dates: { from: string; to: string };
-  budget: { min: number; max: number };
+  budget?: { min?: number; max?: number };
   experienceTypes: string[];
   departureCity: string;
   group: { type: 'solo' | 'couple' | 'friends' | 'family' };
@@ -125,6 +125,7 @@ export interface PlanConfirmedResponse {
 export interface SearchResponse {
   mode: 'hybrid' | 'ai_full' | 'trek';
   results: SearchResultDestination[] | TrekResult[];
+  budgetNote?: string | null;
 }
 
 export type SearchResponseWithPlan = SearchResponse | PlanConfirmedResponse;
