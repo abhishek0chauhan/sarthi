@@ -17,7 +17,7 @@ const initialFormValues: PartialSearchDto = {
   mode: 'find',
   experienceTypes: [],
   group: { type: 'friends' },
-  budget: { min: 2000, max: 20000 },
+  budget: { min: undefined, max: undefined },
   hiddenGem: false,
 };
 
