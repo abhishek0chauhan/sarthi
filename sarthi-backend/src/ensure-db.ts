@@ -35,10 +35,13 @@ export async function ensureDatabase(): Promise<void> {
     await client.end();
   }
 
-  // Step 2: Sync schema (creates tables if missing, no-op if up to date)
+  // Step 2: Sync schema — use migrate deploy in production, db push in dev
+  const cmd = process.env.NODE_ENV === 'production'
+    ? 'npx prisma migrate deploy'
+    : 'npx prisma db push --skip-generate';
   try {
-    execSync('npx prisma db push --skip-generate', { stdio: 'inherit' });
+    execSync(cmd, { stdio: 'inherit' });
   } catch {
-    console.warn('prisma db push failed — tables may need manual sync');
+    console.warn(`${cmd} failed — tables may need manual sync`);
   }
 }

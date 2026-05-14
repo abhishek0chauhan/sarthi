@@ -7,9 +7,12 @@ import {
 import * as admin from 'firebase-admin';
 
 if (!admin.apps.length) {
-  admin.initializeApp({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-  });
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  admin.initializeApp(
+    serviceAccountJson
+      ? { credential: admin.credential.cert(JSON.parse(serviceAccountJson)) }
+      : { projectId: process.env.FIREBASE_PROJECT_ID },
+  );
 }
 
 @Injectable()
