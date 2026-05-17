@@ -27,6 +27,7 @@ export default function RootLayout() {
 
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
+  const backgroundPathRef = useRef<string | null>(null);
   useEffect(() => { pathnameRef.current = pathname; }, [pathname]);
 
   useEffect(() => {
@@ -63,17 +64,24 @@ export default function RootLayout() {
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', async (state) => {
-      if (state !== 'active') return;
+      // Track which screen the user was on when they left the app
+      if (state === 'background' || state === 'inactive') {
+        backgroundPathRef.current = pathnameRef.current;
+        return;
+      }
 
-      // Skip if notification tap handler is already navigating to live guide
+      if (state !== 'active') return;
       if (notificationNavState.navigatingToLiveGuide) return;
 
       const session = await liveModePersistence.get();
       if (!session) return;
 
-      // Skip if already on the live guide screen for this trip
       const targetPath = `/trip/${session.tripId}/live-guide`;
       if (pathnameRef.current === targetPath) return;
+
+      // Only auto-resume if the user was on the live guide screen when they left —
+      // prevents interrupting itinerary/other screens when Google Maps is opened from there
+      if (backgroundPathRef.current !== targetPath) return;
 
       router.replace(targetPath as any);
     });
