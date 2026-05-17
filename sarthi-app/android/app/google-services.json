@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023377235150",
+    "project_id": "sarthi-499cb",
+    "storage_bucket": "sarthi-499cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023377235150:android:be2fa2d33ace6b2232849f",
+        "android_client_info": {
+          "package_name": "com.sarthi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDddoAkhxYE8a0t2KkvAWH9NxGhMNBEqZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

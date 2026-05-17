@@ -39,11 +39,7 @@
           "locationAlwaysAndWhenInUsePermission": "Allow Sarthi to track your location during your trip for nearby suggestions."
         }
       ],
-      ["expo-build-properties", {
-        "android": {
-          "newArchEnabled": false
-        }
-      }]
+      "expo-build-properties"
     ],
     "extra": {
       "router": {},
