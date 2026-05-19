@@ -3,73 +3,105 @@ export function buildPhrasebookPrompt(
   state: string,
 ): { system: string; user: string } {
   return {
-    system: `You are an expert travel language guide for India with deep knowledge of regional languages, local idioms, and authentic travel phrases.
-Your goal is to provide REAL, COMMONLY-USED phrases that travelers will actually hear and use - not direct word-for-word translations.
-Prioritize accuracy and authenticity over literal translation.`,
-    user: `Generate an authentic, practical travel phrasebook for ${destination}, ${state}.
+    system: `You are a native-language travel guide for India specialising in regional languages.
+You produce phrasebooks that real locals would recognise and understand — not textbook translations.
+Rules you MUST follow:
+• "local" = the phrase written in its NATIVE SCRIPT (Devanagari, Bengali script, Gurmukhi, Telugu script, etc.) — NEVER Roman letters.
+• "pronunciation" = easy phonetic guide in Roman letters so a tourist can attempt to say it (e.g. "soo-kree-yaa").
+• Use the PRIMARY language spoken in ${destination}, ${state} — not Hindi unless that is genuinely the local tongue.
+• Phrases must be natural and colloquial, not dictionary-formal.`,
+    user: `Generate a practical travel phrasebook for ${destination}, ${state}.
 
-**CRITICAL REQUIREMENTS:**
-1. Use ONLY authentic phrases that locals actually say - not direct English-to-language translations
-2. Include context for when/where each phrase is used
-3. For food: include actual local dish names, food stall phrases, and market haggling language
-4. For directions: use real phrases locals understand (not formal textbook language)
-5. For greetings: include formal, casual, and regional variations
-6. Provide phonetic guides that are EASY to pronounce (not IPA notation)
-7. Include 4 phrases per category (not 3)
+CRITICAL RULES — violating any of these will make the output useless:
+1. "local" MUST be in the native script of the local language (e.g. हिन्दी, বাংলা, मराठी, ਪੰਜਾਬੀ, తెలుగు, தமிழ், ಕನ್ನಡ, മലയാളം). Never use Roman/English letters in the "local" field.
+2. "pronunciation" provides the Roman-letter phonetic guide.
+3. Use the dominant spoken language of ${destination}, not defaulting to Hindi unless it is genuinely the local tongue.
+4. Each phrase must be something a traveller would ACTUALLY use, not a grammar exercise.
+5. Return EXACTLY 5 phrases per category.
 
-**EXAMPLE OF GOOD PHRASE:**
-- BAD: "Hello" → "Namaste" (too formal, not how travelers speak)
-- GOOD: "Hello" → "Kya hal hai?" (actual greeting, with context: "casual, friendly way to greet shopkeepers")
-
-**Respond with ONLY a valid JSON object (no markdown, no extra text):**
+Respond with ONLY a valid JSON object (no markdown, no extra text):
 {
   "result": {
-    "language": "<local language name e.g. Marathi, Hindi>",
+    "language": "<full language name, e.g. Marathi, Bengali, Punjabi, Tamil>",
     "destination": "${destination}",
+    "script": "<script name, e.g. Devanagari, Bengali script, Gurmukhi, Tamil script>",
     "greeting": [
       {
-        "english": "<traveler phrase>",
-        "local": "<transliterated - easy to read>",
-        "pronunciation": "<phonetic guide>",
-        "context": "<when/where to use this>"
+        "english": "<what the traveller wants to say>",
+        "local": "<native script ONLY — e.g. नमस्ते>",
+        "pronunciation": "<roman phonetic — e.g. na-mas-tay>",
+        "context": "<when/where to use>"
       }
     ],
     "food": [
       {
-        "english": "<food-related phrase or dish name>",
-        "local": "<transliterated>",
-        "pronunciation": "<phonetic guide>",
-        "context": "<e.g. 'used in food stalls or restaurants'>"
+        "english": "<food phrase or local dish name>",
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<e.g. ordering at a dhaba, street stall>"
+      }
+    ],
+    "transport": [
+      {
+        "english": "<transport phrase — auto, bus, train, taxi>",
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<e.g. haggling with auto-rickshaw driver>"
       }
     ],
     "directions": [
       {
         "english": "<direction phrase>",
-        "local": "<transliterated>",
-        "pronunciation": "<phonetic guide>",
-        "context": "<how locals say this>"
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<how locals give / receive directions>"
+      }
+    ],
+    "shopping": [
+      {
+        "english": "<shopping / market phrase>",
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<e.g. at a local market or souvenir shop>"
+      }
+    ],
+    "accommodation": [
+      {
+        "english": "<hotel / guesthouse phrase>",
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<checking in, asking for services, complaints>"
       }
     ],
     "emergency": [
       {
         "english": "<emergency phrase>",
-        "local": "<transliterated>",
-        "pronunciation": "<phonetic guide>",
-        "context": "<important context>"
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<medical, police, lost — when to use>"
       }
     ],
     "bargaining": [
       {
         "english": "<haggling phrase>",
-        "local": "<transliterated>",
-        "pronunciation": "<phonetic guide>",
-        "context": "<used in markets, street vendors, etc.>"
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<market, vendor, cab negotiation>"
+      }
+    ],
+    "polite": [
+      {
+        "english": "<polite expression — thank you, sorry, please, excuse me>",
+        "local": "<native script>",
+        "pronunciation": "<roman phonetic>",
+        "context": "<social etiquette context>"
       }
     ],
     "culturalNotes": [
-      "<authentic cultural insight for ${destination}>",
-      "<regional custom or etiquette tip>",
-      "<practical advice for travelers>"
+      "<specific cultural insight for ${destination} — not generic India tips>",
+      "<local custom or taboo travellers must know>",
+      "<practical traveller tip unique to this region>",
+      "<local festival, market day, or timing tip if relevant>"
     ]
   }
 }`,

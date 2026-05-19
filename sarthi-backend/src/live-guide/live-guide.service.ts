@@ -193,6 +193,7 @@ export class LiveGuideService {
 
     return {
       todayPlan: { ...todayPlan, dayIndex },
+      activityStatus: session.activityStatus,
       briefing,
       pushSummary,
       sessionId: session.id,
@@ -308,6 +309,16 @@ export class LiveGuideService {
     const status = session.activityStatus as ActivityStatus;
     status[`${dayIndex}:${activityIndex}`] = 'done';
     await this.sessionService.update(sessionId, { activityStatus: status });
+
+    // Cancel any pending scheduled notification for this activity so it
+    // doesn't fire after the user already marked it done.
+    await this.prisma.activitySchedule
+      .updateMany({
+        where: { sessionId, dayIndex, activityIndex, notificationSent: false },
+        data: { notificationSent: true },
+      })
+      .catch(() => null);
+
     return { dayIndex, activityIndex, status: 'done' };
   }
 
@@ -323,6 +334,14 @@ export class LiveGuideService {
     const actStatus = session.activityStatus as ActivityStatus;
     actStatus[`${dayIndex}:${activityIndex}`] = 'skipped';
     await this.sessionService.update(sessionId, { activityStatus: actStatus });
+
+    // Cancel pending scheduled notification — skipped activity needs no reminder.
+    await this.prisma.activitySchedule
+      .updateMany({
+        where: { sessionId, dayIndex, activityIndex, notificationSent: false },
+        data: { notificationSent: true },
+      })
+      .catch(() => null);
 
     this.correctionsService
       .create(firebaseUid, {

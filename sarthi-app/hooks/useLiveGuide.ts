@@ -42,9 +42,18 @@ export function useLiveGuide() {
       store.setConnectionState('connected');
       store.setSession(payload.sessionId, payload.todayPlan.dayIndex);
       store.setBriefing(payload.briefing);
+
+      // Restore done/skipped statuses from the persisted session so reconnect
+      // doesn't wipe out progress the user made earlier in the session.
+      const savedStatus = payload.activityStatus ?? {};
+      const dayIdx = payload.todayPlan.dayIndex;
       store.setTodayPlan(
-        (payload.todayPlan.activities ?? []).map((a) => ({ ...a, status: a.status ?? 'pending' }))
+        (payload.todayPlan.activities ?? []).map((a, i) => ({
+          ...a,
+          status: (savedStatus[`${dayIdx}:${i}`] as Activity['status']) ?? 'pending',
+        }))
       );
+
       store.setActiveTripId(tripId);
       liveModePersistence.save({
         tripId,

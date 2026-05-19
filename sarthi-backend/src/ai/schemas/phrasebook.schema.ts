@@ -13,9 +13,13 @@ export const phrasebookSchema = z.object({
   script: z.string().optional(),
   greeting: z.array(phraseSchema).default([]),
   food: z.array(phraseSchema).default([]),
+  transport: z.array(phraseSchema).default([]),
   directions: z.array(phraseSchema).default([]),
+  shopping: z.array(phraseSchema).default([]),
+  accommodation: z.array(phraseSchema).default([]),
   emergency: z.array(phraseSchema).default([]),
   bargaining: z.array(phraseSchema).default([]),
+  polite: z.array(phraseSchema).default([]),
   culturalNotes: z.array(z.string()).default([]),
 });
 

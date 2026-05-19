@@ -44,6 +44,8 @@ export interface GuideActivatedPayload {
     dayIndex: number;
     activities?: Activity[];
   };
+  // Persisted done/skipped statuses so reconnect restores progress
+  activityStatus?: Record<string, 'done' | 'skipped' | 'pending'>;
 }
 
 export type ConnectionState = 'idle' | 'connecting' | 'connected' | 'reconnecting';
