@@ -11,6 +11,7 @@ import { NotificationService } from './notification.service';
 import { AiService } from '../ai/ai.service';
 import { ProfileService } from '../profile/profile.service';
 import { CorrectionsService } from '../corrections/corrections.service';
+import { DevicesService } from '../devices/devices.service';
 import { LiveGuideGateway } from './live-guide.gateway';
 import { ActivitySchedulerService } from './activity-scheduler.service';
 import type { LiveGuideSession } from '@prisma/client';
@@ -28,6 +29,7 @@ export class LiveGuideService {
     private readonly aiService: AiService,
     private readonly profileService: ProfileService,
     private readonly correctionsService: CorrectionsService,
+    private readonly devicesService: DevicesService,
     @Inject(forwardRef(() => LiveGuideGateway))
     private readonly gateway: LiveGuideGateway,
     private readonly activityScheduler: ActivitySchedulerService,
@@ -89,6 +91,18 @@ export class LiveGuideService {
 
   async activateGuide(tripId: string, firebaseUid: string, fcmToken: string) {
     const user = await this.findOrCreateUser(firebaseUid);
+
+    // Register FCM token so push notifications reach this device
+    if (fcmToken) {
+      await this.devicesService
+        .register(firebaseUid, { fcmToken, platform: 'android' })
+        .catch((err) => {
+          this.logger.warn(
+            `Failed to register FCM token for ${firebaseUid}: ${(err as Error).message}`,
+          );
+        });
+    }
+
     const trip = await this.getTrip(tripId, user.id);
 
     const { dayIndex, status } = this.sessionService.computeCurrentDay(
@@ -164,14 +178,14 @@ export class LiveGuideService {
       }
 
       // Schedule activity notifications for today's activities
-      if (activities.length > 0 && profile?.travelPace) {
+      if (activities.length > 0) {
         await this.scheduleActivityNotifications(
           session.id,
           tripId,
           user.id,
           Math.max(dayIndex, 0),
           activities,
-          profile.travelPace,
+          profile?.travelPace ?? 'loose',
           trip.travelMode || 'public_transit',
         );
       }
@@ -385,9 +399,9 @@ export class LiveGuideService {
     const activities: any[] = todayPlan?.activities ?? [];
 
     try {
-      const profile = await this.profileService
-        .getProfile(session.userId)
-        .catch(() => null);
+      // Use the profile cached at activation time (session.userProfile) to avoid
+      // passing a DB user ID to profileService.getProfile which expects a Firebase UID
+      const profile = (session as any).userProfile ?? null;
       const result = await this.aiService.generateLiveBriefing({
         destination: trip.destination,
         state: trip.state,
@@ -455,6 +469,7 @@ export class LiveGuideService {
     session: LiveGuideSession,
     lat: number,
     lng: number,
+    firebaseUid?: string,
   ) {
     await this.sessionService.update(sessionId, {
       lastLocation: { lat, lng, timestamp: Date.now() },
@@ -473,33 +488,32 @@ export class LiveGuideService {
       .catch(() => []);
 
     for (const scheduled of pendingActivities) {
-      // Emit activity_approaching event
-      this.dispatch(
-        session.userId,
-        'activity_approaching',
-        {
+      // Atomic claim: prevents duplicate if cron fires simultaneously
+      const claimed = await this.prisma.activitySchedule
+        .updateMany({
+          where: { id: scheduled.id, notificationSent: false },
+          data: { notificationSent: true },
+        })
+        .catch(() => ({ count: 0 }));
+      if (claimed.count === 0) continue;
+
+      // Deliver in-app via WebSocket when foregrounded (firebaseUid is the gateway key),
+      // falling back to FCM if firebase UID is not available.
+      if (firebaseUid && this.gateway.isConnected(firebaseUid)) {
+        this.gateway.sendToUser(firebaseUid, 'activity_approaching', {
           activityIndex: scheduled.activityIndex,
           activity: scheduled.activity,
           distance: scheduled.distance,
           estimatedTravelTime: scheduled.estimatedTravelTime,
           mapQuery: scheduled.activity,
-        },
-        `Time for ${scheduled.activity}`,
-        `Leave now to arrive on time. ${scheduled.estimatedTravelTime} min away.`,
-      );
-
-      // Mark as sent
-      await this.prisma.activitySchedule
-        .update({
-          where: { id: scheduled.id },
-          data: { notificationSent: true },
-        })
-        .catch((err) => {
-          this.logger.warn(
-            `Failed to mark activity notification as sent: ${scheduled.id}`,
-            err instanceof Error ? err.message : String(err),
-          );
         });
+      } else {
+        await this.notificationService.sendToUser(
+          session.userId,
+          `Time for ${scheduled.activity}`,
+          `Leave now to arrive on time — ${scheduled.estimatedTravelTime} min travel time.`,
+        ).catch(() => null);
+      }
     }
 
     // Check for location-based suggestions (rate limited to 1 per hour)
@@ -612,6 +626,39 @@ export class LiveGuideService {
             );
           }
         }
+      }
+    }
+  }
+
+  // Called by the scheduler every minute to fire time-based activity notifications
+  // via FCM, independently of WebSocket/GPS. The handleLocationUpdate path handles
+  // in-app (WebSocket) delivery and also marks notificationSent, preventing duplicates.
+  async sendPendingActivityNotifications(): Promise<void> {
+    const now = new Date();
+    const pending = await this.prisma.activitySchedule
+      .findMany({
+        where: { notificationSent: false, scheduledTime: { lte: now } },
+      })
+      .catch(() => []);
+
+    for (const scheduled of pending) {
+      try {
+        // Atomic claim: only one caller wins when cron and handleLocationUpdate race
+        const claimed = await this.prisma.activitySchedule.updateMany({
+          where: { id: scheduled.id, notificationSent: false },
+          data: { notificationSent: true },
+        });
+        if (claimed.count === 0) continue;
+
+        await this.notificationService.sendToUser(
+          scheduled.userId,
+          `Time for ${scheduled.activity}`,
+          `Leave now to arrive on time — ${scheduled.estimatedTravelTime} min travel time.`,
+        );
+      } catch (err) {
+        this.logger.warn(
+          `Failed to send activity notification ${scheduled.id}: ${(err as Error).message}`,
+        );
       }
     }
   }

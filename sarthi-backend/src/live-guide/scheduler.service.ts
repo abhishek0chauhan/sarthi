@@ -23,6 +23,16 @@ export class SchedulerService {
       }),
     );
     const istMinute = now.getMinutes();
+
+    // Fire activity schedule notifications independently of GPS/WebSocket
+    await this.liveGuideService
+      .sendPendingActivityNotifications()
+      .catch((err) => {
+        this.logger.warn(
+          `sendPendingActivityNotifications error: ${(err as Error).message}`,
+        );
+      });
+
     await this.tick(istHour, istMinute);
   }
 

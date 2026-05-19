@@ -154,6 +154,7 @@ export class LiveGuideGateway
           session,
           payload.lat,
           payload.lng,
+          client.data?.userId as string, // Firebase UID for WebSocket dispatch
         );
     } catch (err) {
       this.logger.warn(`location_update error: ${(err as Error).message}`);
