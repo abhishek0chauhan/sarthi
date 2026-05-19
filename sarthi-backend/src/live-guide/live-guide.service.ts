@@ -389,17 +389,26 @@ export class LiveGuideService {
       .getProfile(firebaseUid)
       .catch(() => null);
 
-    const activities = await this.aiService.replanDay({
-      destination: trip.destination,
-      currentTime,
-      remainingActivities: remaining.map((a: any) => ({
-        time: a.time,
-        activity: a.activity,
-        mapQuery: a.mapQuery,
-      })),
-      triggeredBy,
-      profileSummary: this.buildProfileSummary(profile),
-    });
+    let activities: any[];
+    try {
+      activities = await this.aiService.replanDay({
+        destination: trip.destination,
+        currentTime,
+        remainingActivities: remaining.map((a: any) => ({
+          time: a.time,
+          activity: a.activity,
+          mapQuery: a.mapQuery,
+        })),
+        triggeredBy,
+        profileSummary: this.buildProfileSummary(profile),
+      });
+    } catch (err) {
+      this.logger.warn(
+        `AI replan failed for session ${sessionId}, returning original remaining plan: ${(err as Error).message}`,
+      );
+      // Fall back to the original remaining activities so the frontend stays functional
+      activities = remaining;
+    }
 
     await this.sessionService.update(sessionId, {
       replanCount: { date: today, count: todayCount + 1 },

@@ -38,8 +38,12 @@ class SocketService {
     this.socket?.on(event, cb);
   }
 
-  off(event: string): void {
-    this.socket?.off(event);
+  off(event: string, cb?: (data: any) => void): void {
+    if (cb) {
+      this.socket?.off(event, cb);
+    } else {
+      this.socket?.off(event);
+    }
   }
 
   isConnected(): boolean {

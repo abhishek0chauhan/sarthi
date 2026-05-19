@@ -126,21 +126,32 @@ export function useLiveGuide() {
     socketService.emit('skip_activity', { dayIndex, activityIndex, ...(reason ? { reason } : {}) });
   };
 
-  const requestReplan = (onResult?: () => void) => {
+  const requestReplan = (onResult?: () => void, onError?: (msg: string) => void) => {
     const dayIndex = useLiveGuideStore.getState().dayIndex ?? 0;
     console.log('[useLiveGuide] emit request_replan dayIndex=', dayIndex);
 
-    // Set up one-time callback for completion (don't duplicate the main listener)
-    if (onResult) {
-      let called = false;
-      const handler = () => {
-        if (!called) {
-          called = true;
-          onResult();
-          socketService.off('replan_result', handler);
-        }
+    // One-time success handler — use specific cb reference so off() only removes this one
+    if (onResult || onError) {
+      let settled = false;
+
+      const successHandler = (payload: any) => {
+        if (settled) return;
+        settled = true;
+        socketService.off('replan_result', successHandler);
+        socketService.off('replan_error', errorHandler);
+        onResult?.();
       };
-      socketService.on('replan_result', handler);
+
+      const errorHandler = (err: { message?: string }) => {
+        if (settled) return;
+        settled = true;
+        socketService.off('replan_result', successHandler);
+        socketService.off('replan_error', errorHandler);
+        onError?.(err?.message ?? 'Replan failed');
+      };
+
+      socketService.on('replan_result', successHandler);
+      socketService.on('replan_error', errorHandler);
     }
 
     socketService.emit('request_replan', { dayIndex });

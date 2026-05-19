@@ -44,8 +44,15 @@ export default function LiveGuideScreen() {
   const handleReplan = () => {
     console.log('[LiveGuide] requestReplan dayIndex=', dayIndex);
     setIsReplanning(true);
-    requestReplan(() => setIsReplanning(false));
-    setTimeout(() => setIsReplanning(false), 15000);
+    requestReplan(
+      () => setIsReplanning(false),
+      (errMsg) => {
+        setIsReplanning(false);
+        Alert.alert('Replan failed', errMsg ?? 'Could not replan. Try again in a moment.');
+      },
+    );
+    // Safety fallback in case neither callback fires
+    setTimeout(() => setIsReplanning(false), 30000);
   };
 
   const currentIndex = todayPlan?.findIndex((a) => a.status === 'pending') ?? -1;

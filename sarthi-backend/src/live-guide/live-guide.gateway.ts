@@ -219,12 +219,21 @@ export class LiveGuideGateway
     @MessageBody() payload: { dayIndex: number },
   ) {
     const ctx = this.connectedSockets.get(client.id);
-    if (!ctx?.sessionId || !ctx.tripId || !client.data?.userId) return;
+    if (!ctx?.sessionId || !ctx.tripId || !client.data?.userId) {
+      this.logger.warn(
+        `[request_replan] Missing context — sessionId:${ctx?.sessionId} tripId:${ctx?.tripId} userId:${client.data?.userId}`,
+      );
+      client.emit('replan_error', { message: 'Session not ready. Please restart Live Guide.' });
+      return;
+    }
     try {
       const session = await this.prisma.liveGuideSession.findUnique({
         where: { id: ctx.sessionId },
       });
-      if (!session) return;
+      if (!session) {
+        client.emit('replan_error', { message: 'Session not found.' });
+        return;
+      }
       const result = await this.liveGuideService.replanDay(
         ctx.sessionId,
         ctx.tripId,
@@ -235,7 +244,8 @@ export class LiveGuideGateway
       );
       client.emit('replan_result', result);
     } catch (err) {
-      client.emit('error', { message: (err as Error).message });
+      this.logger.error(`[request_replan] ${(err as Error).message}`, (err as Error).stack);
+      client.emit('replan_error', { message: (err as Error).message });
     }
   }
 
